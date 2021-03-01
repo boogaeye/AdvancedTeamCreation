@@ -116,7 +116,8 @@ namespace TeamsEXILED
         }
         public void RoundEnding(EndingRoundEventArgs ev)
         {
-            ev.IsAllowed = false;
+            //Not implemented yet
+            ev.IsAllowed = true;
         }
     }
 }

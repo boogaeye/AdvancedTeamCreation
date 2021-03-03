@@ -48,6 +48,9 @@
     <Reference Include="Exiled.API">
       <HintPath>..\..\..\..\Desktop\EXILED STUFF\EXILED\EXILED\Plugins\dependencies\Exiled.API.dll</HintPath>
     </Reference>
+    <Reference Include="Exiled.CustomItems">
+      <HintPath>..\..\..\..\Downloads\Exiled (14).tar\Exiled (14)\EXILED\Plugins\Exiled.CustomItems.dll</HintPath>
+    </Reference>
     <Reference Include="Exiled.Events">
       <HintPath>..\..\..\..\Desktop\EXILED STUFF\EXILED\EXILED\Plugins\Exiled.Events.dll</HintPath>
     </Reference>

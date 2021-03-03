@@ -9,4 +9,11 @@ using Respawning;
 
 namespace TeamsEXILED.enums
 {
+    public enum ChosenType
+    {
+        AllPlayers,
+        FirstPlayerSpawn,
+        AllPlayersExceptFirst,
+        Disabled
+    }
 }

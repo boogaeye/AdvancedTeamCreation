@@ -16,9 +16,9 @@ namespace TeamsEXILED.Classes
             string[] r = team.Enemies;
             return r;
         }
-        public bool IsTeamFriendly(Teams i, Teams u)
+        public bool IsTeamFriendly(Teams i, string u)
         {
-            if (i.Friendlys.Contains(u.Name.ToLower()))
+            if (i.Friendlys.Contains(u))
             {
                 return true;
             }

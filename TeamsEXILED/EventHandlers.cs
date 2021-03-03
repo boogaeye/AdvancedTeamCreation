@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Exiled.Loader;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs;
 using TeamsEXILED.API;
@@ -18,7 +15,7 @@ namespace TeamsEXILED
     {
         private readonly Plugin<Config> plugin;
         public EventHandlers(Plugin<Config> plugin) => this.plugin = plugin;
-        public Dictionary<Player, string> teamedPlayers = new Dictionary<Player, string>() {};
+        public Dictionary<Player, string> teamedPlayers = new Dictionary<Player, string>();
         public Teams chosenTeam;
         public Random random = new Random();
         public Classes.Classes Classes = new Classes.Classes();
@@ -41,10 +38,10 @@ namespace TeamsEXILED
                                 return;
                             }
                             ev.ReplyMessage = "<color=red>Error Player Not Found</color>";
-                            if (Player.Get(ev.Arguments[1]).IsVerified)
+                            if (Player.Get(ev.Arguments[2]).IsVerified)
                             {
                                 ev.ReplyMessage = "<color=green>Changed players Team!!!</color>";
-                                ChangeTeam(Player.Get(ev.Arguments[1]), ev.Arguments[0].ToLower());
+                                ChangeTeam(Player.Get(ev.Arguments[2]), ev.Arguments[0].ToLower(), ev.Arguments[1].ToLower());
                                 return;
                             }
                             return;
@@ -57,41 +54,139 @@ namespace TeamsEXILED
                 }
                 return;
             }
+            if (ev.Name == "pos")
+            {
+                ev.IsAllowed = false;
+                ev.ReplyMessage = ev.Sender.Position.ToString();
+                return;
+            }
+            if (ev.Name == "team")
+            {
+                ev.IsAllowed = false;
+                ev.ReplyMessage = teamedPlayers[ev.Sender];
+                return;
+            }
+        }
+        public void OnRoleChange(ChangingRoleEventArgs ev)
+        {
+            Timing.CallDelayed(0.1f, () =>
+            {
+                teamedPlayers[ev.Player] = ev.Player.Team.ToString().ToLower();
+            });
         }
         public void Respawn(RespawningTeamEventArgs ev)
         {
             chosenTeam = this.plugin.Config.Teams[random.Next(0, this.plugin.Config.Teams.Length)];
-            foreach (Player p in ev.Players)
+            if (chosenTeam.SpawnTypes.Contains(ev.NextKnownTeam) && chosenTeam.Active)
             {
-                if (chosenTeam.SpawnTypes.Contains(ev.NextKnownTeam) && chosenTeam.Active)
+                List<Exiled.API.Features.Player> tempPlayers = new List<Player>();
+                foreach (Player i in ev.Players)
                 {
-                    Timing.CallDelayed(1.5f, () =>
-                    {
-                        ChangeTeam(p, chosenTeam.Name);
-                    });
+                    tempPlayers.Add(i);
                 }
-                else
+                Timing.CallDelayed(1.5f, () =>
                 {
-                    chosenTeam = null;
+                    ChangeTeamReferancing(tempPlayers, chosenTeam.Name);
+                });
+            }
+            else
+            {
+                chosenTeam = null;
+            }
+        }
+        void ChangeTeamReferancing(List<Player> p, string t)
+        {
+            //finding teams
+            foreach (Teams team in this.plugin.Config.Teams)
+            {
+                if (team.Name == t)
+                {
+                    Log.Debug("Got team " + team.Name + " from referance method", this.plugin.Config.Debug);
+                    Dictionary<Player, string> switchList = new Dictionary<Player, string>();
+                    int i = 0;
+                    int selectedSubclass = 0;
+                    foreach (Player y in p)
+                    {
+                        i++;
+                        if (team.Subclasses[selectedSubclass].NumOfAllowedPlayers > i && team.Subclasses[selectedSubclass].NumOfAllowedPlayers != -1)
+                        {
+                            ChangeTeam(y, t, team.Subclasses[selectedSubclass].Name);
+                            Log.Debug("allowed subteam " + team.Subclasses[selectedSubclass].Name + " from referance method", this.plugin.Config.Debug);
+                        }
+                        else if (team.Subclasses[selectedSubclass].NumOfAllowedPlayers == -1)
+                        {
+                            ChangeTeam(y, t, team.Subclasses[selectedSubclass].Name);
+                            Log.Debug("allowed subteam " + team.Subclasses[selectedSubclass].Name + " from referance method with -1 players allowed(making everyone else this role)", this.plugin.Config.Debug);
+                        }
+                        else
+                        {
+                            ChangeTeam(y, t, team.Subclasses[selectedSubclass].Name);
+                            i = 0;
+                            selectedSubclass++;
+                            Log.Debug("allowed subteam " + team.Subclasses[selectedSubclass].Name + " from referance method reseting method as selected subclass no longer allows more players to be this role", this.plugin.Config.Debug);
+                        }
+                    }
                 }
             }
         }
-        void ChangeTeam(Player p, string t)
+        void ChangeTeam(Player p, string t, string s)
         {
             foreach (Teams team in this.plugin.Config.Teams)
             {
                 if (team.Name == t)
                 {
-                    p.SetRole(team.ModelRole, true);
-                    p.ClearInventory();
-                    foreach (ItemType i in team.Inventory)
+                    foreach (Subteams subteams in team.Subclasses)
                     {
-                        p.AddItem(i);
+                        if (subteams.Name == s)
+                        {
+                            p.SetRole(subteams.ModelRole, true);
+                            p.Health = subteams.HP;
+                            p.MaxHealth = subteams.HP;
+                            p.ClearInventory();
+                            foreach (ItemType i in subteams.Inventory)
+                            {
+                                p.AddItem(i);
+                            }
+                            foreach (System.Collections.Generic.KeyValuePair<AmmoType, uint> a in subteams.Ammo)
+                            {
+                                p.Ammo[(int)a.Key] = a.Value;
+                            }
+                            p.ShowHint(subteams.RoleHint, 10);
+                            if (this.plugin.Config.RoleNameChangesAllowed)
+                            {
+                                p.RankName = subteams.PlayerListRoleName;
+                                p.RankColor = subteams.PlayerListRoleColor;
+                            }
+                        }
                     }
-                    foreach (System.Collections.Generic.KeyValuePair<AmmoType, uint> a in team.Ammo)
+                    Timing.CallDelayed(0.2f, () =>
                     {
-                        p.Ammo[(int)a.Key] = a.Value;
-                    }
+                        teamedPlayers[p] = t;
+                    });
+                }
+            }
+        }
+        public void OnHurt(HurtingEventArgs ev)
+        {
+            try
+            {
+                if (Classes.IsTeamFriendly(Classes.GetTeamFromString(teamedPlayers[ev.Target], this.plugin.Config), teamedPlayers[ev.Attacker]))
+                {
+                    ev.IsAllowed = false;
+                    Log.Debug("Protected a player in " + teamedPlayers[ev.Target] + " from " + teamedPlayers[ev.Attacker], this.plugin.Config.Debug);
+                }
+            }
+            catch (Exception)
+            {
+                if (Classes.IsTeamFriendly(Classes.GetTeamFromString(teamedPlayers[ev.Attacker], this.plugin.Config), teamedPlayers[ev.Target]))
+                {
+                    ev.IsAllowed = false;
+                    Log.Debug("Protected a player in " + teamedPlayers[ev.Attacker] + " from " + teamedPlayers[ev.Target], this.plugin.Config.Debug);
+                }
+                else if (teamedPlayers[ev.Attacker] == teamedPlayers[ev.Target])
+                {
+                    ev.IsAllowed = false;
+                    Log.Debug("Protected a player in " + teamedPlayers[ev.Attacker] + " from " + teamedPlayers[ev.Target], this.plugin.Config.Debug);
                 }
             }
         }

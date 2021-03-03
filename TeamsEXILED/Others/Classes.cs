@@ -13,7 +13,7 @@ namespace TeamsEXILED.Classes
         
         public string[] GetFriendlyTeams(Teams team)
         {
-            string[] r = team.Enemies;
+            string[] r = team.Friendlys;
             return r;
         }
         public bool IsTeamFriendly(Teams i, string u)

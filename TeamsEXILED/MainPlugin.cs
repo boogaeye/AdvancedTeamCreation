@@ -28,6 +28,8 @@ namespace TeamsEXILED
             Exiled.Events.Handlers.Server.RespawningTeam += EventHandlers.Respawn;
             Exiled.Events.Handlers.Player.ChangingRole += EventHandlers.OnRoleChange;
             Exiled.Events.Handlers.Player.Hurting += EventHandlers.OnHurt;
+            Exiled.Events.Handlers.Player.Verified += EventHandlers.OnJoin;
+            Exiled.Events.Handlers.Player.Destroying += EventHandlers.OnLeave;
         }
 
         public override void OnDisabled()
@@ -38,6 +40,8 @@ namespace TeamsEXILED
             Exiled.Events.Handlers.Server.RespawningTeam -= EventHandlers.Respawn;
             Exiled.Events.Handlers.Player.ChangingRole -= EventHandlers.OnRoleChange;
             Exiled.Events.Handlers.Player.Hurting -= EventHandlers.OnHurt;
+            Exiled.Events.Handlers.Player.Verified -= EventHandlers.OnJoin;
+            Exiled.Events.Handlers.Player.Destroying -= EventHandlers.OnLeave;
         }
     }
 }

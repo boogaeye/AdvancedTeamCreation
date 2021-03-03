@@ -37,12 +37,20 @@ namespace TeamsEXILED
                                 ev.ReplyMessage = "<color=red>Error you cant force team this team as you dont have the ATS.bypassActivity Permission</color>";
                                 return;
                             }
-                            ev.ReplyMessage = "<color=red>Error Player Not Found</color>";
-                            if (Player.Get(ev.Arguments[2]).IsVerified)
+                            ev.ReplyMessage = "<color=red>Error Could not find subclass</color>";
+                            foreach (Subteams st in t.Subclasses)
                             {
-                                ev.ReplyMessage = "<color=green>Changed players Team!!!</color>";
-                                ChangeTeam(Player.Get(ev.Arguments[2]), ev.Arguments[0].ToLower(), ev.Arguments[1].ToLower());
-                                return;
+                                if (ev.Arguments[2].ToLower() == st.Name)
+                                {
+                                    ev.ReplyMessage = "<color=red>Error Player Not Found</color>";
+                                    if (Player.Get(ev.Arguments[2]).IsVerified)
+                                    {
+                                        ev.ReplyMessage = "<color=green>Changed players Team!!!</color>";
+                                        ChangeTeam(Player.Get(ev.Arguments[2]), ev.Arguments[0].ToLower(), ev.Arguments[1].ToLower());
+                                        return;
+                                    }
+                                    return;
+                                }
                             }
                             return;
                         }
@@ -66,6 +74,14 @@ namespace TeamsEXILED
                 ev.ReplyMessage = teamedPlayers[ev.Sender];
                 return;
             }
+        }
+        public void OnJoin(VerifiedEventArgs ev)
+        {
+            teamedPlayers[ev.Player] = "RIP";
+        }
+        public void OnLeave(DestroyingEventArgs ev)
+        {
+            teamedPlayers.Remove(ev.Player);
         }
         public void OnRoleChange(ChangingRoleEventArgs ev)
         {
@@ -179,11 +195,6 @@ namespace TeamsEXILED
             catch (Exception)
             {
                 if (Classes.IsTeamFriendly(Classes.GetTeamFromString(teamedPlayers[ev.Attacker], this.plugin.Config), teamedPlayers[ev.Target]))
-                {
-                    ev.IsAllowed = false;
-                    Log.Debug("Protected a player in " + teamedPlayers[ev.Attacker] + " from " + teamedPlayers[ev.Target], this.plugin.Config.Debug);
-                }
-                else if (teamedPlayers[ev.Attacker] == teamedPlayers[ev.Target])
                 {
                     ev.IsAllowed = false;
                     Log.Debug("Protected a player in " + teamedPlayers[ev.Attacker] + " from " + teamedPlayers[ev.Target], this.plugin.Config.Debug);

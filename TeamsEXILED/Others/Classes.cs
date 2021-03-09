@@ -16,6 +16,30 @@ namespace TeamsEXILED.Classes
             string[] r = team.Friendlys;
             return r;
         }
+        public List<string> GetAllEnemyTeams(string TeamFond, Config config)
+        {
+            List<string> team = new List<string>();
+            foreach (Teams t in config.Teams)
+            {
+                if (t.Enemies.Contains(TeamFond))
+                {
+                    team.Add(t.Name);
+                }
+            }
+            return team;
+        }
+        public List<string> GetAllFriendlyTeams(string TeamFond, Config config)
+        {
+            List<string> team = new List<string>();
+            foreach (Teams t in config.Teams)
+            {
+                if (t.Friendlys.Contains(TeamFond))
+                {
+                    team.Add(t.Name);
+                }
+            }
+            return team;
+        }
         public bool IsTeamFriendly(Teams i, string u)
         {
             if (i.Friendlys.Contains(u))
@@ -41,7 +65,7 @@ namespace TeamsEXILED.Classes
                     return t;
                 }
             }
-            return null;
+            return new Teams { Name = s, Enemies = GetAllEnemyTeams(s, config).ToArray<string>(), Friendlys = GetAllFriendlyTeams(s, config).ToArray<string>() };
         }
     }
 }

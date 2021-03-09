@@ -8,6 +8,7 @@ using Exiled.API.Enums;
 using Exiled.Permissions.Extensions;
 using TeamsEXILED.Classes;
 using MEC;
+using Exiled.CustomItems.API.Features;
 
 namespace TeamsEXILED
 {
@@ -19,6 +20,8 @@ namespace TeamsEXILED
         public Teams chosenTeam;
         public Random random = new Random();
         public Classes.Classes Classes = new Classes.Classes();
+        public LeadingTeam leadingTeam = LeadingTeam.Draw;
+        public bool AllowNormalRoundEnd = false;
         public void RACommand(SendingRemoteAdminCommandEventArgs ev)
         {
             if (ev.Name == "forceteam")
@@ -163,6 +166,10 @@ namespace TeamsEXILED
                             {
                                 p.AddItem(i);
                             }
+                            foreach (int it in subteams.CustomItemIds)
+                            {
+                                CustomItem.TryGive(p, it, true);
+                            }
                             foreach (System.Collections.Generic.KeyValuePair<AmmoType, uint> a in subteams.Ammo)
                             {
                                 p.Ammo[(int)a.Key] = a.Value;
@@ -184,6 +191,11 @@ namespace TeamsEXILED
         }
         public void OnHurt(HurtingEventArgs ev)
         {
+            List<DamageTypes.DamageType> damageTypes = new List<DamageTypes.DamageType> { DamageTypes.Contain, DamageTypes.Bleeding, DamageTypes.Asphyxiation, DamageTypes.Decont, DamageTypes.Falldown, DamageTypes.Grenade, DamageTypes.Lure, DamageTypes.MicroHid, DamageTypes.Nuke, DamageTypes.Pocket, DamageTypes.Poison, DamageTypes.Recontainment, DamageTypes.Scp207, DamageTypes.Tesla };
+            if (damageTypes.Contains(ev.DamageType))
+            {
+                return;
+            }
             try
             {
                 if (Classes.IsTeamFriendly(Classes.GetTeamFromString(teamedPlayers[ev.Target], this.plugin.Config), teamedPlayers[ev.Attacker]))
@@ -197,6 +209,7 @@ namespace TeamsEXILED
                 if (Classes.IsTeamFriendly(Classes.GetTeamFromString(teamedPlayers[ev.Attacker], this.plugin.Config), teamedPlayers[ev.Target]))
                 {
                     ev.IsAllowed = false;
+                    Log.Debug("Caught Exception and using other method", this.plugin.Config.Debug);
                     Log.Debug("Protected a player in " + teamedPlayers[ev.Attacker] + " from " + teamedPlayers[ev.Target], this.plugin.Config.Debug);
                 }
             }
@@ -217,12 +230,20 @@ namespace TeamsEXILED
                 {
                     roundEndingAllowed = false;
                 }
+                else if (Classes.GetTeamFromString(teamedPlayers[ev.Target], this.plugin.Config) != null)
+                {
+                    leadingTeam = Classes.GetTeamFromString(teamedPlayers[ev.Target], this.plugin.Config).teamLeaders;
+                }
+                else
+                {
+                    roundEndingAllowed = false;
+                }
             }
             if (roundEndingAllowed) { if (!Round.IsLocked) { Round.ForceEnd(); } }
         }
         public void RoundEnding(EndingRoundEventArgs ev)
         {
-            //Not implemented yet
+            ev.LeadingTeam = leadingTeam;
             ev.IsAllowed = true;
         }
     }

@@ -43,7 +43,7 @@ namespace TeamsEXILED
                             ev.ReplyMessage = "<color=red>Error Could not find subclass</color>";
                             foreach (Subteams st in t.Subclasses)
                             {
-                                if (ev.Arguments[2].ToLower() == st.Name)
+                                if (ev.Arguments[1].ToLower() == st.Name)
                                 {
                                     ev.ReplyMessage = "<color=red>Error Player Not Found</color>";
                                     if (Player.Get(ev.Arguments[2]).IsVerified)
@@ -77,6 +77,15 @@ namespace TeamsEXILED
                 ev.ReplyMessage = teamedPlayers[ev.Sender];
                 return;
             }
+            if (ev.Name == "teamsalive")
+            {
+                ev.IsAllowed = false;
+                foreach (KeyValuePair<Player, string> t in teamedPlayers)
+                {
+                    ev.ReplyMessage = ev.ReplyMessage + "\n" + t.Value + " : " + t.Key.Nickname;
+                }
+                return;
+            }
         }
         public void OnJoin(VerifiedEventArgs ev)
         {
@@ -88,7 +97,7 @@ namespace TeamsEXILED
         }
         public void OnRoleChange(ChangingRoleEventArgs ev)
         {
-            Timing.CallDelayed(0.1f, () =>
+            Timing.CallDelayed(0.01f, () =>
             {
                 teamedPlayers[ev.Player] = ev.Player.Team.ToString().ToLower();
             });
@@ -98,15 +107,28 @@ namespace TeamsEXILED
             chosenTeam = this.plugin.Config.Teams[random.Next(0, this.plugin.Config.Teams.Length)];
             if (chosenTeam.SpawnTypes.Contains(ev.NextKnownTeam) && chosenTeam.Active)
             {
-                List<Exiled.API.Features.Player> tempPlayers = new List<Player>();
-                foreach (Player i in ev.Players)
+                Log.Debug("Next Known Spawn is " + ev.NextKnownTeam, this.plugin.Config.Debug);
+                Log.Debug("Next Known Chosen Team is " + chosenTeam.Name, this.plugin.Config.Debug);
+                if (random.Next(0, 100) < chosenTeam.Chance)
                 {
-                    tempPlayers.Add(i);
+                    List<Exiled.API.Features.Player> tempPlayers = new List<Player>();
+                    foreach (Player i in ev.Players)
+                    {
+                        tempPlayers.Add(i);
+                    }
+                    Timing.CallDelayed(1.5f, () =>
+                    {
+                        ChangeTeamReferancing(tempPlayers, chosenTeam.Name);
+                    });
+                    if (random.Next(0, 100) < chosenTeam.CassieMessageChaosAnnounceChance && ev.NextKnownTeam == Respawning.SpawnableTeamType.ChaosInsurgency)
+                    {
+                        Cassie.DelayedGlitchyMessage(chosenTeam.CassieMessageChaosMessage, 0, 0.25f, 0.25f);
+                    }
                 }
-                Timing.CallDelayed(1.5f, () =>
+                else
                 {
-                    ChangeTeamReferancing(tempPlayers, chosenTeam.Name);
-                });
+                    chosenTeam = null;
+                }
             }
             else
             {
@@ -150,14 +172,21 @@ namespace TeamsEXILED
         }
         void ChangeTeam(Player p, string t, string s)
         {
+            if (p.IsOverwatchEnabled)
+            {
+                return;
+            }
+            //Finding teems and seeing if the string exists
             foreach (Teams team in this.plugin.Config.Teams)
             {
                 if (team.Name == t)
                 {
+                    //Finding subteams and seeing if the string exists
                     foreach (Subteams subteams in team.Subclasses)
                     {
                         if (subteams.Name == s)
                         {
+                            //If found it will give you everything defined here
                             p.SetRole(subteams.ModelRole, true);
                             p.Health = subteams.HP;
                             p.MaxHealth = subteams.HP;
@@ -166,32 +195,34 @@ namespace TeamsEXILED
                             {
                                 p.AddItem(i);
                             }
-                            foreach (int it in subteams.CustomItemIds)
+                            if (subteams.CustomItemIds.Length != 0)
                             {
-                                CustomItem.TryGive(p, it, true);
+                                foreach (int it in subteams.CustomItemIds)
+                                {
+                                    CustomItem.TryGive(p, it, true);
+                                }
                             }
                             foreach (System.Collections.Generic.KeyValuePair<AmmoType, uint> a in subteams.Ammo)
                             {
                                 p.Ammo[(int)a.Key] = a.Value;
                             }
                             p.ShowHint(subteams.RoleHint, 10);
-                            if (this.plugin.Config.RoleNameChangesAllowed)
+                            p.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
+                            p.CustomInfo = subteams.RoleName;
+                            Timing.CallDelayed(0.2f, () =>
                             {
-                                p.RankName = subteams.PlayerListRoleName;
-                                p.RankColor = subteams.PlayerListRoleColor;
-                            }
+                                teamedPlayers[p] = t;
+                                Log.Debug("Changing player " + p.Nickname + " to " + t, this.plugin.Config.Debug);
+                            });
                         }
                     }
-                    Timing.CallDelayed(0.2f, () =>
-                    {
-                        teamedPlayers[p] = t;
-                    });
+                    //delay needed so it overrides normal teams
                 }
             }
         }
         public void OnHurt(HurtingEventArgs ev)
         {
-            List<DamageTypes.DamageType> damageTypes = new List<DamageTypes.DamageType> { DamageTypes.Contain, DamageTypes.Bleeding, DamageTypes.Asphyxiation, DamageTypes.Decont, DamageTypes.Falldown, DamageTypes.Grenade, DamageTypes.Lure, DamageTypes.MicroHid, DamageTypes.Nuke, DamageTypes.Pocket, DamageTypes.Poison, DamageTypes.Recontainment, DamageTypes.Scp207, DamageTypes.Tesla };
+            List<DamageTypes.DamageType> damageTypes = new List<DamageTypes.DamageType> { DamageTypes.Contain, DamageTypes.Bleeding, DamageTypes.Asphyxiation, DamageTypes.Decont, DamageTypes.Falldown, DamageTypes.Grenade, DamageTypes.Lure, DamageTypes.MicroHid, DamageTypes.Nuke, DamageTypes.Pocket, DamageTypes.Poison, DamageTypes.Recontainment, DamageTypes.Scp207, DamageTypes.Tesla, DamageTypes.None };
             if (damageTypes.Contains(ev.DamageType))
             {
                 return;
@@ -201,6 +232,7 @@ namespace TeamsEXILED
                 if (Classes.IsTeamFriendly(Classes.GetTeamFromString(teamedPlayers[ev.Target], this.plugin.Config), teamedPlayers[ev.Attacker]))
                 {
                     ev.IsAllowed = false;
+                    ev.Attacker.ShowHint("You cant hurt teams teamed with you!");
                     Log.Debug("Protected a player in " + teamedPlayers[ev.Target] + " from " + teamedPlayers[ev.Attacker], this.plugin.Config.Debug);
                 }
             }
@@ -219,32 +251,60 @@ namespace TeamsEXILED
             if (chosenTeam != null)
             {
                 ev.IsAllowed = false;
+                Cassie.Message(chosenTeam.CassieMessageMTFSpawn.Replace("{SCP}", ev.ScpsLeft.ToString()).Replace("{unit}", ev.UnitNumber.ToString()).Replace("{nato}", "nato_" + ev.UnitName[0].ToString()), isNoisy: false);
             }
         }
         public void OnDied(DiedEventArgs ev)
         {
-            bool roundEndingAllowed = true;
+            if (AllowNormalRoundEnd)
+            {
+                return;
+            }
+            List<string> enemies = new List<string>();
+            Log.Debug(teamedPlayers[ev.Killer], this.plugin.Config.Debug);
             foreach (string t in teamedPlayers.Values)
             {
-                if (Classes.IsTeamEnemy(Classes.GetTeamFromString(teamedPlayers[ev.Target], this.plugin.Config), t))
+                Log.Debug("got " + t + " from teamedPlayers");
+                if (Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Requirements.Contains(t) && t != teamedPlayers[ev.Target])
                 {
-                    roundEndingAllowed = false;
-                }
-                else if (Classes.GetTeamFromString(teamedPlayers[ev.Target], this.plugin.Config) != null)
-                {
-                    leadingTeam = Classes.GetTeamFromString(teamedPlayers[ev.Target], this.plugin.Config).teamLeaders;
-                }
-                else
-                {
-                    roundEndingAllowed = false;
+                    Log.Debug("This team is an enemy of this team stopping the round from ending");
+                    return;
                 }
             }
-            if (roundEndingAllowed) { if (!Round.IsLocked) { Round.ForceEnd(); } }
+            ev.Target.Broadcast(5, "You didnt get team killed you where probably killed by someone who looks like you but isnt");
+            teamedPlayers[ev.Target] = "Dead";
+            if (ev.Target == ev.Killer)
+            {
+                return;
+            }
+            AllowNormalRoundEnd = true;
+            leadingTeam = Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).teamLeaders;
+            foreach (string a in teamedPlayers.Values)
+            {
+                if (Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Neutral.Contains(a))
+                {
+                    leadingTeam = LeadingTeam.Draw;
+                }
+            }
+            Round.ForceEnd();
         }
         public void RoundEnding(EndingRoundEventArgs ev)
         {
+            if (AllowNormalRoundEnd)
+            {
+                Log.Debug("List of teams:", this.plugin.Config.Debug);
+                foreach (KeyValuePair<Player, string> t in teamedPlayers)
+                {
+                    Log.Debug(t.Value + " : " + t.Key, this.plugin.Config.Debug);
+                }
+            }
+            ev.IsAllowed = AllowNormalRoundEnd;
+            ev.IsRoundEnded = AllowNormalRoundEnd;
             ev.LeadingTeam = leadingTeam;
-            ev.IsAllowed = true;
+        }
+        public void RoundEnd(RoundEndedEventArgs ev)
+        {
+            AllowNormalRoundEnd = false;
         }
     }
 }

@@ -9,5 +9,10 @@ using Respawning;
 
 namespace TeamsEXILED.enums
 {
-    
+    [Obsolete("No longer in use")]
+    public enum NormalRoles
+    {
+        NineTailedFox,
+        ChaosInsurgency
+    }
 }

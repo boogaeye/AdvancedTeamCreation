@@ -16,19 +16,31 @@ namespace TeamsEXILED.Classes
             string[] r = team.Friendlys;
             return r;
         }
-        public List<string> GetAllEnemyTeams(string TeamFond, Config config)
+        public static List<string> GetAllRequirements(string TeamFond, Config config)
         {
             List<string> team = new List<string>();
             foreach (Teams t in config.Teams)
             {
-                if (t.Enemies.Contains(TeamFond))
+                if (t.Requirements.Contains(TeamFond))
                 {
                     team.Add(t.Name);
                 }
             }
             return team;
         }
-        public List<string> GetAllFriendlyTeams(string TeamFond, Config config)
+        public static List<string> GetAllNeutrals(string TeamFond, Config config)
+        {
+            List<string> team = new List<string>();
+            foreach (Teams t in config.Teams)
+            {
+                if (t.Neutral.Contains(TeamFond))
+                {
+                    team.Add(t.Name);
+                }
+            }
+            return team;
+        }
+        public static List<string> GetAllFriendlyTeams(string TeamFond, Config config)
         {
             List<string> team = new List<string>();
             foreach (Teams t in config.Teams)
@@ -50,7 +62,16 @@ namespace TeamsEXILED.Classes
         }
         public bool IsTeamEnemy(Teams i, String u)
         {
-            if (i.Enemies.Contains(u))
+            if (i.Requirements.Contains(u))
+            {
+                return true;
+            }
+            return false;
+        }
+        [Obsolete("No longer in use")]
+        public static bool Exists(string look, string[] teams)
+        {
+            if (teams.Contains(look))
             {
                 return true;
             }
@@ -65,7 +86,31 @@ namespace TeamsEXILED.Classes
                     return t;
                 }
             }
-            return new Teams { Name = s, Enemies = GetAllEnemyTeams(s, config).ToArray<string>(), Friendlys = GetAllFriendlyTeams(s, config).ToArray<string>() };
+            if (s == "mtf")
+            {
+                return Teams.NTF(config);
+            }
+            if (s == "chi")
+            {
+                return Teams.CHI(config);
+            }
+            if (s == "cdp")
+            {
+                return Teams.CDP(config);
+            }
+            if (s == "scp")
+            {
+                return Teams.SCP(config);
+            }
+            if (s == "rsc")
+            {
+                return Teams.RSC(config);
+            }
+            List<string> friendlys = new List<string>() { s };
+            foreach (string i in GetAllFriendlyTeams(s, config)) {
+                friendlys.Add(i);
+            }
+            return new Teams { Name = s, Requirements = GetAllRequirements(s, config).ToArray<string>(), Friendlys = friendlys.ToArray() };
         }
     }
 }

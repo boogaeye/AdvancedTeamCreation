@@ -13,7 +13,6 @@ namespace TeamsEXILED
     public class Config : IConfig
     {
         public bool IsEnabled { get; set; } = true;
-        public uint EndRoundTime { get; set; } = 10;
         public bool Debug { get; set; } = false;
         [Description("All team names have to be lowercase otherwise IT WILL NOT LET YOU SPAWN CORRECTLY!")]
         public Teams[] Teams { get; set; } = new Teams[]{ new Teams() {
@@ -29,9 +28,10 @@ namespace TeamsEXILED
             }
             },
             Friendlys = new string[] { "serpentshand", "scp" },
-            Requirements = new string[] { "goc", "mtf", "cdp", "chi", "gru", "tta", "rsc" },
+            Requirements = new string[] { "goc", "mtf", "cdp", "chi", "gru", "tta", "rsc", "tta", "opcf" },
             teamLeaders = LeadingTeam.Anomalies,
-            Chance = 95
+            Chance = 95,
+            Color = "green"
         }, 
             new Teams() {
             Active = true,
@@ -40,12 +40,14 @@ namespace TeamsEXILED
                 Name = "rookie", Ammo = new Dictionary<AmmoType, uint>(){ { AmmoType.Nato762, 200 } }, Inventory = new ItemType[]{ ItemType.KeycardNTFLieutenant, ItemType.Radio, ItemType.Medkit }, HP = 135, ModelRole = RoleType.ChaosInsurgency, RoleName = "<color=yellow>GOC</color>", RoleHint = "You are the GOC", CustomItemIds = new int[] { 5, 2, 2, 0, }
             } },
             Friendlys = new string[] { "goc" },
-            Requirements = new string[] { "serpentshand", "scp", "cdp", "tta", "rsc" },
+            Requirements = new string[] { "serpentshand", "scp", "cdp", "tta", "rsc", "opcf" },
             teamLeaders = LeadingTeam.FacilityForces,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.ChaosInsurgency },
             CassieMessageChaosMessage = "pitch_0.6 .g5 .g5 .g5 pitch_1 the g o c has entered the facility bell_end",
             CassieMessageChaosAnnounceChance = 100,
-            Chance = 65
+            Chance = 65,
+            Color = "yellow",
+            Neutral = new string[]{ "mtf", "chi", "gru" }
         }, new Teams(){
             Active = true,
             Name = "gru",
@@ -57,7 +59,9 @@ namespace TeamsEXILED
             teamLeaders = LeadingTeam.FacilityForces,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.NineTailedFox },
             CassieMessageMTFSpawn = ".g5 .g5 the g r u has entered the facility. there are {SCP} scpsubjects",
-            Chance = 65
+            Chance = 65,
+            Color = "yellow",
+            Neutral = new string[]{ "mtf", "chi", "goc" }
         },new Teams(){
             Active = true,
             Name = "tta",
@@ -65,13 +69,14 @@ namespace TeamsEXILED
                 Name = "officer", Ammo = new Dictionary<AmmoType, uint>(){ { AmmoType.Nato9, 200 } }, Inventory = new ItemType[]{ ItemType.GunUSP, ItemType.KeycardFacilityManager, ItemType.Adrenaline, ItemType.WeaponManagerTablet }, HP = 100, ModelRole = RoleType.NtfScientist, RoleName = "<color=red>TTA</color>", RoleHint = "You are the TTA\nKill everything in sight", CustomItemIds = new int[] { 0, 0 }
             } },
             Friendlys = new string[] { "tta" },
-            Requirements = new string[] { "chi", "scp", "serpentshand", "goc", "gru", "mtf", "cdp", "rsc" },
+            Requirements = new string[] { "chi", "scp", "serpentshand", "goc", "gru", "mtf", "cdp", "rsc", "opcf" },
             teamLeaders = LeadingTeam.Anomalies,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.NineTailedFox, Respawning.SpawnableTeamType.ChaosInsurgency },
             CassieMessageMTFSpawn = "pitch_0.1 .g3 .g3 .g3 pitch_1 The Tactical Target Agent C has entered the facility bell_end",
             CassieMessageChaosAnnounceChance = 75,
             CassieMessageChaosMessage = "pitch_0.1 .g3 .g3 .g3 pitch_1 The Tactical Target Agent C unit {nato} {SCP} has entered the facility bell_end",
-            Chance = 50
+            Chance = 50,
+            Color = "red",
         },new Teams(){
             Active = true,
             Name = "opcf",
@@ -96,7 +101,7 @@ namespace TeamsEXILED
                     RoleHint = "You are part of the branch of the NTF\n<color=blue>Operation Chaos Force</color>\nKill everything you see and help the MTF",
                     Inventory = new ItemType[]{ ItemType.GunLogicer, ItemType.GunProject90, ItemType.KeycardNTFLieutenant, ItemType.Radio, ItemType.Medkit, ItemType.Painkillers },
                     CustomItemIds = new int[]{ 0 },
-                    NumOfAllowedPlayers = 3
+                    NumOfAllowedPlayers = 2
                 },
                 new Subteams{
                     Name = "Cadet",
@@ -111,12 +116,14 @@ namespace TeamsEXILED
                 },
             },
             Friendlys = new string[] { "opcf", "mtf" },
-            Requirements = new string[] { "chi", "scp", "serpentshand", "goc", "gru", "cdp", "rsc" },
+            Requirements = new string[] { "chi", "scp", "serpentshand", "goc", "gru", "cdp", "tta" },
             teamLeaders = LeadingTeam.FacilityForces,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.ChaosInsurgency },
             CassieMessageChaosAnnounceChance = 100,
             CassieMessageChaosMessage = "pitch_0.1 .g5 .g5 .g5 pitch_1 operation chaos force has entered the facility bell_end",
-            Chance = 100
+            Chance = 100,
+            Color = "green",
+            Neutral = new string[]{ "rsc" }
         }
         };
     }

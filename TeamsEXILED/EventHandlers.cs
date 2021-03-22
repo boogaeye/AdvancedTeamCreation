@@ -22,6 +22,7 @@ namespace TeamsEXILED
         public Classes.Classes Classes = new Classes.Classes();
         public LeadingTeam leadingTeam = LeadingTeam.Draw;
         public bool AllowNormalRoundEnd = false;
+        public int respawns = 0;
         public void RACommand(SendingRemoteAdminCommandEventArgs ev)
         {
             if (ev.Name == "forceteam")
@@ -97,6 +98,12 @@ namespace TeamsEXILED
         }
         public void OnRoleChange(ChangingRoleEventArgs ev)
         {
+            if (ev.Player.IsOverwatchEnabled)
+            {
+                return;
+            }
+            ev.Player.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
+            ev.Player.CustomInfo = ev.NewRole.ToString();
             Timing.CallDelayed(0.01f, () =>
             {
                 teamedPlayers[ev.Player] = ev.Player.Team.ToString().ToLower();
@@ -104,6 +111,7 @@ namespace TeamsEXILED
         }
         public void Respawn(RespawningTeamEventArgs ev)
         {
+            respawns++;
             chosenTeam = this.plugin.Config.Teams[random.Next(0, this.plugin.Config.Teams.Length)];
             if (chosenTeam.SpawnTypes.Contains(ev.NextKnownTeam) && chosenTeam.Active)
             {
@@ -207,10 +215,10 @@ namespace TeamsEXILED
                                 p.Ammo[(int)a.Key] = a.Value;
                             }
                             p.ShowHint(subteams.RoleHint, 10);
-                            p.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
-                            p.CustomInfo = subteams.RoleName;
                             Timing.CallDelayed(0.2f, () =>
                             {
+                                p.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
+                                p.CustomInfo = subteams.RoleName;
                                 teamedPlayers[p] = t;
                                 Log.Debug("Changing player " + p.Nickname + " to " + t, this.plugin.Config.Debug);
                             });
@@ -244,6 +252,7 @@ namespace TeamsEXILED
                     Log.Debug("Caught Exception and using other method", this.plugin.Config.Debug);
                     Log.Debug("Protected a player in " + teamedPlayers[ev.Attacker] + " from " + teamedPlayers[ev.Target], this.plugin.Config.Debug);
                 }
+
             }
         }
         public void MTFSpawnAnnounce(AnnouncingNtfEntranceEventArgs ev)
@@ -252,36 +261,40 @@ namespace TeamsEXILED
             {
                 ev.IsAllowed = false;
                 Cassie.Message(chosenTeam.CassieMessageMTFSpawn.Replace("{SCP}", ev.ScpsLeft.ToString()).Replace("{unit}", ev.UnitNumber.ToString()).Replace("{nato}", "nato_" + ev.UnitName[0].ToString()), isNoisy: false);
+                Map.ChangeUnitColor(respawns, chosenTeam.Color);
             }
+        }
+        bool TeamExists(string team)
+        {
+            return teamedPlayers.ContainsValue(team);
         }
         public void OnDied(DiedEventArgs ev)
         {
-            if (AllowNormalRoundEnd)
-            {
-                return;
-            }
-            List<string> enemies = new List<string>();
             Log.Debug(teamedPlayers[ev.Killer], this.plugin.Config.Debug);
-            foreach (string t in teamedPlayers.Values)
+            ev.Target.Broadcast(5, "You didnt get team killed you where probably killed by someone who looks like you but isnt");
+            teamedPlayers[ev.Target] = "Dead";
+            foreach (string t in Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Requirements)
             {
-                Log.Debug("got " + t + " from teamedPlayers");
-                if (Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Requirements.Contains(t) && t != teamedPlayers[ev.Target])
+                Log.Debug("got " + t + " from enemies", this.plugin.Config.Debug);
+                if (TeamExists(t))
                 {
-                    Log.Debug("This team is an enemy of this team stopping the round from ending");
+                    Log.Debug("This team is an enemy of this team stopping the round from ending", this.plugin.Config.Debug);
                     return;
                 }
             }
-            ev.Target.Broadcast(5, "You didnt get team killed you where probably killed by someone who looks like you but isnt");
-            teamedPlayers[ev.Target] = "Dead";
             if (ev.Target == ev.Killer)
+            {
+                return;
+            }
+            if (AllowNormalRoundEnd)
             {
                 return;
             }
             AllowNormalRoundEnd = true;
             leadingTeam = Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).teamLeaders;
-            foreach (string a in teamedPlayers.Values)
+            foreach (string a in Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Neutral)
             {
-                if (Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Neutral.Contains(a))
+                if (TeamExists(a))
                 {
                     leadingTeam = LeadingTeam.Draw;
                 }
@@ -305,6 +318,8 @@ namespace TeamsEXILED
         public void RoundEnd(RoundEndedEventArgs ev)
         {
             AllowNormalRoundEnd = false;
+            respawns = 0;
+            teamedPlayers.Clear();
         }
     }
 }

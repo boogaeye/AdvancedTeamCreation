@@ -23,6 +23,7 @@ namespace TeamsEXILED
         public LeadingTeam leadingTeam = LeadingTeam.Draw;
         public bool AllowNormalRoundEnd = false;
         public int respawns = 0;
+        public Respawning.SpawnableTeamType spawnableTeamType = Respawning.SpawnableTeamType.None;
         public void RACommand(SendingRemoteAdminCommandEventArgs ev)
         {
             if (ev.Name == "forceteam")
@@ -111,7 +112,11 @@ namespace TeamsEXILED
         }
         public void Respawn(RespawningTeamEventArgs ev)
         {
-            respawns++;
+            spawnableTeamType = ev.NextKnownTeam;
+            if (ev.NextKnownTeam == Respawning.SpawnableTeamType.NineTailedFox)
+            {
+                respawns++;
+            }
             chosenTeam = this.plugin.Config.Teams[random.Next(0, this.plugin.Config.Teams.Length)];
             if (chosenTeam.SpawnTypes.Contains(ev.NextKnownTeam) && chosenTeam.Active)
             {
@@ -198,6 +203,10 @@ namespace TeamsEXILED
                             p.SetRole(subteams.ModelRole, true);
                             p.Health = subteams.HP;
                             p.MaxHealth = subteams.HP;
+                            if (spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
+                            {
+                                p.ReferenceHub.characterClassManager.NetworkCurUnitName = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[respawns].UnitName;
+                            }
                             p.ClearInventory();
                             foreach (ItemType i in subteams.Inventory)
                             {
@@ -261,6 +270,7 @@ namespace TeamsEXILED
             {
                 ev.IsAllowed = false;
                 Cassie.Message(chosenTeam.CassieMessageMTFSpawn.Replace("{SCP}", ev.ScpsLeft.ToString()).Replace("{unit}", ev.UnitNumber.ToString()).Replace("{nato}", "nato_" + ev.UnitName[0].ToString()), isNoisy: false);
+                Classes.RenameUnit(respawns, chosenTeam.Name.ToUpper() + "-" + ev.UnitNumber.ToString());
                 Map.ChangeUnitColor(respawns, chosenTeam.Color);
             }
         }
@@ -315,7 +325,7 @@ namespace TeamsEXILED
             ev.IsRoundEnded = AllowNormalRoundEnd;
             ev.LeadingTeam = leadingTeam;
         }
-        public void RoundEnd(RoundEndedEventArgs ev)
+        public void RoundEnd()
         {
             AllowNormalRoundEnd = false;
             respawns = 0;

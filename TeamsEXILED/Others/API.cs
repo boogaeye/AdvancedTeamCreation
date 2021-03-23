@@ -59,8 +59,8 @@ namespace TeamsEXILED.API
         public string CassieMessageChaosMessage { get; set; }
         [Description("set this to 0 to prevent the cassie announcement for chaos")]
         public ushort CassieMessageChaosAnnounceChance { get; set; } = 100;
+        public string Color { get; set; } = "cyan";
         [Description("the chance this team will spawn if its been selected")]
-        public string Color { get; set; }
         public ushort Chance { get; set; } = 50;
         #endregion
         #region Static Zone

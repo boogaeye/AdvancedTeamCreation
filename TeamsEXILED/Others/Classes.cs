@@ -10,7 +10,25 @@ namespace TeamsEXILED.Classes
 {
     public class Classes
     {
-        
+        public void RenameUnit(int index, string name)
+        {
+            var unit = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[index];
+            unit.UnitName = name;
+            Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames.Remove(Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[index]);
+            Respawning.NamingRules.UnitNamingRules.AllNamingRules[Respawning.SpawnableTeamType.NineTailedFox].AddCombination($"{unit.UnitName}", Respawning.SpawnableTeamType.NineTailedFox);
+            foreach (var ply in Player.List.Where(x => x.ReferenceHub.characterClassManager.CurUnitName == unit.UnitName))
+            {
+                ply.ReferenceHub.characterClassManager.NetworkCurUnitName = unit.UnitName;
+            }
+        }
+        public void AddUnit(string name, Player[] players)
+        {
+            Respawning.NamingRules.UnitNamingRules.AllNamingRules[Respawning.SpawnableTeamType.NineTailedFox].AddCombination(name, Respawning.SpawnableTeamType.NineTailedFox);
+            foreach (var ply in players)
+            {
+                ply.ReferenceHub.characterClassManager.NetworkCurUnitName = name;
+            }
+        }
         public string[] GetFriendlyTeams(Teams team)
         {
             string[] r = team.Friendlys;

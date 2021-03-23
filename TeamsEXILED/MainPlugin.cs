@@ -26,7 +26,7 @@ namespace TeamsEXILED
             EventHandlers = new EventHandlers(this);
             Exiled.Events.Handlers.Server.SendingRemoteAdminCommand += EventHandlers.RACommand;
             Exiled.Events.Handlers.Server.EndingRound += EventHandlers.RoundEnding;
-            Exiled.Events.Handlers.Server.RoundEnded += EventHandlers.RoundEnd;
+            Exiled.Events.Handlers.Server.WaitingForPlayers += EventHandlers.RoundEnd;
             Exiled.Events.Handlers.Player.Died += EventHandlers.OnDied;
             Exiled.Events.Handlers.Server.RespawningTeam += EventHandlers.Respawn;
             Exiled.Events.Handlers.Player.ChangingRole += EventHandlers.OnRoleChange;
@@ -47,7 +47,7 @@ namespace TeamsEXILED
             Exiled.Events.Handlers.Player.Verified -= EventHandlers.OnJoin;
             Exiled.Events.Handlers.Player.Destroying -= EventHandlers.OnLeave;
             Exiled.Events.Handlers.Map.AnnouncingNtfEntrance -= EventHandlers.MTFSpawnAnnounce;
-            Exiled.Events.Handlers.Server.RoundEnded -= EventHandlers.RoundEnd;
+            Exiled.Events.Handlers.Server.WaitingForPlayers -= EventHandlers.RoundEnd;
         }
     }
 }

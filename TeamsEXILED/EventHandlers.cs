@@ -9,64 +9,97 @@ using Exiled.Permissions.Extensions;
 using TeamsEXILED.Classes;
 using MEC;
 using Exiled.CustomItems.API.Features;
+using Exiled.API.Interfaces;
 
 namespace TeamsEXILED
 {
     public class EventHandlers
     {
+        #region vars
         private readonly Plugin<Config> plugin;
+
         public EventHandlers(Plugin<Config> plugin) => this.plugin = plugin;
+
         public Dictionary<Player, string> teamedPlayers = new Dictionary<Player, string>();
+
         public Teams chosenTeam;
+
         public Random random = new Random();
+
         public Classes.Classes Classes = new Classes.Classes();
+
         public LeadingTeam leadingTeam = LeadingTeam.Draw;
+
         public bool AllowNormalRoundEnd = false;
+
         public int respawns = 0;
+
+        public bool HasReference = false;
+
         public Respawning.SpawnableTeamType spawnableTeamType = Respawning.SpawnableTeamType.None;
-        public void RACommand(SendingRemoteAdminCommandEventArgs ev)
+        #endregion
+        #region Fake Respawn Timer
+        CoroutineHandle coroutineHandle = new CoroutineHandle();
+
+        public void OnRoundStart()
         {
-            if (ev.Name == "forceteam")
+            if (coroutineHandle.IsRunning)
             {
-                ev.IsAllowed = false;
-                if (ev.Sender.CheckPermission("ATS.forceteam"))
+                Timing.KillCoroutines(coroutineHandle);
+            }
+            Timing.RunCoroutine(Timer());
+        }
+
+        IEnumerator<float> Timer()
+        {
+            while (Round.IsStarted)
+            {
+                yield return Timing.WaitForSeconds(1f);
+                if (Respawn.NextKnownTeam != Respawning.SpawnableTeamType.None)
                 {
-                    ev.ReplyMessage = "<color=red>Error Team Does Not Exist</color>";
-                    ev.Success = false;
-                    foreach (Teams t in this.plugin.Config.Teams)
+                    if (!HasReference)
                     {
-                        if (t.Name == ev.Arguments[0].ToLower())
+                        RefNextTeamSpawn();
+                    }
+                }
+                if (MainPlugin.assemblyTimer)
+                {
+                    string text = string.Empty;
+                    text += "\n";
+                    if (Respawn.NextKnownTeam == Respawning.SpawnableTeamType.None)
+                    {
+                        text += $"<color=orange>You will respawn in:</color>\n";
+                    }
+                    else
+                    {
+                        text += $"<color=yellow>You are respawning, Please Wait!:</color>\n";
+                    }
+                    text += $"{Respawn.TimeUntilRespawn / 60} Minutes and {Respawn.TimeUntilRespawn % 60} Seconds\n";
+                    if (chosenTeam == null)
+                    {
+                        if (Respawn.NextKnownTeam != Respawning.SpawnableTeamType.None)
                         {
-                            if (!t.Active && !ev.Sender.CheckPermission("ATS.bypassActivity"))
-                            {
-                                ev.ReplyMessage = "<color=red>Error you cant force team this team as you dont have the ATS.bypassActivity Permission</color>";
-                                return;
-                            }
-                            ev.ReplyMessage = "<color=red>Error Could not find subclass</color>";
-                            foreach (Subteams st in t.Subclasses)
-                            {
-                                if (ev.Arguments[1].ToLower() == st.Name)
-                                {
-                                    ev.ReplyMessage = "<color=red>Error Player Not Found</color>";
-                                    if (Player.Get(ev.Arguments[2]).IsVerified)
-                                    {
-                                        ev.ReplyMessage = "<color=green>Changed players Team!!!</color>";
-                                        ChangeTeam(Player.Get(ev.Arguments[2]), ev.Arguments[0].ToLower(), ev.Arguments[1].ToLower());
-                                        return;
-                                    }
-                                    return;
-                                }
-                            }
-                            return;
+                            text += $"Respawning as {Respawn.NextKnownTeam.ToString()}";
+                        }
+                    }
+                    else
+                    {
+                        text += $"Respawning as <color={chosenTeam.Color}>{chosenTeam.Name}</color>";
+                    }
+                    foreach (Player p in Player.List)
+                    {
+                        if (p.IsDead)
+                        {
+                            p.ShowHint(text, 1.1f);
                         }
                     }
                 }
-                else
-                {
-                    ev.ReplyMessage = "<color=red>You do not have permission to use this command</color>";
-                }
-                return;
             }
+        }
+        #endregion
+        #region Base Plugin
+        public void RACommand(SendingRemoteAdminCommandEventArgs ev)
+        {
             if (ev.Name == "pos")
             {
                 ev.IsAllowed = false;
@@ -89,14 +122,64 @@ namespace TeamsEXILED
                 return;
             }
         }
-        public void OnJoin(VerifiedEventArgs ev)
+
+        public void RefNextTeamSpawn()
+        {
+            HasReference = true;
+            Log.Debug("Getting Team Referances", this.plugin.Config.Debug);
+            chosenTeam = this.plugin.Config.Teams[random.Next(0, this.plugin.Config.Teams.Length)];
+            if (chosenTeam.SpawnTypes.Contains(Respawn.NextKnownTeam) && chosenTeam.Active)
+            {
+                Log.Debug("Next Known Spawn is " + Respawn.NextKnownTeam, this.plugin.Config.Debug);
+                Log.Debug("Next Known Chosen Team is " + chosenTeam.Name, this.plugin.Config.Debug);
+                if (random.Next(0, 100) < chosenTeam.Chance)
+                {
+                    return;
+                }
+                else
+                {
+                    chosenTeam = null;
+                }
+            }
+            else
+            {
+                chosenTeam = null;
+            }
+        }
+
+        public void RefNextTeamSpawn(Respawning.SpawnableTeamType spawnableTeamType)
+        {
+            Log.Debug("Getting Team Referances", this.plugin.Config.Debug);
+            chosenTeam = this.plugin.Config.Teams[random.Next(0, this.plugin.Config.Teams.Length)];
+            if (chosenTeam.SpawnTypes.Contains(spawnableTeamType) && chosenTeam.Active)
+            {
+                Log.Debug("Next Known Spawn is " + spawnableTeamType, this.plugin.Config.Debug);
+                Log.Debug("Next Known Chosen Team is " + chosenTeam.Name, this.plugin.Config.Debug);
+                if (random.Next(0, 100) < chosenTeam.Chance)
+                {
+                    return;
+                }
+                else
+                {
+                    chosenTeam = null;
+                }
+            }
+            else
+            {
+                chosenTeam = null;
+            }
+        }
+
+        public void OnVerified(VerifiedEventArgs ev)
         {
             teamedPlayers[ev.Player] = "RIP";
         }
-        public void OnLeave(DestroyingEventArgs ev)
+
+        public void OnLeave(LeftEventArgs ev)
         {
             teamedPlayers.Remove(ev.Player);
         }
+
         public void OnRoleChange(ChangingRoleEventArgs ev)
         {
             if (ev.Player.IsOverwatchEnabled)
@@ -110,44 +193,40 @@ namespace TeamsEXILED
                 teamedPlayers[ev.Player] = ev.Player.Team.ToString().ToLower();
             });
         }
-        public void Respawn(RespawningTeamEventArgs ev)
+
+        public void OnRespawning(RespawningTeamEventArgs ev)
         {
+            if (!HasReference)
+            {
+                RefNextTeamSpawn(ev.NextKnownTeam);
+                Log.Debug("Possible admin spawn due to No Team Reference yet", this.plugin.Config.Debug);
+            }
             spawnableTeamType = ev.NextKnownTeam;
             if (ev.NextKnownTeam == Respawning.SpawnableTeamType.NineTailedFox)
             {
                 respawns++;
             }
-            chosenTeam = this.plugin.Config.Teams[random.Next(0, this.plugin.Config.Teams.Length)];
-            if (chosenTeam.SpawnTypes.Contains(ev.NextKnownTeam) && chosenTeam.Active)
+            if (chosenTeam != null)
             {
-                Log.Debug("Next Known Spawn is " + ev.NextKnownTeam, this.plugin.Config.Debug);
-                Log.Debug("Next Known Chosen Team is " + chosenTeam.Name, this.plugin.Config.Debug);
-                if (random.Next(0, 100) < chosenTeam.Chance)
+                Log.Debug("Spawned " + chosenTeam.Name, this.plugin.Config.Debug);
+                List<Exiled.API.Features.Player> tempPlayers = new List<Player>();
+                foreach (Player i in ev.Players)
                 {
-                    List<Exiled.API.Features.Player> tempPlayers = new List<Player>();
-                    foreach (Player i in ev.Players)
-                    {
-                        tempPlayers.Add(i);
-                    }
-                    Timing.CallDelayed(1.5f, () =>
-                    {
-                        ChangeTeamReferancing(tempPlayers, chosenTeam.Name);
-                    });
-                    if (random.Next(0, 100) < chosenTeam.CassieMessageChaosAnnounceChance && ev.NextKnownTeam == Respawning.SpawnableTeamType.ChaosInsurgency)
-                    {
-                        Cassie.DelayedGlitchyMessage(chosenTeam.CassieMessageChaosMessage, 0, 0.25f, 0.25f);
-                    }
+                    tempPlayers.Add(i);
                 }
-                else
+                Timing.CallDelayed(1.5f, () =>
                 {
-                    chosenTeam = null;
+                    ChangeTeamReferancing(tempPlayers, chosenTeam.Name);
+                });
+                if (random.Next(0, 100) < chosenTeam.CassieMessageChaosAnnounceChance && ev.NextKnownTeam == Respawning.SpawnableTeamType.ChaosInsurgency)
+                {
+                    Cassie.DelayedGlitchyMessage(chosenTeam.CassieMessageChaosMessage, 0, 0.25f, 0.25f);
                 }
             }
-            else
-            {
-                chosenTeam = null;
-            }
+            Timing.CallDelayed(3f, () => chosenTeam = null);
+            HasReference = false;
         }
+
         void ChangeTeamReferancing(List<Player> p, string t)
         {
             //finding teams
@@ -183,7 +262,8 @@ namespace TeamsEXILED
                 }
             }
         }
-        void ChangeTeam(Player p, string t, string s)
+
+        public void ChangeTeam(Player p, string t, string s)
         {
             if (p.IsOverwatchEnabled)
             {
@@ -237,6 +317,7 @@ namespace TeamsEXILED
                 }
             }
         }
+
         public void OnHurt(HurtingEventArgs ev)
         {
             List<DamageTypes.DamageType> damageTypes = new List<DamageTypes.DamageType> { DamageTypes.Contain, DamageTypes.Bleeding, DamageTypes.Asphyxiation, DamageTypes.Decont, DamageTypes.Falldown, DamageTypes.Grenade, DamageTypes.Lure, DamageTypes.MicroHid, DamageTypes.Nuke, DamageTypes.Pocket, DamageTypes.Poison, DamageTypes.Recontainment, DamageTypes.Scp207, DamageTypes.Tesla, DamageTypes.None };
@@ -255,62 +336,92 @@ namespace TeamsEXILED
             }
             catch (Exception)
             {
-                if (Classes.IsTeamFriendly(Classes.GetTeamFromString(teamedPlayers[ev.Attacker], this.plugin.Config), teamedPlayers[ev.Target]))
-                {
-                    ev.IsAllowed = false;
-                    Log.Debug("Caught Exception and using other method", this.plugin.Config.Debug);
-                    Log.Debug("Protected a player in " + teamedPlayers[ev.Attacker] + " from " + teamedPlayers[ev.Target], this.plugin.Config.Debug);
-                }
-
+                Log.Debug("Player possibly left so we caught this error");
             }
         }
+
         public void MTFSpawnAnnounce(AnnouncingNtfEntranceEventArgs ev)
         {
             if (chosenTeam != null)
             {
                 ev.IsAllowed = false;
-                Cassie.Message(chosenTeam.CassieMessageMTFSpawn.Replace("{SCP}", ev.ScpsLeft.ToString()).Replace("{unit}", ev.UnitNumber.ToString()).Replace("{nato}", "nato_" + ev.UnitName[0].ToString()), isNoisy: false);
+                if (chosenTeam.CassieMessageMTFSpawn != null)
+                {
+                    Cassie.Message(chosenTeam.CassieMessageMTFSpawn.Replace("{SCP}", ev.ScpsLeft.ToString()).Replace("{unit}", ev.UnitNumber.ToString()).Replace("{nato}", "nato_" + ev.UnitName[0].ToString()), isNoisy: false);
+                }
                 Classes.RenameUnit(respawns, chosenTeam.Name.ToUpper() + "-" + ev.UnitNumber.ToString());
                 Map.ChangeUnitColor(respawns, chosenTeam.Color);
             }
         }
+
         bool TeamExists(string team)
         {
             return teamedPlayers.ContainsValue(team);
         }
+
         public void OnDied(DiedEventArgs ev)
         {
-            Log.Debug(teamedPlayers[ev.Killer], this.plugin.Config.Debug);
-            ev.Target.Broadcast(5, "You didnt get team killed you where probably killed by someone who looks like you but isnt");
-            teamedPlayers[ev.Target] = "Dead";
-            foreach (string t in Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Requirements)
+            try
             {
-                Log.Debug("got " + t + " from enemies", this.plugin.Config.Debug);
-                if (TeamExists(t))
+                Log.Debug(teamedPlayers[ev.Killer], this.plugin.Config.Debug);
+                if (teamedPlayers[ev.Target] == teamedPlayers[ev.Killer])
                 {
-                    Log.Debug("This team is an enemy of this team stopping the round from ending", this.plugin.Config.Debug);
+                    ev.Target.Broadcast(5, "You got teamkilled report this to the admins if you dont think its an accident");
+                }
+                else
+                {
+                    ev.Target.Broadcast(5, "You didnt get team killed you where probably killed by someone who looks like you but isnt");
+                }
+                teamedPlayers[ev.Target] = "Dead";
+                foreach (string t in Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Requirements)
+                {
+                    Log.Debug("got " + t + " from enemies", this.plugin.Config.Debug);
+                    if (TeamExists(t))
+                    {
+                        Log.Debug("This team is an enemy of this team stopping the round from ending", this.plugin.Config.Debug);
+                        return;
+                    }
+                }
+                if (ev.Target == ev.Killer)
+                {
+                    int alive = 0;
+                    foreach (Player p in Player.List)
+                    {
+                        if (p.IsAlive)
+                        {
+                            alive++;
+                        }
+                    }
+                    if (alive == 1 && this.plugin.Config.Allow1Player)
+                    {
+                        return;
+                    }
+                    if (alive > 1)
+                    {
+                        return;
+                    }
+                }
+                if (AllowNormalRoundEnd)
+                {
                     return;
                 }
-            }
-            if (ev.Target == ev.Killer)
-            {
-                return;
-            }
-            if (AllowNormalRoundEnd)
-            {
-                return;
-            }
-            AllowNormalRoundEnd = true;
-            leadingTeam = Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).teamLeaders;
-            foreach (string a in Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Neutral)
-            {
-                if (TeamExists(a))
+                AllowNormalRoundEnd = true;
+                leadingTeam = Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).teamLeaders;
+                foreach (string a in Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Neutral)
                 {
-                    leadingTeam = LeadingTeam.Draw;
+                    if (TeamExists(a))
+                    {
+                        leadingTeam = LeadingTeam.Draw;
+                    }
                 }
+                Round.ForceEnd();
             }
-            Round.ForceEnd();
+            catch (Exception)
+            {
+                Log.Debug("Caught On died error. this probably happened because someone left", this.plugin.Config.Debug);
+            }
         }
+
         public void RoundEnding(EndingRoundEventArgs ev)
         {
             if (AllowNormalRoundEnd)
@@ -325,11 +436,14 @@ namespace TeamsEXILED
             ev.IsRoundEnded = AllowNormalRoundEnd;
             ev.LeadingTeam = leadingTeam;
         }
+
         public void RoundEnd()
         {
             AllowNormalRoundEnd = false;
             respawns = 0;
+            HasReference = false;
             teamedPlayers.Clear();
         }
+        #endregion
     }
 }

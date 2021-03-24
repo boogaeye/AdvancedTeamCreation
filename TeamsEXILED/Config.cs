@@ -13,6 +13,8 @@ namespace TeamsEXILED
     public class Config : IConfig
     {
         public bool IsEnabled { get; set; } = true;
+        [Description("if this is true then it will allow one player to be alive in the round when someone kills themselves(This is basically to give them another chance before ending the game)")]
+        public bool Allow1Player { get; set; } = false;
         public bool Debug { get; set; } = false;
         [Description("All team names have to be lowercase otherwise IT WILL NOT LET YOU SPAWN CORRECTLY!")]
         public Teams[] Teams { get; set; } = new Teams[]{ new Teams() {

@@ -15,6 +15,10 @@ namespace TeamsEXILED
         public bool IsEnabled { get; set; } = true;
         [Description("if this is true then it will allow one player to be alive in the round when someone kills themselves(This is basically to give them another chance before ending the game)")]
         public bool Allow1Player { get; set; } = false;
+        [Description("allows friendly teams to hurt eachother no matter what hurts them")]
+        public bool FriendlyFire { get; set; } = false;
+        public string TeamKillBroadcast { get; set; } = "You got teamkilled report this to the admins if you dont think its an accident";
+        public string KilledByNonfriendlyPlayer { get; set; } = "You didnt get team killed you where probably killed by someone who looks like you but isnt";
         public bool Debug { get; set; } = false;
         [Description("All team names have to be lowercase otherwise IT WILL NOT LET YOU SPAWN CORRECTLY!")]
         public Teams[] Teams { get; set; } = new Teams[]{ new Teams() {
@@ -30,7 +34,7 @@ namespace TeamsEXILED
             }
             },
             Friendlys = new string[] { "serpentshand", "scp" },
-            Requirements = new string[] { "goc", "mtf", "cdp", "chi", "gru", "tta", "rsc", "tta", "opcf" },
+            Requirements = new string[] { "goc", "mtf", "cdp", "chi", "gru", "tta", "rsc", "tta", "opcf", "aes" },
             teamLeaders = LeadingTeam.Anomalies,
             Chance = 95,
             Color = "green"
@@ -42,7 +46,7 @@ namespace TeamsEXILED
                 Name = "rookie", Ammo = new Dictionary<AmmoType, uint>(){ { AmmoType.Nato762, 200 } }, Inventory = new ItemType[]{ ItemType.KeycardNTFLieutenant, ItemType.Radio, ItemType.Medkit }, HP = 135, ModelRole = RoleType.ChaosInsurgency, RoleName = "<color=yellow>GOC</color>", RoleHint = "You are the GOC", CustomItemIds = new int[] { 5, 2, 2, 0, }
             } },
             Friendlys = new string[] { "goc" },
-            Requirements = new string[] { "serpentshand", "scp", "cdp", "tta", "rsc", "opcf" },
+            Requirements = new string[] { "serpentshand", "scp", "cdp", "tta", "rsc", "opcf", "aes" },
             teamLeaders = LeadingTeam.FacilityForces,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.ChaosInsurgency },
             CassieMessageChaosMessage = "pitch_0.6 .g5 .g5 .g5 pitch_1 the g o c has entered the facility bell_end",
@@ -57,7 +61,7 @@ namespace TeamsEXILED
                 Name = "rookie", Ammo = new Dictionary<AmmoType, uint>(){ { AmmoType.Nato762, 200 } }, Inventory = new ItemType[]{ ItemType.GunE11SR, ItemType.KeycardChaosInsurgency, ItemType.Adrenaline, ItemType.WeaponManagerTablet, ItemType.GrenadeFlash }, HP = 150, ModelRole = RoleType.FacilityGuard, RoleName = "<color=yellow>GRU</color>", RoleHint = "", CustomItemIds = new int[] { 7, 6 }
             } },
             Friendlys = new string[] { "gru" },
-            Requirements = new string[] { "scp", "serpentshand", "tta", "cdp", "rsc"  },
+            Requirements = new string[] { "scp", "serpentshand", "tta", "cdp", "rsc", "aes" },
             teamLeaders = LeadingTeam.FacilityForces,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.NineTailedFox },
             CassieMessageMTFSpawn = ".g5 .g5 the g r u has entered the facility. there are {SCP} scpsubjects",
@@ -119,7 +123,7 @@ namespace TeamsEXILED
                 },
             },
             Friendlys = new string[] { "opcf", "mtf" },
-            Requirements = new string[] { "chi", "scp", "serpentshand", "goc", "gru", "cdp", "tta" },
+            Requirements = new string[] { "chi", "scp", "serpentshand", "goc", "gru", "cdp", "tta", "aes" },
             teamLeaders = LeadingTeam.FacilityForces,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.ChaosInsurgency },
             CassieMessageChaosAnnounceChance = 100,

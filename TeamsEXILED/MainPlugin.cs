@@ -43,7 +43,7 @@ namespace TeamsEXILED
 
             Exiled.Events.Handlers.Server.EndingRound += EventHandlers.RoundEnding;
 
-            Exiled.Events.Handlers.Server.WaitingForPlayers += EventHandlers.RoundEnd;
+            Exiled.Events.Handlers.Server.WaitingForPlayers += EventHandlers.WaitingForPlayers;
 
             Exiled.Events.Handlers.Player.Died += EventHandlers.OnDied;
 
@@ -60,6 +60,10 @@ namespace TeamsEXILED
             Exiled.Events.Handlers.Map.AnnouncingNtfEntrance += EventHandlers.MTFSpawnAnnounce;
 
             Exiled.Events.Handlers.Server.RoundStarted += EventHandlers.OnRoundStart;
+            if (!Server.FriendlyFire)
+            {
+                Log.Warn("Friendly Fire Is heavily recommended to be enabled on server config as it can lead to problems with people not being able to finish around because a person is supposed to be their enemy");
+            }
 
             foreach (IPlugin<IConfig> plugin in Loader.Plugins)
             {
@@ -97,7 +101,7 @@ namespace TeamsEXILED
 
             Exiled.Events.Handlers.Map.AnnouncingNtfEntrance -= EventHandlers.MTFSpawnAnnounce;
 
-            Exiled.Events.Handlers.Server.WaitingForPlayers -= EventHandlers.RoundEnd;
+            Exiled.Events.Handlers.Server.WaitingForPlayers -= EventHandlers.WaitingForPlayers;
 
             Exiled.Events.Handlers.Server.RoundStarted -= EventHandlers.OnRoundStart;
 

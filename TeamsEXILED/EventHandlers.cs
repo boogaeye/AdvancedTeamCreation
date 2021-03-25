@@ -67,7 +67,8 @@ namespace TeamsEXILED
                 {
                     if (!Respawn.IsSpawning && MainPlugin.rtconfig.ShowTimerOnlyOnSpawn) continue;
                     string text = string.Empty;
-                    text += "\n";
+                    text += new string('\n', MainPlugin.rtconfig.TextLowering);
+
                     if (Respawn.NextKnownTeam == Respawning.SpawnableTeamType.None)
                     {
                         text += $"{MainPlugin.rtconfig.translations.YouWillRespawnIn}\n";
@@ -210,6 +211,21 @@ namespace TeamsEXILED
                 chosenTeam = null;
             }
         }
+        public void RefNextTeamSpawn(string teamname)
+        {
+            Log.Debug("Getting Team Referances", this.plugin.Config.Debug);
+            chosenTeam = Classes.GetTeamFromString(teamname, this.plugin.Config);
+            if (!Respawn.IsSpawning && chosenTeam.Active)
+            {
+                Log.Debug("Next Known Spawn is " + spawnableTeamType, this.plugin.Config.Debug);
+                Log.Debug("Next Known Chosen Team is " + chosenTeam.Name, this.plugin.Config.Debug);
+                return;
+            }
+            else
+            {
+                chosenTeam = null;
+            }
+        }
 
         public void OnVerified(VerifiedEventArgs ev)
         {
@@ -227,8 +243,8 @@ namespace TeamsEXILED
             {
                 return;
             }
-            ev.Player.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
-            ev.Player.CustomInfo = ev.NewRole.ToString();
+            ev.Player.CustomInfo = string.Empty;
+            ev.Player.ReferenceHub.nicknameSync.ShownPlayerInfo |= PlayerInfoArea.Role;
             Timing.CallDelayed(0.01f, () =>
             {
                 teamedPlayers[ev.Player] = ev.Player.Team.ToString().ToLower();
@@ -398,7 +414,7 @@ namespace TeamsEXILED
             }
             try
             {
-                if (Classes.IsTeamFriendly(Classes.GetTeamFromString(teamedPlayers[ev.Target], this.plugin.Config), teamedPlayers[ev.Attacker]))
+                if (Classes.IsTeamFriendly(Classes.GetTeamFromString(teamedPlayers[ev.Target], this.plugin.Config), teamedPlayers[ev.Attacker]) && !this.plugin.Config.FriendlyFire)
                 {
                     ev.IsAllowed = false;
                     ev.Attacker.ShowHint("You cant hurt teams teamed with you!");
@@ -437,11 +453,11 @@ namespace TeamsEXILED
                 Log.Debug(teamedPlayers[ev.Killer], this.plugin.Config.Debug);
                 if (teamedPlayers[ev.Target] == teamedPlayers[ev.Killer])
                 {
-                    ev.Target.Broadcast(5, "You got teamkilled report this to the admins if you dont think its an accident");
+                    ev.Target.Broadcast(5, this.plugin.Config.TeamKillBroadcast);
                 }
                 else
                 {
-                    ev.Target.Broadcast(5, "You didnt get team killed you where probably killed by someone who looks like you but isnt");
+                    ev.Target.Broadcast(5, this.plugin.Config.KilledByNonfriendlyPlayer);
                 }
                 teamedPlayers[ev.Target] = "Dead";
                 foreach (string t in Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Requirements)
@@ -508,7 +524,7 @@ namespace TeamsEXILED
             ev.LeadingTeam = leadingTeam;
         }
 
-        public void RoundEnd()
+        public void WaitingForPlayers()
         {
             AllowNormalRoundEnd = false;
             respawns = 0;

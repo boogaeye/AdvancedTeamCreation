@@ -25,8 +25,9 @@ namespace TeamsEXILED
         public override Version RequiredExiledVersion { get; } = new Version("2.8.0.0");
 
         public override string Author { get; } = "BoogaEye";
+        public override string Name { get; } = "Advanced Team Creation";
 
-        public override Version Version { get; } = new Version("1.0.1.1");
+        public override Version Version { get; } = new Version("1.0.3.0");
 
         public static bool assemblyTimer = false;
         public static RespawnTimer.Config rtconfig = new RespawnTimer.Config();

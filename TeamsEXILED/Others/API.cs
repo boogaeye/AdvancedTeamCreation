@@ -59,6 +59,8 @@ namespace TeamsEXILED.API
         public string CassieMessageChaosMessage { get; set; }
         [Description("set this to 0 to prevent the cassie announcement for chaos")]
         public ushort CassieMessageChaosAnnounceChance { get; set; } = 100;
+        [Description("Sets where this team spawns")]
+        public SpawnLocation spawnLocation { get; set; } = SpawnLocation.Normal;
         public string Color { get; set; } = "cyan";
         [Description("the chance this team will spawn if its been selected")]
         public ushort Chance { get; set; } = 50;

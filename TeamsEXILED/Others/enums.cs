@@ -9,10 +9,11 @@ using Respawning;
 
 namespace TeamsEXILED.enums
 {
-    [Obsolete("No longer in use")]
-    public enum NormalRoles
+    public enum SpawnLocation
     {
-        NineTailedFox,
-        ChaosInsurgency
+        Normal = -1,
+        Escape = 0,
+        SCP106 = 1,
+        SurfaceNuke = 2
     }
 }

@@ -79,12 +79,13 @@ namespace TeamsEXILED
             CassieMessageChaosMessage = "pitch_0.1 .g3 .g3 .g3 pitch_1 The Tactical Target Agent C unit {nato} {SCP} has entered the facility bell_end",
             Chance = 50,
             Color = "red",
+            spawnLocation = enums.SpawnLocation.SurfaceNuke
         },new Teams(){
             Active = true,
             Name = "opcf",
             Subclasses = new Subteams[]{ 
                 new Subteams{ 
-                    Name = "Commander",
+                    Name = "commander",
                     Ammo = new Dictionary<AmmoType, uint>{ { AmmoType.Nato9, 450 } },
                     HP = 160,
                     ModelRole = RoleType.FacilityGuard,
@@ -95,7 +96,7 @@ namespace TeamsEXILED
                     NumOfAllowedPlayers = 1
                 },
                 new Subteams{
-                    Name = "Officer",
+                    Name = "officer",
                     Ammo = new Dictionary<AmmoType, uint>{ { AmmoType.Nato9, 450 } },
                     HP = 120,
                     ModelRole = RoleType.NtfLieutenant,
@@ -106,7 +107,7 @@ namespace TeamsEXILED
                     NumOfAllowedPlayers = 2
                 },
                 new Subteams{
-                    Name = "Cadet",
+                    Name = "cadet",
                     Ammo = new Dictionary<AmmoType, uint>{ { AmmoType.Nato9, 450 } },
                     HP = 100,
                     ModelRole = RoleType.NtfCadet,
@@ -125,7 +126,68 @@ namespace TeamsEXILED
             CassieMessageChaosMessage = "pitch_0.1 .g5 .g5 .g5 pitch_1 operation chaos force has entered the facility bell_end",
             Chance = 100,
             Color = "green",
-            Neutral = new string[]{ "rsc" }
+            Neutral = new string[]{ "rsc" },
+            spawnLocation = enums.SpawnLocation.Escape
+        }, new Teams{
+            Active = true,
+            Name = "aes",
+            Subclasses = new Subteams[]{
+                new Subteams{
+                    Name = "commander",
+                    Ammo = new Dictionary<AmmoType, uint>{ { AmmoType.Nato9, 450 }, { AmmoType.Nato762, 450 } },
+                    HP = 100,
+                    ModelRole = RoleType.ChaosInsurgency,
+                    RoleName = "AES Commander",
+                    RoleHint = "You are to eliminate all scp subjects",
+                    Inventory = new ItemType[]{ ItemType.GunProject90, ItemType.KeycardO5, ItemType.Medkit, ItemType.Medkit, ItemType.WeaponManagerTablet, ItemType.Radio },
+                    CustomItemIds = new int[]{ 6 },
+                    NumOfAllowedPlayers = 1
+                },
+                new Subteams{
+                    Name = "firstofficer",
+                    Ammo = new Dictionary<AmmoType, uint>{ { AmmoType.Nato9, 450 }, { AmmoType.Nato762, 450 } },
+                    HP = 100,
+                    ModelRole = RoleType.ChaosInsurgency,
+                    RoleName = "AES First Officer",
+                    RoleHint = "You are to eliminate all scp subjects",
+                    Inventory = new ItemType[]{ ItemType.GunProject90, ItemType.KeycardChaosInsurgency, ItemType.Medkit, ItemType.Medkit, ItemType.WeaponManagerTablet, ItemType.Radio },
+                    CustomItemIds = new int[]{ },
+                    NumOfAllowedPlayers = 1
+                },
+                new Subteams{
+                    Name = "officer",
+                    Ammo = new Dictionary<AmmoType, uint>{ { AmmoType.Nato9, 450 }, { AmmoType.Nato762, 450 } },
+                    HP = 100,
+                    ModelRole = RoleType.ChaosInsurgency,
+                    RoleName = "AES Officer",
+                    RoleHint = "You are to eliminate all scp subjects",
+                    Inventory = new ItemType[]{ ItemType.GunMP7, ItemType.KeycardZoneManager, ItemType.Medkit, ItemType.Medkit, ItemType.WeaponManagerTablet },
+                    CustomItemIds = new int[]{ },
+                    NumOfAllowedPlayers = 2
+                },
+                new Subteams{
+                    Name = "rookie",
+                    Ammo = new Dictionary<AmmoType, uint>{ { AmmoType.Nato9, 450 }, { AmmoType.Nato762, 450 } },
+                    HP = 100,
+                    ModelRole = RoleType.ChaosInsurgency,
+                    RoleName = "AES rookie",
+                    RoleHint = "You are to eliminate all scp subjects",
+                    Inventory = new ItemType[]{ ItemType.GunMP7, ItemType.KeycardZoneManager, ItemType.Medkit, ItemType.WeaponManagerTablet, ItemType.WeaponManagerTablet },
+                    CustomItemIds = new int[]{ },
+                    NumOfAllowedPlayers = 1
+                },
+            },
+            Friendlys = new string[] { "aes" },
+            Requirements = new string[] { "scp", "serpentshand", "tta" },
+            teamLeaders = LeadingTeam.FacilityForces,
+            SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.NineTailedFox },
+            CassieMessageChaosAnnounceChance = 0,
+            CassieMessageChaosMessage = "",
+            Chance = 50,
+            Color = "red",
+            Neutral = new string[]{ "mtf", "opcf", "goc", "gru", "chi", "rsc", "cdp" },
+            spawnLocation = enums.SpawnLocation.SCP106,
+            CassieMessageMTFSpawn = "cassie pitch_0.6 .g3 .g3 pitch_1 the arrival of the anomaly emergency squad {nato} {unit} has entered the facility. pitch_0.96 please escort2 all scpsubjects to surface zone. pitch_1 all scpsubjects need to be secured. please wait inside of your designated evacuation shelters until this emergency has been completed. there are {SCP} scpsubjects remaining."
         }
         };
     }

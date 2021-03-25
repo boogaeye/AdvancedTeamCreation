@@ -39,8 +39,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Desktop\scp-sl\SCPSL_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-Publicized">
-      <HintPath>..\..\..\..\Desktop\EXILED STUFF\Assembly-CSharp-Publicized.dll</HintPath>
+    <Reference Include="Assembly-CSharp-Publicized %284%29">
+      <HintPath>..\..\FazbearServer\ScpHPScale-EXILED2\bin\Debug\Assembly-CSharp-Publicized (4).dll</HintPath>
     </Reference>
     <Reference Include="CommandSystem.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

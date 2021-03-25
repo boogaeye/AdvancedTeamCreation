@@ -29,6 +29,7 @@ namespace TeamsEXILED
         public override Version Version { get; } = new Version("1.0.1.1");
 
         public static bool assemblyTimer = false;
+        public static RespawnTimer.Config rtconfig = new RespawnTimer.Config();
 
 
         public override void OnEnabled()
@@ -67,7 +68,9 @@ namespace TeamsEXILED
                     {
                         plugin.OnDisabled();
                         assemblyTimer = true;
-                        Log.Warn("this plugin will override this plugin!");
+                        Log.Warn("this plugin will override Respawn Timer now");
+                        rtconfig = (RespawnTimer.Config)plugin.Config;
+                        Log.Debug("Got respawn timer configs", this.Config.Debug);
                     });
                 }
             }

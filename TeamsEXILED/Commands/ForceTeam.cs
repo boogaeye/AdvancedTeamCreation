@@ -22,6 +22,11 @@ namespace TeamsEXILED.Commands
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             Player ply = Player.Get((sender as CommandSender));
+            if (arguments.ToList()[0] == null)
+            {
+                response = "<color=red>Error you cant force team this team as this team doesnt exist</color>";
+                return false;
+            }
             if (ply.CheckPermission("ATC.forceteam"))
             {
                 response = "<color=red>Error Team Does Not Exist</color>";
@@ -31,7 +36,7 @@ namespace TeamsEXILED.Commands
                     {
                         if (!t.Active && !ply.CheckPermission("ATC.bypass"))
                         {
-                            response = "<color=red>Error you cant force team this team as you dont have the ATS.bypassActivity Permission</color>";
+                            response = "<color=red>Error you cant force team this team as you dont have the ATC.bypass Permission</color>";
                             return false;
                         }
                         response = "<color=red>Error Could not find subclass</color>";
@@ -55,7 +60,7 @@ namespace TeamsEXILED.Commands
             }
             else
             {
-                response = "<color=red>You do not have permission to use this command</color>";
+                response = "<color=red>You do not have permission to use this command aka you dont have ATC.forceteam</color>";
             }
             return false;
     }

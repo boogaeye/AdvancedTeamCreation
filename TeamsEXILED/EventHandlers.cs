@@ -10,6 +10,7 @@ using TeamsEXILED.Classes;
 using MEC;
 using Exiled.CustomItems.API.Features;
 using Exiled.API.Interfaces;
+using Interactables.Interobjects.DoorUtils;
 
 namespace TeamsEXILED
 {
@@ -64,33 +65,73 @@ namespace TeamsEXILED
                 }
                 if (MainPlugin.assemblyTimer)
                 {
+                    if (!Respawn.IsSpawning && MainPlugin.rtconfig.ShowTimerOnlyOnSpawn) continue;
                     string text = string.Empty;
                     text += "\n";
                     if (Respawn.NextKnownTeam == Respawning.SpawnableTeamType.None)
                     {
-                        text += $"<color=orange>You will respawn in:</color>\n";
+                        text += $"{MainPlugin.rtconfig.translations.YouWillRespawnIn}\n";
                     }
                     else
                     {
                         text += $"<color=yellow>You are respawning, Please Wait!:</color>\n";
                     }
-                    text += $"{Respawn.TimeUntilRespawn / 60} Minutes and {Respawn.TimeUntilRespawn % 60} Seconds\n";
+                    if (MainPlugin.rtconfig.ShowMinutes)
+                    {
+                        text += $"{Respawn.TimeUntilRespawn / 60} Minutes";
+                    }
+                    if (MainPlugin.rtconfig.ShowSeconds && MainPlugin.rtconfig.ShowMinutes)
+                    {
+                        text += $" and {Respawn.TimeUntilRespawn % 60} Seconds\n";
+                    }
+                    else if (MainPlugin.rtconfig.ShowSeconds)
+                    {
+                        text += $"{Respawn.TimeUntilRespawn} Seconds\n";
+                    }
                     if (chosenTeam == null)
                     {
                         if (Respawn.NextKnownTeam != Respawning.SpawnableTeamType.None)
                         {
-                            text += $"Respawning as {Respawn.NextKnownTeam.ToString()}";
+                            switch (Respawn.NextKnownTeam)
+                            {
+                                case Respawning.SpawnableTeamType.ChaosInsurgency:
+                                    text += $"{MainPlugin.rtconfig.translations.YouWillSpawnAs}{MainPlugin.rtconfig.translations.Ci}\n";
+                                    break;
+                                case Respawning.SpawnableTeamType.NineTailedFox:
+                                    text += $"{MainPlugin.rtconfig.translations.YouWillSpawnAs}{MainPlugin.rtconfig.translations.Ntf}\n";
+                                    break;
+                            }
                         }
                     }
                     else
                     {
-                        text += $"Respawning as <color={chosenTeam.Color}>{chosenTeam.Name}</color>";
+                        text += $"{MainPlugin.rtconfig.translations.YouWillSpawnAs}<color={chosenTeam.Color}>{chosenTeam.Name}</color>\n";
+                    }
+                    if (MainPlugin.rtconfig.ShowNumberOfSpectators)
+                    {
+                        text += $"<align=right>{MainPlugin.rtconfig.translations.Spectators} {MainPlugin.rtconfig.translations.SpectatorsNum}\n</align>";
+                        List<Player> Spectators = new List<Player>();
+                        foreach (Player p in Player.List)
+                        {
+                            if (p.IsDead)
+                            {
+                                Spectators.Add(p);
+                            }
+                        }
+                        text = text.Replace("{spectators_num}", Spectators.Count.ToString());
+                    }
+                    if (MainPlugin.rtconfig.ShowTickets)
+                    {
+                        text += $"<align=right>{MainPlugin.rtconfig.translations.NtfTickets} {MainPlugin.rtconfig.translations.NtfTicketsNum}</align>" +
+                                    $"\n<align=right>{MainPlugin.rtconfig.translations.CiTickets} {MainPlugin.rtconfig.translations.CiTicketsNum}</align>";
+                        text = text.Replace("{ntf_tickets_num}", Respawn.NtfTickets.ToString());
+                        text = text.Replace("{ci_tickets_num}", Respawn.ChaosTickets.ToString());
                     }
                     foreach (Player p in Player.List)
                     {
                         if (p.IsDead)
                         {
-                            p.ShowHint(text, 1.1f);
+                            p.ShowHint(text, MainPlugin.rtconfig.Interval);
                         }
                     }
                 }
@@ -286,6 +327,36 @@ namespace TeamsEXILED
                             if (spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
                             {
                                 p.ReferenceHub.characterClassManager.NetworkCurUnitName = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[respawns].UnitName;
+                            }
+                            if (team.spawnLocation != enums.SpawnLocation.Normal)
+                            {
+                                string nameLooked = string.Empty;
+                                int xoff = 0;
+                                int yoff = 0;
+                                int zoff = 0;
+                                switch (team.spawnLocation)
+                                {
+                                    case enums.SpawnLocation.Escape:
+                                        nameLooked = "ESCAPE_PRIMARY";
+                                        zoff = 2;
+                                        break;
+                                    case enums.SpawnLocation.SCP106:
+                                        if (!Warhead.IsDetonated)
+                                        {
+                                            nameLooked = "106_BOTTOM";
+                                        }
+                                        break;
+                                    case enums.SpawnLocation.SurfaceNuke:
+                                        nameLooked = "SURFACE_NUKE";
+                                        zoff = 2;
+                                        break;
+                                }
+                                try
+                                {
+                                    DoorNametagExtension.NamedDoors[nameLooked].TargetDoor.NetworkTargetState = true;
+                                    p.Position = DoorNametagExtension.NamedDoors[nameLooked].gameObject.transform.position + new UnityEngine.Vector3(0 + xoff, 1 + yoff, 0 + zoff);
+                                }
+                                catch (KeyNotFoundException) { }
                             }
                             p.ClearInventory();
                             foreach (ItemType i in subteams.Inventory)

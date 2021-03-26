@@ -25,11 +25,13 @@ namespace TeamsEXILED
         public override Version RequiredExiledVersion { get; } = new Version("2.8.0.0");
 
         public override string Author { get; } = "BoogaEye";
+
         public override string Name { get; } = "Advanced Team Creation";
 
         public override Version Version { get; } = new Version("1.0.3.0");
 
         public static bool assemblyTimer = false;
+
         public static RespawnTimer.Config rtconfig = new RespawnTimer.Config();
 
 
@@ -60,6 +62,11 @@ namespace TeamsEXILED
             Exiled.Events.Handlers.Map.AnnouncingNtfEntrance += EventHandlers.MTFSpawnAnnounce;
 
             Exiled.Events.Handlers.Server.RoundStarted += EventHandlers.OnRoundStart;
+
+            Events.EventArgs.SetTeam += EventHandlers.OnTeamSpawn;
+
+            Events.EventArgs.ReferancingTeam += EventHandlers.OnReferanceTeam;
+
             if (!Server.FriendlyFire)
             {
                 Log.Warn("Friendly Fire Is heavily recommended to be enabled on server config as it can lead to problems with people not being able to finish around because a person is supposed to be their enemy");
@@ -105,6 +112,9 @@ namespace TeamsEXILED
 
             Exiled.Events.Handlers.Server.RoundStarted -= EventHandlers.OnRoundStart;
 
+            Events.EventArgs.SetTeam -= EventHandlers.OnTeamSpawn;
+
+            Events.EventArgs.ReferancingTeam -= EventHandlers.OnReferanceTeam;
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using TeamsEXILED.enums;
+using TeamsEXILED.Events;
 using Respawning;
 
 namespace TeamsEXILED.API
@@ -78,7 +79,7 @@ namespace TeamsEXILED.API
             {
                 enemies.Add(i);
             }
-            return new Teams
+            Teams teams = new Teams
             {
                 Name = "mtf",
                 Requirements = enemies.ToArray(),
@@ -86,6 +87,10 @@ namespace TeamsEXILED.API
                 Neutral = Classes.Classes.GetAllNeutrals("mtf", config).ToArray(),
                 teamLeaders = LeadingTeam.FacilityForces
             };
+            var handler = new Events.EventArgs.CreatingTeamEventArgs(Teams.NTF(config));
+            handler.StartInvoke();
+            teams = handler.Team;
+            return teams;
         }
         public static Teams CHI(Config config)
         {
@@ -99,7 +104,7 @@ namespace TeamsEXILED.API
             {
                 enemies.Add(i);
             }
-            return new Teams
+            Teams teams = new Teams
             {
                 Name = "chi",
                 Requirements = enemies.ToArray(),
@@ -107,6 +112,10 @@ namespace TeamsEXILED.API
                 Neutral = Classes.Classes.GetAllNeutrals("chi", config).ToArray(),
                 teamLeaders = LeadingTeam.ChaosInsurgency
             };
+            var handler = new Events.EventArgs.CreatingTeamEventArgs(Teams.CHI(config));
+            handler.StartInvoke();
+            teams = handler.Team;
+            return teams;
         }
         public static Teams CDP(Config config)
         {
@@ -120,7 +129,7 @@ namespace TeamsEXILED.API
             {
                 enemies.Add(i);
             }
-            return new Teams
+            Teams teams = new Teams
             {
                 Name = "cdp",
                 Requirements = enemies.ToArray(),
@@ -128,6 +137,10 @@ namespace TeamsEXILED.API
                 Neutral = Classes.Classes.GetAllNeutrals("cdp", config).ToArray(),
                 teamLeaders = LeadingTeam.Anomalies
             };
+            var handler = new Events.EventArgs.CreatingTeamEventArgs(Teams.CDP(config));
+            handler.StartInvoke();
+            teams = handler.Team;
+            return teams;
         }
         public static Teams SCP(Config config)
         {
@@ -141,7 +154,7 @@ namespace TeamsEXILED.API
             {
                 enemies.Add(i);
             }
-            return new Teams
+            Teams teams = new Teams
             {
                 Name = "scp",
                 Requirements = enemies.ToArray(),
@@ -149,6 +162,10 @@ namespace TeamsEXILED.API
                 Neutral = Classes.Classes.GetAllNeutrals("scp", config).ToArray(),
                 teamLeaders = LeadingTeam.Anomalies
             };
+            var handler = new Events.EventArgs.CreatingTeamEventArgs(Teams.SCP(config));
+            handler.StartInvoke();
+            teams = handler.Team;
+            return teams;
         }
         public static Teams RSC(Config config)
         {
@@ -162,7 +179,7 @@ namespace TeamsEXILED.API
             {
                 enemies.Add(i);
             }
-            return new Teams
+            Teams teams = new Teams
             {
                 Name = "rsc",
                 Requirements = enemies.ToArray(),
@@ -170,7 +187,24 @@ namespace TeamsEXILED.API
                 Neutral = Classes.Classes.GetAllNeutrals("rsc", config).ToArray(),
                 teamLeaders = LeadingTeam.Anomalies
             };
+            var handler = new Events.EventArgs.CreatingTeamEventArgs(Teams.RSC(config));
+            handler.StartInvoke();
+            teams = handler.Team;
+            return teams;
         }
+        #endregion
+    }
+    [Obsolete("Not going to use this since this is for custom teams not normal teams Developers can use the CreatingTeam Event to do this if they want")]
+    public class NormalRole
+    {
+        #region NTeam config zone
+        public bool Active { get; set; } = false;
+
+        public RoleType Role { get; set; } = RoleType.Tutorial;
+
+        public ItemType[] Inventory { get; set; } = new ItemType[] { };
+
+        public int[] CustomItems { get; set; } = new int[] { };
         #endregion
     }
 }

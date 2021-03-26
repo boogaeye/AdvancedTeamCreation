@@ -11,6 +11,7 @@ using MEC;
 using Exiled.CustomItems.API.Features;
 using Exiled.API.Interfaces;
 using Interactables.Interobjects.DoorUtils;
+using TeamsEXILED.Events;
 
 namespace TeamsEXILED
 {
@@ -165,11 +166,28 @@ namespace TeamsEXILED
             }
         }
 
+        public void OnReferanceTeam(Events.EventArgs.TeamReferancedEventArgs ev)
+        {
+            Log.Debug($"Forceteam: {ev.ForceTeam}\nIsAllowed: {ev.IsAllowed}\nTeamName: {ev.Team.Name}", this.plugin.Config.Debug);
+        }
+
         public void RefNextTeamSpawn()
         {
             HasReference = true;
             Log.Debug("Getting Team Referances", this.plugin.Config.Debug);
             chosenTeam = this.plugin.Config.Teams[random.Next(0, this.plugin.Config.Teams.Length)];
+            var handler = new Events.EventArgs.TeamReferancedEventArgs(chosenTeam);
+            handler.StartInvoke();
+            chosenTeam = handler.Team;
+            if (!handler.IsAllowed)
+            {
+                chosenTeam = null;
+                return;
+            }
+            if (handler.ForceTeam)
+            {
+                return;
+            }
             if (chosenTeam.SpawnTypes.Contains(Respawn.NextKnownTeam) && chosenTeam.Active)
             {
                 Log.Debug("Next Known Spawn is " + Respawn.NextKnownTeam, this.plugin.Config.Debug);
@@ -193,6 +211,18 @@ namespace TeamsEXILED
         {
             Log.Debug("Getting Team Referances", this.plugin.Config.Debug);
             chosenTeam = this.plugin.Config.Teams[random.Next(0, this.plugin.Config.Teams.Length)];
+            var handler = new Events.EventArgs.TeamReferancedEventArgs(chosenTeam);
+            handler.StartInvoke();
+            chosenTeam = handler.Team;
+            if (!handler.IsAllowed)
+            {
+                chosenTeam = null;
+                return;
+            }
+            if (handler.ForceTeam)
+            {
+                return;
+            }
             if (chosenTeam.SpawnTypes.Contains(spawnableTeamType) && chosenTeam.Active)
             {
                 Log.Debug("Next Known Spawn is " + spawnableTeamType, this.plugin.Config.Debug);
@@ -249,6 +279,23 @@ namespace TeamsEXILED
             {
                 teamedPlayers[ev.Player] = ev.Player.Team.ToString().ToLower();
             });
+        }
+
+        public void OnTeamSpawn(Events.EventArgs.SetTeamEventArgs ev)
+        {
+            if (!Round.IsStarted)
+            {
+                ev.IsAllowed = false;
+                ev.Player.ShowHint("Couldnt spawn you in before the round started");
+            }
+            if (HasReference)
+            {
+                if (ev.Player.Role == RoleType.Spectator)
+                {
+                    ev.IsAllowed = false;
+                    ev.Player.ShowHint("Couldnt spawn you in because you are already spawning in");
+                }
+            }
         }
 
         public void OnRespawning(RespawningTeamEventArgs ev)
@@ -319,13 +366,17 @@ namespace TeamsEXILED
                 }
             }
         }
-
         public void ChangeTeam(Player p, string t, string s)
         {
             if (p.IsOverwatchEnabled)
             {
                 return;
             }
+            var handler = new Events.EventArgs.SetTeamEventArgs(t, s, p);
+            handler.StartInvoke();
+            t = handler.Team;
+            s = handler.Subclass;
+            if (!handler.IsAllowed) return;
             //Finding teems and seeing if the string exists
             foreach (Teams team in this.plugin.Config.Teams)
             {

@@ -75,7 +75,7 @@ namespace TeamsEXILED
                 Name = "officer", Ammo = new Dictionary<AmmoType, uint>(){ { AmmoType.Nato9, 200 } }, Inventory = new ItemType[]{ ItemType.GunUSP, ItemType.KeycardFacilityManager, ItemType.Adrenaline, ItemType.WeaponManagerTablet }, HP = 100, ModelRole = RoleType.NtfScientist, RoleName = "<color=red>TTA</color>", RoleHint = "You are the TTA\nKill everything in sight", CustomItemIds = new int[] { 0, 0 }
             } },
             Friendlys = new string[] { "tta" },
-            Requirements = new string[] { "chi", "scp", "serpentshand", "goc", "gru", "mtf", "cdp", "rsc", "opcf" },
+            Requirements = new string[] { "chi", "scp", "serpentshand", "goc", "gru", "mtf", "cdp", "rsc", "opcf", "aes" },
             teamLeaders = LeadingTeam.Anomalies,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.NineTailedFox, Respawning.SpawnableTeamType.ChaosInsurgency },
             CassieMessageMTFSpawn = "pitch_0.1 .g3 .g3 .g3 pitch_1 The Tactical Target Agent C has entered the facility bell_end",
@@ -178,7 +178,7 @@ namespace TeamsEXILED
                     RoleHint = "You are to eliminate all scp subjects",
                     Inventory = new ItemType[]{ ItemType.GunMP7, ItemType.KeycardZoneManager, ItemType.Medkit, ItemType.WeaponManagerTablet, ItemType.WeaponManagerTablet },
                     CustomItemIds = new int[]{ },
-                    NumOfAllowedPlayers = 1
+                    NumOfAllowedPlayers = -1
                 },
             },
             Friendlys = new string[] { "aes" },

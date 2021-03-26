@@ -128,7 +128,11 @@ namespace TeamsEXILED.Classes
             foreach (string i in GetAllFriendlyTeams(s, config)) {
                 friendlys.Add(i);
             }
-            return new Teams { Name = s, Requirements = GetAllRequirements(s, config).ToArray<string>(), Friendlys = friendlys.ToArray() };
+            Teams teams = new Teams { Name = s, Requirements = GetAllRequirements(s, config).ToArray<string>(), Friendlys = friendlys.ToArray() };
+            var handler = new Events.EventArgs.CreatingTeamEventArgs(teams);
+            handler.StartInvoke();
+            teams = handler.Team;
+            return teams;
         }
     }
 }

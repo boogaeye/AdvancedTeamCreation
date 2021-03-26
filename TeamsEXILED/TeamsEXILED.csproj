@@ -97,6 +97,7 @@
     <Compile Include="MainPlugin.cs" />
     <Compile Include="Others\Classes.cs" />
     <Compile Include="Others\enums.cs" />
+    <Compile Include="Others\Events.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Others\API.cs" />
   </ItemGroup>

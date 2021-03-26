@@ -15,7 +15,7 @@ namespace TeamsEXILED.Events
     {
         public static event TeamEvent<SetTeamEventArgs> SetTeam;
         public static event TeamEvent<CreatingTeamEventArgs> CreatingTeam;
-        public static event TeamEvent<TeamReferancedEventArgs> ReferancingTeam;
+        public static event TeamEvent<TeamReferencedEventArgs> ReferencingTeam;
         public class SetTeamEventArgs : System.EventArgs
         {
             public SetTeamEventArgs(string team, string subclass, Player player, bool isAllowed = true)
@@ -46,9 +46,9 @@ namespace TeamsEXILED.Events
                 CreatingTeam.Invoke(this);
             }
         }
-        public class TeamReferancedEventArgs : System.EventArgs
+        public class TeamReferencedEventArgs : System.EventArgs
         {
-            public TeamReferancedEventArgs(Teams teams, bool isAllowed = true, bool forceTeam = false)
+            public TeamReferencedEventArgs(Teams teams, bool isAllowed = true, bool forceTeam = false)
             {
                 Team = teams;
                 IsAllowed = isAllowed;
@@ -59,7 +59,7 @@ namespace TeamsEXILED.Events
             public bool IsAllowed { get; set; }
             public void StartInvoke()
             {
-                ReferancingTeam.Invoke(this);
+                ReferencingTeam.Invoke(this);
             }
         }
     }

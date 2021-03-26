@@ -65,7 +65,7 @@ namespace TeamsEXILED
 
             Events.EventArgs.SetTeam += EventHandlers.OnTeamSpawn;
 
-            Events.EventArgs.ReferancingTeam += EventHandlers.OnReferanceTeam;
+            Events.EventArgs.ReferencingTeam += EventHandlers.OnReferanceTeam;
 
             if (!Server.FriendlyFire)
             {
@@ -114,7 +114,7 @@ namespace TeamsEXILED
 
             Events.EventArgs.SetTeam -= EventHandlers.OnTeamSpawn;
 
-            Events.EventArgs.ReferancingTeam -= EventHandlers.OnReferanceTeam;
+            Events.EventArgs.ReferencingTeam -= EventHandlers.OnReferanceTeam;
         }
     }
 }

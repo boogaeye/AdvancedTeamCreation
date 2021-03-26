@@ -166,7 +166,7 @@ namespace TeamsEXILED
             }
         }
 
-        public void OnReferanceTeam(Events.EventArgs.TeamReferancedEventArgs ev)
+        public void OnReferanceTeam(Events.EventArgs.TeamReferencedEventArgs ev)
         {
             Log.Debug($"Forceteam: {ev.ForceTeam}\nIsAllowed: {ev.IsAllowed}\nTeamName: {ev.Team.Name}", this.plugin.Config.Debug);
         }
@@ -176,7 +176,7 @@ namespace TeamsEXILED
             HasReference = true;
             Log.Debug("Getting Team Referances", this.plugin.Config.Debug);
             chosenTeam = this.plugin.Config.Teams[random.Next(0, this.plugin.Config.Teams.Length)];
-            var handler = new Events.EventArgs.TeamReferancedEventArgs(chosenTeam);
+            var handler = new Events.EventArgs.TeamReferencedEventArgs(chosenTeam);
             handler.StartInvoke();
             chosenTeam = handler.Team;
             if (!handler.IsAllowed)
@@ -211,7 +211,7 @@ namespace TeamsEXILED
         {
             Log.Debug("Getting Team Referances", this.plugin.Config.Debug);
             chosenTeam = this.plugin.Config.Teams[random.Next(0, this.plugin.Config.Teams.Length)];
-            var handler = new Events.EventArgs.TeamReferancedEventArgs(chosenTeam);
+            var handler = new Events.EventArgs.TeamReferencedEventArgs(chosenTeam);
             handler.StartInvoke();
             chosenTeam = handler.Team;
             if (!handler.IsAllowed)

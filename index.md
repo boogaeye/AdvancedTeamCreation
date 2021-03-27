@@ -13,3 +13,8 @@ Advanced Team Creation
 [I need help](https://github.com/boogaeye/AdvancedTeamCreation/discussions/new)
 
 [I found an issue](https://github.com/boogaeye/AdvancedTeamCreation/issues/new)
+
+```YML
+this plugin supports:
+- Respawn Timer
+```

@@ -1,7 +1,15 @@
 Advanced Team Creation
 ----
-<h1>BoogasCustomItems Recommended for default config</h1>
+<h3>BoogasCustomItems Recommended for default config</h3>
 
 [Get Latest Version](https://github.com/boogaeye/AdvancedTeamCreation/releases/latest)
 
 [Developer Wiki](https://github.com/boogaeye/AdvancedTeamCreation/wiki/Developers)
+
+[Config Wiki](https://github.com/boogaeye/AdvancedTeamCreation/wiki/Configs)
+
+[Cmd&Perms Wiki](https://github.com/boogaeye/AdvancedTeamCreation/wiki/Commands-And-Permissions)
+
+[I need help](https://github.com/boogaeye/AdvancedTeamCreation/discussions/new)
+
+[I found an issue](https://github.com/boogaeye/AdvancedTeamCreation/issues/new)

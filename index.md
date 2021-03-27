@@ -6,6 +6,8 @@ Advanced Team Creation
 
 [Developer Wiki](https://github.com/boogaeye/AdvancedTeamCreation/wiki/Developers)
 
+[Code Repo](https://github.com/boogaeye/AdvancedTeamCreation)
+
 [Config Wiki](https://github.com/boogaeye/AdvancedTeamCreation/wiki/Configs)
 
 [Cmd&Perms Wiki](https://github.com/boogaeye/AdvancedTeamCreation/wiki/Commands-And-Permissions)

@@ -59,7 +59,8 @@ namespace TeamsEXILED
             Timing.RunCoroutine(Timer());
             Timing.RunCoroutine(RespawnTimerPatch());
         }
-
+        
+        //https://github.com/Michal78900/RespawnTimer respawn timer by Michal78900
         IEnumerator<float> Timer()
         {
             while (Round.IsStarted)

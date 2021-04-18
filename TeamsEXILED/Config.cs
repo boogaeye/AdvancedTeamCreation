@@ -83,7 +83,7 @@ namespace TeamsEXILED
             CassieMessageChaosMessage = "pitch_0.1 .g3 .g3 .g3 pitch_1 The Tactical Target Agent C unit {nato} {SCP} has entered the facility bell_end",
             Chance = 50,
             Color = "red",
-            spawnLocation = enums.SpawnLocation.SurfaceNuke
+            spawnLocation = Enums.SpawnLocation.SurfaceNuke
         },new Teams(){
             Active = true,
             Name = "opcf",
@@ -131,7 +131,7 @@ namespace TeamsEXILED
             Chance = 100,
             Color = "green",
             Neutral = new string[]{ "rsc" },
-            spawnLocation = enums.SpawnLocation.Escape
+            spawnLocation = Enums.SpawnLocation.Escape
         }, new Teams{
             Active = true,
             Name = "aes",
@@ -190,9 +190,51 @@ namespace TeamsEXILED
             Chance = 50,
             Color = "red",
             Neutral = new string[]{ "mtf", "opcf", "goc", "gru", "chi", "rsc", "cdp" },
-            spawnLocation = enums.SpawnLocation.SCP106,
+            spawnLocation = Enums.SpawnLocation.SCP106,
             CassieMessageMTFSpawn = "cassie pitch_0.6 .g3 .g3 pitch_1 the arrival of the anomaly emergency squad {nato} {unit} has entered the facility. pitch_0.96 please escort2 all scpsubjects to surface zone. pitch_1 all scpsubjects need to be secured. please wait inside of your designated evacuation shelters until this emergency has been completed. there are {SCP} scpsubjects remaining."
         }
+        };
+        public NormalTeam[] TeamRedefine { get; set; } = new NormalTeam[] {
+            new NormalTeam()
+            {
+                Active = true,
+                Team = Team.MTF,
+                Friendlys = new string[] { "opcf", "mtf", "rtc" },
+                Requirements = new string[] { "scp", "rsc", "chi", "cdp", "serpentshand", "tta"  },
+                Neutral = new string[]{ "aes", "goc", "gru" }
+            },
+            new NormalTeam()
+            {
+                Active = true,
+                Team = Team.CHI,
+                Friendlys = new string[] { "chi", "cdp" },
+                Requirements = new string[] { "scp", "rsc", "mtf", "cdp", "serpentshand", "tta", "opcf"  },
+                Neutral = new string[]{ "aes", "goc", "gru" }
+            },
+            new NormalTeam()
+            {
+                Active = true,
+                Team = Team.CDP,
+                Friendlys = new string[] { "chi", "cdp" },
+                Requirements = new string[] { "scp", "rsc", "mtf", "serpentshand", "tta", "opcf"  },
+                Neutral = new string[]{ "aes", "goc", "gru" }
+            },
+            new NormalTeam()
+            {
+                Active = true,
+                Team = Team.RSC,
+                Friendlys = new string[] { "mtf", "rsc" },
+                Requirements = new string[] { "scp", "rsc", "mtf", "cdp", "serpentshand", "tta", "opcf"  },
+                Neutral = new string[]{ "aes", "goc", "gru", "opcf" }
+            },
+            new NormalTeam()
+            {
+                Active = true,
+                Team = Team.SCP,
+                Friendlys = new string[] { "scp", "serpentshand" },
+                Requirements = new string[] { "scp", "rsc", "mtf", "cdp", "serpentshand", "tta", "opcf", "aes", "goc", "gru"  },
+                Neutral = new string[]{ }
+            }
         };
     }
 }

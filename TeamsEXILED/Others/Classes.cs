@@ -31,8 +31,7 @@ namespace TeamsEXILED.Classes
         }
         public string[] GetFriendlyTeams(Teams team)
         {
-            string[] r = team.Friendlys;
-            return r;
+            return team.Friendlys;
         }
         public static List<string> GetAllRequirements(string TeamFond, Config config)
         {
@@ -72,19 +71,11 @@ namespace TeamsEXILED.Classes
         }
         public bool IsTeamFriendly(Teams i, string u)
         {
-            if (i.Friendlys.Contains(u))
-            {
-                return true;
-            }
-            return false;
+            return i.Friendlys.Contains(u);
         }
         public bool IsTeamEnemy(Teams i, String u)
         {
-            if (i.Requirements.Contains(u))
-            {
-                return true;
-            }
-            return false;
+            return i.Requirements.Contains(u);
         }
         [Obsolete("No longer in use")]
         public static bool Exists(string look, string[] teams)

@@ -7,13 +7,13 @@ using System.Collections;
 using TeamsEXILED.API;
 using Respawning;
 
-namespace TeamsEXILED.enums
+namespace TeamsEXILED.Enums
 {
     public enum SpawnLocation
     {
-        Normal = -1,
-        Escape = 0,
-        SCP106 = 1,
-        SurfaceNuke = 2
+        Normal,
+        Escape,
+        SCP106,
+        SurfaceNuke
     }
 }

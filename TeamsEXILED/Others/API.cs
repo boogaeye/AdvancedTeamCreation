@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using TeamsEXILED.enums;
+using TeamsEXILED.Enums;
 using TeamsEXILED.Events;
 using Respawning;
 
@@ -67,6 +67,17 @@ namespace TeamsEXILED.API
         public ushort Chance { get; set; } = 50;
         #endregion
         #region Static Zone
+        public static bool IsDefinedInConfig(string normalteam, Config config)
+        {
+            foreach (NormalTeam n in config.TeamRedefine)
+            {
+                if (n.Team.ToString().ToLower() == normalteam)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         public static Teams NTF(Config config)
         {
             List<string> friendlys = new List<string>() { "mtf", "rsc" };
@@ -87,7 +98,7 @@ namespace TeamsEXILED.API
                 Neutral = Classes.Classes.GetAllNeutrals("mtf", config).ToArray(),
                 teamLeaders = LeadingTeam.FacilityForces
             };
-            var handler = new Events.EventArgs.CreatingTeamEventArgs(Teams.NTF(config));
+            var handler = new Events.EventArgs.CreatingTeamEventArgs(teams);
             handler.StartInvoke();
             teams = handler.Team;
             return teams;
@@ -96,6 +107,7 @@ namespace TeamsEXILED.API
         {
             List<string> friendlys = new List<string>() { "chi", "cdp" };
             List<string> enemies = new List<string>() { "mtf", "scp", "cdp" };
+            List<string> neutral = new List<string>() { };
             foreach (string i in Classes.Classes.GetAllFriendlyTeams("chi", config))
             {
                 friendlys.Add(i);
@@ -104,15 +116,19 @@ namespace TeamsEXILED.API
             {
                 enemies.Add(i);
             }
+            foreach (string i in Classes.Classes.GetAllNeutrals("chi", config).ToArray())
+            {
+                neutral.Add(i);
+            }
             Teams teams = new Teams
             {
                 Name = "chi",
                 Requirements = enemies.ToArray(),
                 Friendlys = friendlys.ToArray(),
-                Neutral = Classes.Classes.GetAllNeutrals("chi", config).ToArray(),
+                Neutral = neutral.ToArray(),
                 teamLeaders = LeadingTeam.ChaosInsurgency
             };
-            var handler = new Events.EventArgs.CreatingTeamEventArgs(Teams.CHI(config));
+            var handler = new Events.EventArgs.CreatingTeamEventArgs(teams);
             handler.StartInvoke();
             teams = handler.Team;
             return teams;
@@ -137,7 +153,7 @@ namespace TeamsEXILED.API
                 Neutral = Classes.Classes.GetAllNeutrals("cdp", config).ToArray(),
                 teamLeaders = LeadingTeam.Anomalies
             };
-            var handler = new Events.EventArgs.CreatingTeamEventArgs(Teams.CDP(config));
+            var handler = new Events.EventArgs.CreatingTeamEventArgs(teams);
             handler.StartInvoke();
             teams = handler.Team;
             return teams;
@@ -162,7 +178,7 @@ namespace TeamsEXILED.API
                 Neutral = Classes.Classes.GetAllNeutrals("scp", config).ToArray(),
                 teamLeaders = LeadingTeam.Anomalies
             };
-            var handler = new Events.EventArgs.CreatingTeamEventArgs(Teams.SCP(config));
+            var handler = new Events.EventArgs.CreatingTeamEventArgs(teams);
             handler.StartInvoke();
             teams = handler.Team;
             return teams;
@@ -187,24 +203,26 @@ namespace TeamsEXILED.API
                 Neutral = Classes.Classes.GetAllNeutrals("rsc", config).ToArray(),
                 teamLeaders = LeadingTeam.Anomalies
             };
-            var handler = new Events.EventArgs.CreatingTeamEventArgs(Teams.RSC(config));
+            var handler = new Events.EventArgs.CreatingTeamEventArgs(teams);
             handler.StartInvoke();
             teams = handler.Team;
             return teams;
         }
         #endregion
     }
-    [Obsolete("Not going to use this since this is for custom teams not normal teams Developers can use the CreatingTeam Event to do this if they want")]
-    public class NormalRole
+    public class NormalTeam
     {
         #region NTeam config zone
         public bool Active { get; set; } = false;
 
-        public RoleType Role { get; set; } = RoleType.Tutorial;
+        public Team Team { get; set; } = Team.TUT;
 
-        public ItemType[] Inventory { get; set; } = new ItemType[] { };
-
-        public int[] CustomItems { get; set; } = new int[] { };
+        [Description("String values of teams MUST be lowercase to define correctly. you can define Exiled teams too! this defines who cant hurt this team")]
+        public string[] Friendlys { get; set; } = new string[] { };
+        [Description("String values MUST be lowercase to define correctly. this defines teams that if alive when this team wins will make the round a draw")]
+        public string[] Neutral { get; set; } = new string[] { };
+        [Description("String values of teams MUST be lowercase to define correctly and you can use Exiled teams too. this ends the round when none of these teams are in the round when this team is active(This is requirements due to the fact that You wouldnt want Scientist to win when MTF is here to try helping them escape. plus requirements are also for which teams are enemies and cant allow them to win)")]
+        public string[] Requirements { get; set; } = new string[] { };
         #endregion
     }
 }

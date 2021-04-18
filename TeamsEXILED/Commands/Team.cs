@@ -10,7 +10,7 @@ using Exiled.Permissions.Extensions;
 
 namespace TeamsEXILED.Commands
 {
-    [CommandHandler(typeof(CommandHandler))]
+    [CommandHandler(typeof(ClientCommandHandler))]
     class Team : ICommand
     {
         public string Command { get; } = "team";

@@ -73,23 +73,26 @@ namespace TeamsEXILED
 
             Events.EventArgs.CreatingTeam += EventHandlers.OnCreatingTeam;
 
+            Exiled.Events.Handlers.Server.SendingConsoleCommand += EventHandlers.OnSendingCommand;
+
             if (!Server.FriendlyFire)
             {
                 Log.Warn("Friendly Fire Is heavily recommended to be enabled on server config as it can lead to problems with people not being able to finish around because a person is supposed to be their enemy");
             }
-            foreach (IPlugin<IConfig> plugin in Loader.Plugins)
+
+            Timing.CallDelayed(2f, () =>
             {
-                if (plugin.Name == "RespawnTimer" && plugin.Config.IsEnabled)
+                foreach (IPlugin<IConfig> plugin in Loader.Plugins)
                 {
-                    assemblyTimer = true;
-                    rtconfig = (RespawnTimer.Config)plugin.Config;
-                    Log.Debug("Got respawn timer configs", this.Config.Debug);
-                    EventHandlers.mtfTrans = rtconfig.translations.Ntf;
-                    EventHandlers.chaosTrans = rtconfig.translations.Ci;
-                }
-                if (plugin.Name == "UIU Rescue Squad" && plugin.Config.IsEnabled)
-                {
-                    Timing.CallDelayed(5f, () =>
+                    if (plugin.Name == "RespawnTimer" && plugin.Config.IsEnabled)
+                    {
+                        assemblyTimer = true;
+                        rtconfig = (RespawnTimer.Config)plugin.Config;
+                        Log.Debug("Got respawn timer configs", this.Config.Debug);
+                        EventHandlers.mtfTrans = rtconfig.translations.Ntf;
+                        EventHandlers.chaosTrans = rtconfig.translations.Ci;
+                    }
+                    if (plugin.Name == "UIU Rescue Squad" && plugin.Config.IsEnabled)
                     {
                         asseblyUIU = true;
                         uiuConfig = (UIURescueSquad.Config)plugin.Config;
@@ -108,9 +111,9 @@ namespace TeamsEXILED
                         //        new Subteams {}
                         //    },
                         //});
-                    });
+                    }
                 }
-            }
+            });
 
             base.OnEnabled();
         }
@@ -143,7 +146,13 @@ namespace TeamsEXILED
 
             Events.EventArgs.CreatingTeam -= EventHandlers.OnCreatingTeam;
 
+            Exiled.Events.Handlers.Server.SendingConsoleCommand -= EventHandlers.OnSendingCommand;
+
             base.OnDisabled();
+        }
+
+        public void OnReload()
+        {
         }
     }
 }

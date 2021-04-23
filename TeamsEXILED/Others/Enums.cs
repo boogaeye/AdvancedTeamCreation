@@ -15,8 +15,14 @@ namespace TeamsEXILED.Enums
         Escape,
         SCP106,
         SurfaceNuke,
-        PluginHandle
+        PluginHandle,
+        SCP012,
+        SCP079,
+        SCP096,
+        SCP173,
+        Shelter
     }
+
     public enum EscapeRoles : sbyte
     {
         DClass = RoleType.ClassD,

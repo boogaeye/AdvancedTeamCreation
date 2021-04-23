@@ -95,25 +95,15 @@ namespace TeamsEXILED.Classes
                     return t;
                 }
             }
-            if (s == "mtf")
+            if (Teams.IsDefinedInConfig(s, config))
             {
-                return Teams.NTF(config);
-            }
-            if (s == "chi")
-            {
-                return Teams.CHI(config);
-            }
-            if (s == "cdp")
-            {
-                return Teams.CDP(config);
-            }
-            if (s == "scp")
-            {
-                return Teams.SCP(config);
-            }
-            if (s == "rsc")
-            {
-                return Teams.RSC(config);
+                foreach (NormalTeam nt in config.TeamRedefine)
+                {
+                    if (nt.Team.ToString().ToLower() == s)
+                    {
+                        return new Teams { Active = nt.Active, Name = nt.Team.ToString().ToLower(), Friendlys = nt.Friendlys, Requirements = nt.Requirements, Neutral = nt.Neutral, teamLeaders = nt.TeamLeaders };
+                    }
+                }
             }
             List<string> friendlys = new List<string>() { s };
             foreach (string i in GetAllFriendlyTeams(s, config)) {
@@ -124,6 +114,25 @@ namespace TeamsEXILED.Classes
             handler.StartInvoke();
             teams = handler.Team;
             return teams;
+        }
+        public Team ConvertToNormalTeamName(RoleType role)
+        {
+            RoleType[] mtf = { RoleType.NtfCadet, RoleType.NtfCommander, RoleType.NtfLieutenant, RoleType.NtfScientist, RoleType.FacilityGuard, RoleType.Scientist };
+            RoleType[] ci = { RoleType.ChaosInsurgency, RoleType.ClassD };
+            RoleType[] scp = { RoleType.Scp173, RoleType.Scp106, RoleType.Scp096, RoleType.Scp079, RoleType.Scp0492, RoleType.Scp049, RoleType.Scp93989, RoleType.Scp93953 };
+            if (mtf.Contains(role))
+            {
+                return Team.MTF;
+            }
+            else if (ci.Contains(role))
+            {
+                return Team.CHI;
+            }
+            else if (scp.Contains(role))
+            {
+                return Team.SCP;
+            }
+            return Team.TUT;
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Exiled.API.Enums;
-using Exiled.API.Features;
+using Exiled.CustomItems.API.Features;
 using TeamsEXILED.Enums;
 using TeamsEXILED.Events;
 using Respawning;
@@ -27,11 +27,11 @@ namespace TeamsEXILED.API
         public Dictionary<AmmoType, uint> Ammo { get; set; } = new Dictionary<AmmoType, uint>() { { AmmoType.Nato556, 0u }, { AmmoType.Nato762, 0u }, { AmmoType.Nato9, 0u } };
         [Description("Sets what this role is supposed to look like")]
         public RoleType ModelRole { get; set; }
-        [Description("sets the role name on the playerlist to easily define who you are")]
+        [Description("sets the role name on the player to easily define who you are")]
         public String RoleName { get; set; }
         [Description("What the Hint says for the role itself")]
         public string RoleHint { get; set; }
-        [Description("the amount of players that can be changed to this role when spawning")]
+        [Description("the amount of players that can be changed to this role when spawning setting this to -1 will make the rest of the players this Subteam")]
         public int NumOfAllowedPlayers { get; set; } = -1;
         #endregion
     }
@@ -52,7 +52,7 @@ namespace TeamsEXILED.API
         public string[] Requirements { get; set; } = new string[] { };
         [Description("Defines where this team can spawn by default it can spawn as both Chaos and NineTailedFox spawn locations")]
         public SpawnableTeamType[] SpawnTypes { get; set; } = { SpawnableTeamType.ChaosInsurgency, SpawnableTeamType.NineTailedFox };
-        [Description("defines who wins at the end of the round if the Enemies perameter is accepted")]
+        [Description("defines who wins at the end of the round if the Requirements perameter is accepted")]
         public LeadingTeam teamLeaders { get; set; } = LeadingTeam.Anomalies;
         [Description("Makes MTF cassie messages when this team spawns set it to nothing if you dont want an MTF cassie message")]
         public string CassieMessageMTFSpawn { get; set; }
@@ -62,6 +62,8 @@ namespace TeamsEXILED.API
         public ushort CassieMessageChaosAnnounceChance { get; set; } = 100;
         [Description("Sets where this team spawns")]
         public SpawnLocation spawnLocation { get; set; } = SpawnLocation.Normal;
+        [Description("makes it where if this team is the latest spawn it will spawn the assigned escapees to this team if they are defined in this config")]
+        public EscapeRoles[] escapeChange { get; set; } = { EscapeRoles.Scientist, EscapeRoles.DClass };
         public string Color { get; set; } = "cyan";
         [Description("the chance this team will spawn if its been selected")]
         public ushort Chance { get; set; } = 50;
@@ -71,142 +73,12 @@ namespace TeamsEXILED.API
         {
             foreach (NormalTeam n in config.TeamRedefine)
             {
-                if (n.Team.ToString().ToLower() == normalteam)
+                if (n.Team.ToString().ToLower() == normalteam.ToLower())
                 {
                     return true;
                 }
             }
             return false;
-        }
-        public static Teams NTF(Config config)
-        {
-            List<string> friendlys = new List<string>() { "mtf", "rsc" };
-            List<string> enemies = new List<string>() { "chi", "cdp", "scp", "rsc" };
-            foreach (string i in Classes.Classes.GetAllFriendlyTeams("mtf", config))
-            {
-                friendlys.Add(i);
-            }
-            foreach (string i in Classes.Classes.GetAllRequirements("mtf", config).ToArray())
-            {
-                enemies.Add(i);
-            }
-            Teams teams = new Teams
-            {
-                Name = "mtf",
-                Requirements = enemies.ToArray(),
-                Friendlys = friendlys.ToArray(),
-                Neutral = Classes.Classes.GetAllNeutrals("mtf", config).ToArray(),
-                teamLeaders = LeadingTeam.FacilityForces
-            };
-            var handler = new Events.EventArgs.CreatingTeamEventArgs(teams);
-            handler.StartInvoke();
-            teams = handler.Team;
-            return teams;
-        }
-        public static Teams CHI(Config config)
-        {
-            List<string> friendlys = new List<string>() { "chi", "cdp" };
-            List<string> enemies = new List<string>() { "mtf", "scp", "cdp" };
-            List<string> neutral = new List<string>() { };
-            foreach (string i in Classes.Classes.GetAllFriendlyTeams("chi", config))
-            {
-                friendlys.Add(i);
-            }
-            foreach (string i in Classes.Classes.GetAllRequirements("chi", config).ToArray())
-            {
-                enemies.Add(i);
-            }
-            foreach (string i in Classes.Classes.GetAllNeutrals("chi", config).ToArray())
-            {
-                neutral.Add(i);
-            }
-            Teams teams = new Teams
-            {
-                Name = "chi",
-                Requirements = enemies.ToArray(),
-                Friendlys = friendlys.ToArray(),
-                Neutral = neutral.ToArray(),
-                teamLeaders = LeadingTeam.ChaosInsurgency
-            };
-            var handler = new Events.EventArgs.CreatingTeamEventArgs(teams);
-            handler.StartInvoke();
-            teams = handler.Team;
-            return teams;
-        }
-        public static Teams CDP(Config config)
-        {
-            List<string> friendlys = new List<string>() { "cdp", "chi" };
-            List<string> enemies = new List<string>() { "mtf", "scp", "rsc" };
-            foreach (string i in Classes.Classes.GetAllFriendlyTeams("cdp", config))
-            {
-                friendlys.Add(i);
-            }
-            foreach (string i in Classes.Classes.GetAllRequirements("cdp", config))
-            {
-                enemies.Add(i);
-            }
-            Teams teams = new Teams
-            {
-                Name = "cdp",
-                Requirements = enemies.ToArray(),
-                Friendlys = friendlys.ToArray(),
-                Neutral = Classes.Classes.GetAllNeutrals("cdp", config).ToArray(),
-                teamLeaders = LeadingTeam.Anomalies
-            };
-            var handler = new Events.EventArgs.CreatingTeamEventArgs(teams);
-            handler.StartInvoke();
-            teams = handler.Team;
-            return teams;
-        }
-        public static Teams SCP(Config config)
-        {
-            List<string> friendlys = new List<string>() { "scp" };
-            List<string> enemies = new List<string>() { "mtf", "cdp", "chi", "rsc" };
-            foreach (string i in Classes.Classes.GetAllFriendlyTeams("scp", config))
-            {
-                friendlys.Add(i);
-            }
-            foreach (string i in Classes.Classes.GetAllRequirements("scp", config).ToArray())
-            {
-                enemies.Add(i);
-            }
-            Teams teams = new Teams
-            {
-                Name = "scp",
-                Requirements = enemies.ToArray(),
-                Friendlys = friendlys.ToArray(),
-                Neutral = Classes.Classes.GetAllNeutrals("scp", config).ToArray(),
-                teamLeaders = LeadingTeam.Anomalies
-            };
-            var handler = new Events.EventArgs.CreatingTeamEventArgs(teams);
-            handler.StartInvoke();
-            teams = handler.Team;
-            return teams;
-        }
-        public static Teams RSC(Config config)
-        {
-            List<string> friendlys = new List<string>() { "rsc", "mtf" };
-            List<string> enemies = new List<string>() { "cdp", "chi", "scp" };
-            foreach (string i in Classes.Classes.GetAllFriendlyTeams("rsc", config))
-            {
-                friendlys.Add(i);
-            }
-            foreach (string i in Classes.Classes.GetAllRequirements("rsc", config).ToArray())
-            {
-                enemies.Add(i);
-            }
-            Teams teams = new Teams
-            {
-                Name = "rsc",
-                Requirements = enemies.ToArray(),
-                Friendlys = friendlys.ToArray(),
-                Neutral = Classes.Classes.GetAllNeutrals("rsc", config).ToArray(),
-                teamLeaders = LeadingTeam.Anomalies
-            };
-            var handler = new Events.EventArgs.CreatingTeamEventArgs(teams);
-            handler.StartInvoke();
-            teams = handler.Team;
-            return teams;
         }
         #endregion
     }
@@ -223,6 +95,31 @@ namespace TeamsEXILED.API
         public string[] Neutral { get; set; } = new string[] { };
         [Description("String values of teams MUST be lowercase to define correctly and you can use Exiled teams too. this ends the round when none of these teams are in the round when this team is active(This is requirements due to the fact that You wouldnt want Scientist to win when MTF is here to try helping them escape. plus requirements are also for which teams are enemies and cant allow them to win)")]
         public string[] Requirements { get; set; } = new string[] { };
+
+        public LeadingTeam TeamLeaders { get; set; } = LeadingTeam.Anomalies;
         #endregion
+    }
+    public class TeamConvert
+    {
+        #region vars
+        public static List<Teams> PluginTeams = new List<Teams>();
+        #endregion
+        #region Static zone
+        public static void ConvertPluginTeam(Teams team)
+        {
+            PluginTeams.Add(team);
+        }
+        public static List<Teams> GetPluginTeams()
+        {
+            return PluginTeams;
+        }
+        #endregion
+    }
+    public class CustomItemHandler
+    {
+        public static void ItemHandler(Item itemType)
+        {
+            
+        }
     }
 }

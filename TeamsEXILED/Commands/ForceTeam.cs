@@ -22,9 +22,9 @@ namespace TeamsEXILED.Commands
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             Player ply = Player.Get((sender as CommandSender));
-            if (arguments.ToList()[0] == null)
+            if (arguments.ToList().Count == 0)
             {
-                response = "<color=red>Error you cant force team this team as this team doesnt exist</color>";
+                response = "<color=blue>forceteam <teamName> <subteamName> <playerId></color>";
                 return false;
             }
             if (ply.CheckPermission("ATC.forceteam"))

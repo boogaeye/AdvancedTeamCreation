@@ -12,6 +12,10 @@ using Exiled.CustomItems.API.Features;
 using Exiled.API.Interfaces;
 using Interactables.Interobjects.DoorUtils;
 using TeamsEXILED.Events;
+using System.Linq;
+using TeamsEXILED.Enums;
+using UnityEngine;
+using System.Globalization;
 
 namespace TeamsEXILED
 {
@@ -26,7 +30,9 @@ namespace TeamsEXILED
 
         public Teams chosenTeam;
 
-        public Random random = new Random();
+        public Teams latestSpawn;
+
+        public System.Random random = new System.Random();
 
         public Classes.Classes Classes = new Classes.Classes();
 
@@ -41,25 +47,62 @@ namespace TeamsEXILED
         public string mtfTrans, chaosTrans;
 
         public Respawning.SpawnableTeamType spawnableTeamType = Respawning.SpawnableTeamType.None;
+
+        public List<RoomPoint> fixedpoints = new List<RoomPoint>();
+
+        List<CoroutineHandle> coroutineHandle = new List<CoroutineHandle>();
         #endregion
         #region Fake Respawn Timer
-        CoroutineHandle coroutineHandle = new CoroutineHandle();
-        CoroutineHandle respawnCoroutineHandle = new CoroutineHandle();
 
         public void OnRoundStart()
         {
-            if (coroutineHandle.IsRunning)
+            coroutineHandle.Add(Timing.RunCoroutine(Timer()));
+            coroutineHandle.Add(Timing.RunCoroutine(RespawnTimerPatch()));
+
+            foreach (SpawnLocation sp in (SpawnLocation[])Enum.GetValues(typeof(SpawnLocation)))
             {
-                Timing.KillCoroutines(coroutineHandle);
+                var rn = Methods.PointThings(sp);
+
+                if (rn != "")
+                {
+                    var point = rn.Split(':');
+                    var post = point[1].Split(',');
+                    var dirt = point[2].Split(',');
+
+                    var roomt = Map.Rooms.First(x => x.Name.Contains(point[0])).Transform;
+                    var pos = new Vector3(float.Parse(post[0], NumberStyles.Float, CultureInfo.InvariantCulture), float.Parse(post[1], NumberStyles.Float, CultureInfo.InvariantCulture), float.Parse(post[2], NumberStyles.Float, CultureInfo.InvariantCulture));
+                    var dir = new Vector2(float.Parse(dirt[0], NumberStyles.Float, CultureInfo.InvariantCulture), float.Parse(dirt[1], NumberStyles.Float, CultureInfo.InvariantCulture));
+
+                    var fpos = roomt.TransformPoint(pos);
+                    var fdir = roomt.TransformDirection(dir);
+
+                    fixedpoints.Add(
+                    new RoomPoint
+                    {
+                        Position = fpos,
+                        Direction = fdir,
+                        Type = sp
+                    });
+                }
             }
-            if (respawnCoroutineHandle.IsRunning)
-            {
-                Timing.KillCoroutines(respawnCoroutineHandle);
-            }
-            Timing.RunCoroutine(Timer());
-            Timing.RunCoroutine(RespawnTimerPatch());
         }
-        
+
+        public void OnSendingCommand(SendingConsoleCommandEventArgs ev)
+        {
+            if (ev.Name == "point")
+            {
+                ev.IsAllowed = false;
+                var rotation = ev.Player.Rotations;
+                var position = ev.Player.Position + (Vector3.up * 0.1f);
+                var room = ev.Player.CurrentRoom;
+                var p2 = room.Transform.InverseTransformPoint(position);
+                var r2 = room.Transform.InverseTransformDirection(rotation);
+                var lastr = new Vector2(r2.x, r2.y);
+
+                Log.Info($"Room: {ev.Player.CurrentRoom.Name} Pos:{p2} Rotation:{lastr}");
+                ev.ReturnMessage = $"Room: {ev.Player.CurrentRoom.Name} Pos:{p2} Rotation:{lastr}";
+            }
+        }
         
         IEnumerator<float> Timer()
         {
@@ -109,25 +152,25 @@ namespace TeamsEXILED
         public void OnCreatingTeam(Events.EventArgs.CreatingTeamEventArgs ev)
         {
             Log.Debug("Creating Team Event Called", this.plugin.Config.Debug);
-            if (Teams.IsDefinedInConfig(ev.Team.Name, this.plugin.Config))
-            {
-                Log.Debug($"{ev.Team.Name} is defined in Normal Teams Config", this.plugin.Config.Debug);
-                foreach (NormalTeam t in this.plugin.Config.TeamRedefine)
-                {
-                    if (t.Team.ToString().ToLower() == ev.Team.Name && t.Active)
-                    {
-                        Log.Debug("Redefined Team!", this.plugin.Config.Debug);
-                        ev.Team = new Teams
-                        {
-                            Name = ev.Team.Name,
-                            Neutral = t.Neutral,
-                            Friendlys = t.Friendlys,
-                            Requirements = t.Requirements,
-                            teamLeaders = ev.Team.teamLeaders
-                        };
-                    }
-                }
-            }
+            //if (Teams.IsDefinedInConfig(ev.Team.Name, this.plugin.Config))
+            //{
+            //    Log.Debug($"{ev.Team.Name} is defined in Normal Teams Config", this.plugin.Config.Debug);
+            //    foreach (NormalTeam t in this.plugin.Config.TeamRedefine)
+            //    {
+            //        if (t.Team.ToString().ToLower() == ev.Team.Name && t.Active)
+            //        {
+            //            Log.Debug("Redefined Team!", this.plugin.Config.Debug);
+            //            ev.Team = new Teams
+            //            {
+            //                Name = ev.Team.Name,
+            //                Neutral = t.Neutral,
+            //                Friendlys = t.Friendlys,
+            //                Requirements = t.Requirements,
+            //                teamLeaders = ev.Team.teamLeaders
+            //            };
+            //        }
+            //    }
+            //}
         }
 
         public void RefNextTeamSpawn()
@@ -150,19 +193,21 @@ namespace TeamsEXILED
             if (chosenTeam.SpawnTypes.Contains(Respawn.NextKnownTeam) && chosenTeam.Active)
             {
                 Log.Debug("Next Known Spawn is " + Respawn.NextKnownTeam, this.plugin.Config.Debug);
-                Log.Debug("Next Known Chosen Team is " + chosenTeam.Name, this.plugin.Config.Debug);
                 if (random.Next(0, 100) < chosenTeam.Chance)
                 {
+                    Log.Debug("Next Known Chosen Team is " + chosenTeam.Name, this.plugin.Config.Debug);
                     return;
                 }
                 else
                 {
                     chosenTeam = null;
+                    Log.Debug("Next Known Chosen Team is " + Respawn.NextKnownTeam.ToString().ToLower(), this.plugin.Config.Debug);
                 }
             }
             else
             {
                 chosenTeam = null;
+                Log.Debug("Next Known Chosen Team is " + Respawn.NextKnownTeam.ToString().ToLower(), this.plugin.Config.Debug);
             }
         }
 
@@ -226,7 +271,7 @@ namespace TeamsEXILED
             teamedPlayers.Remove(ev.Player);
         }
 
-        public void OnRoleChange(ChangingRoleEventArgs ev)
+        public void OnRoleChange(ChangedRoleEventArgs ev)
         {
             if (ev.Player.IsOverwatchEnabled)
             {
@@ -234,10 +279,7 @@ namespace TeamsEXILED
             }
             ev.Player.CustomInfo = string.Empty;
             ev.Player.ReferenceHub.nicknameSync.ShownPlayerInfo |= PlayerInfoArea.Role;
-            Timing.CallDelayed(0.01f, () =>
-            {
-                teamedPlayers[ev.Player] = ev.Player.Team.ToString().ToLower();
-            });
+            teamedPlayers[ev.Player] = ev.Player.Team.ToString().ToLower();
         }
 
         public void OnTeamSpawn(Events.EventArgs.SetTeamEventArgs ev)
@@ -272,64 +314,64 @@ namespace TeamsEXILED
             if (chosenTeam != null)
             {
                 Log.Debug("Spawned " + chosenTeam.Name, this.plugin.Config.Debug);
-                List<Exiled.API.Features.Player> tempPlayers = new List<Player>();
+                List<Player> tempPlayers = new List<Player>();
                 foreach (Player i in ev.Players)
                 {
                     tempPlayers.Add(i);
                 }
-                Timing.CallDelayed(1.5f, () =>
+                coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
                 {
                     ChangeTeamReferancing(tempPlayers, chosenTeam.Name);
-                });
+                }));
                 if (random.Next(0, 100) < chosenTeam.CassieMessageChaosAnnounceChance && ev.NextKnownTeam == Respawning.SpawnableTeamType.ChaosInsurgency)
                 {
                     Cassie.DelayedGlitchyMessage(chosenTeam.CassieMessageChaosMessage, 0, 0.25f, 0.25f);
                 }
             }
-            Timing.CallDelayed(3f, () =>
+
+            coroutineHandle.Add(Timing.CallDelayed(3f, () =>
             {
                 chosenTeam = null;
                 MainPlugin.rtconfig.translations.Ci = chaosTrans;
                 MainPlugin.rtconfig.translations.Ntf = mtfTrans;
-            });
-            HasReference = false;
+                HasReference = false;
+            }));
         }
 
         void ChangeTeamReferancing(List<Player> p, string t)
         {
             //finding teams
-            foreach (Teams team in this.plugin.Config.Teams)
+            var team = this.plugin.Config.Teams.First(x => x.Name == t);
+            if (team.Name != null)
             {
-                if (team.Name == t)
+                Log.Debug("Got team " + team.Name + " from referance method", this.plugin.Config.Debug);
+                Dictionary<Player, string> switchList = new Dictionary<Player, string>();
+                int i = 0;
+                int selectedSubclass = 0;
+                foreach (Player y in p)
                 {
-                    Log.Debug("Got team " + team.Name + " from referance method", this.plugin.Config.Debug);
-                    Dictionary<Player, string> switchList = new Dictionary<Player, string>();
-                    int i = 0;
-                    int selectedSubclass = 0;
-                    foreach (Player y in p)
+                    i++;
+                    if (team.Subclasses[selectedSubclass].NumOfAllowedPlayers > i && team.Subclasses[selectedSubclass].NumOfAllowedPlayers != -1)
                     {
-                        i++;
-                        if (team.Subclasses[selectedSubclass].NumOfAllowedPlayers > i && team.Subclasses[selectedSubclass].NumOfAllowedPlayers != -1)
-                        {
-                            ChangeTeam(y, t, team.Subclasses[selectedSubclass].Name);
-                            Log.Debug("allowed subteam " + team.Subclasses[selectedSubclass].Name + " from referance method", this.plugin.Config.Debug);
-                        }
-                        else if (team.Subclasses[selectedSubclass].NumOfAllowedPlayers == -1)
-                        {
-                            ChangeTeam(y, t, team.Subclasses[selectedSubclass].Name);
-                            Log.Debug("allowed subteam " + team.Subclasses[selectedSubclass].Name + " from referance method with -1 players allowed(making everyone else this role)", this.plugin.Config.Debug);
-                        }
-                        else
-                        {
-                            ChangeTeam(y, t, team.Subclasses[selectedSubclass].Name);
-                            i = 0;
-                            selectedSubclass++;
-                            Log.Debug("allowed subteam " + team.Subclasses[selectedSubclass].Name + " from referance method reseting method as selected subclass no longer allows more players to be this role", this.plugin.Config.Debug);
-                        }
+                        ChangeTeam(y, t, team.Subclasses[selectedSubclass].Name);
+                        Log.Debug("allowed subteam " + team.Subclasses[selectedSubclass].Name + " from referance method", this.plugin.Config.Debug);
+                    }
+                    else if (team.Subclasses[selectedSubclass].NumOfAllowedPlayers == -1)
+                    {
+                        ChangeTeam(y, t, team.Subclasses[selectedSubclass].Name);
+                        Log.Debug("allowed subteam " + team.Subclasses[selectedSubclass].Name + " from referance method with -1 players allowed(making everyone else this role)", this.plugin.Config.Debug);
+                    }
+                    else
+                    {
+                        ChangeTeam(y, t, team.Subclasses[selectedSubclass].Name);
+                        i = 0;
+                        selectedSubclass++;
+                        Log.Debug("allowed subteam " + team.Subclasses[selectedSubclass].Name + " from referance method reseting method as selected subclass no longer allows more players to be this role", this.plugin.Config.Debug);
                     }
                 }
             }
         }
+
         public void ChangeTeam(Player p, string t, string s)
         {
             if (p.IsOverwatchEnabled)
@@ -342,102 +384,143 @@ namespace TeamsEXILED
             s = handler.Subclass;
             if (!handler.IsAllowed) return;
             //Finding teems and seeing if the string exists
-            foreach (Teams team in this.plugin.Config.Teams)
+            var team = this.plugin.Config.Teams.First(x => x.Name == t);
+            if (team != null)
             {
-                if (team.Name == t)
+                //Finding subteams and seeing if the string exists
+                foreach (Subteams subteams in team.Subclasses)
                 {
-                    //Finding subteams and seeing if the string exists
-                    foreach (Subteams subteams in team.Subclasses)
+                    if (subteams.Name == s)
                     {
-                        if (subteams.Name == s)
+                        //If found it will give you everything defined here
+                        p.SetRole(subteams.ModelRole, true);
+                        p.Health = subteams.HP;
+                        p.MaxHealth = subteams.HP;
+                        
+                        if (team.spawnLocation != Enums.SpawnLocation.Normal)
                         {
-                            //If found it will give you everything defined here
-                            p.SetRole(subteams.ModelRole, true);
-                            p.Health = subteams.HP;
-                            p.MaxHealth = subteams.HP;
-                            if (spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
+                            var point = fixedpoints.First(x => x.Type == team.spawnLocation);
+                            switch (team.spawnLocation)
                             {
-                                p.ReferenceHub.characterClassManager.NetworkCurUnitName = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[respawns].UnitName;
-                            }
-                            if (team.spawnLocation != Enums.SpawnLocation.Normal)
-                            {
-                                string nameLooked = string.Empty;
-                                int xoff = 0;
-                                int yoff = 0;
-                                int zoff = 0;
-                                switch (team.spawnLocation)
-                                {
-                                    case Enums.SpawnLocation.Escape:
-                                        nameLooked = "ESCAPE_PRIMARY";
-                                        zoff = 2;
+                                case Enums.SpawnLocation.Escape:
+                                    {
+                                        p.Position = point.Position;
+                                        p.Rotations = point.Direction;
                                         break;
-                                    case Enums.SpawnLocation.SCP106:
+                                    }
+                                case Enums.SpawnLocation.SCP106:
+                                    {
                                         if (!Warhead.IsDetonated)
                                         {
-                                            nameLooked = "106_BOTTOM";
+                                            p.Position = point.Position;
+                                            p.Rotations = point.Direction;
                                         }
                                         break;
-                                    case Enums.SpawnLocation.SurfaceNuke:
-                                        nameLooked = "SURFACE_NUKE";
-                                        zoff = 2;
+                                    }
+                                case Enums.SpawnLocation.SurfaceNuke:
+                                    {
+                                        p.Position = point.Position;
+                                        p.Rotations = point.Direction;
                                         break;
-                                }
-                                if (DoorNametagExtension.NamedDoors.ContainsKey(nameLooked))
-                                {
-                                    DoorNametagExtension.NamedDoors[nameLooked].TargetDoor.NetworkTargetState = true;
-                                    p.Position = DoorNametagExtension.NamedDoors[nameLooked].gameObject.transform.position + new UnityEngine.Vector3(0 + xoff, 1 + yoff, 0 + zoff);
-                                }
+                                    }
+                                case Enums.SpawnLocation.SCP012:
+                                    {
+                                        if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
+                                        {
+                                            p.Position = point.Position;
+                                            p.Rotations = point.Direction;
+                                        }
+                                        break;
+                                    }
+                                case Enums.SpawnLocation.SCP079:
+                                    {
+                                        if (!Warhead.IsDetonated)
+                                        {
+                                            p.Position = point.Position;
+                                            p.Rotations = point.Direction;
+                                        }
+                                        break;
+                                    }
+                                case Enums.SpawnLocation.SCP096:
+                                    {
+                                        if (!Warhead.IsDetonated)
+                                        {
+                                            p.Position = point.Position;
+                                            p.Rotations = point.Direction;
+                                        }
+                                        break;
+                                    }
+                                case Enums.SpawnLocation.SCP173:
+                                    {
+                                        if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
+                                        {
+                                            p.Position = point.Position;
+                                            p.Rotations = point.Direction;
+                                        }
+                                        break;
+                                    }
+                                case Enums.SpawnLocation.Shelter:
+                                    {
+                                        if (!Warhead.IsDetonated)
+                                        {
+                                            p.Position = point.Position;
+                                            p.Rotations = point.Direction;
+                                        }
+                                        break;
+                                    }
                             }
-                            p.ClearInventory();
-                            foreach (ItemType i in subteams.Inventory)
-                            {
-                                p.AddItem(i);
-                            }
-                            if (subteams.CustomItemIds.Length != 0)
-                            {
-                                foreach (int it in subteams.CustomItemIds)
-                                {
-                                    CustomItem.TryGive(p, it, true);
-                                }
-                            }
-                            foreach (System.Collections.Generic.KeyValuePair<AmmoType, uint> a in subteams.Ammo)
-                            {
-                                p.Ammo[(int)a.Key] = a.Value;
-                            }
-                            p.ShowHint(subteams.RoleHint, 10);
-                            Timing.CallDelayed(0.2f, () =>
-                            {
-                                p.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
-                                p.CustomInfo = subteams.RoleName;
-                                teamedPlayers[p] = t;
-                                Log.Debug("Changing player " + p.Nickname + " to " + t, this.plugin.Config.Debug);
-                            });
                         }
+                        p.ClearInventory();
+                        foreach (ItemType i in subteams.Inventory)
+                        {
+                            p.AddItem(i);
+                        }
+                        if (subteams.CustomItemIds.Length != 0)
+                        {
+                            foreach (int it in subteams.CustomItemIds)
+                            {
+                                CustomItem.TryGive(p, it, true);
+                            }
+                        }
+                        foreach (KeyValuePair<AmmoType, uint> a in subteams.Ammo)
+                        {
+                            p.Ammo[(int)a.Key] = a.Value;
+                        }
+                        p.ShowHint(subteams.RoleHint, 10);
+                        if (spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
+                        {
+                            coroutineHandle.Add(Timing.CallDelayed(1f, () => p.ReferenceHub.characterClassManager.NetworkCurUnitName = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[respawns].UnitName));
+                        }
+                        coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
+                        {
+                            p.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
+                            p.CustomInfo = subteams.RoleName;
+                            teamedPlayers[p] = t;
+                            Log.Debug("Changing player " + p.Nickname + " to " + t, this.plugin.Config.Debug);
+                        }));
                     }
-                    //delay needed so it overrides normal teams
                 }
+                //delay needed so it overrides normal teams
             }
         }
 
         public void OnHurt(HurtingEventArgs ev)
         {
-            List<DamageTypes.DamageType> damageTypes = new List<DamageTypes.DamageType> { DamageTypes.Contain, DamageTypes.Bleeding, DamageTypes.Asphyxiation, DamageTypes.Decont, DamageTypes.Falldown, DamageTypes.Grenade, DamageTypes.Lure, DamageTypes.MicroHid, DamageTypes.Nuke, DamageTypes.Pocket, DamageTypes.Poison, DamageTypes.Recontainment, DamageTypes.Scp207, DamageTypes.Tesla, DamageTypes.None };
-            if (damageTypes.Contains(ev.DamageType))
+            if (ev.DamageType.isWeapon || ev.DamageType.isScp)
             {
-                return;
-            }
-            try
-            {
-                if (Classes.IsTeamFriendly(Classes.GetTeamFromString(teamedPlayers[ev.Target], this.plugin.Config), teamedPlayers[ev.Attacker]) && !this.plugin.Config.FriendlyFire)
+                try
                 {
-                    ev.IsAllowed = false;
-                    ev.Attacker.ShowHint("You cant hurt teams teamed with you!");
-                    Log.Debug("Protected a player in " + teamedPlayers[ev.Target] + " from " + teamedPlayers[ev.Attacker], this.plugin.Config.Debug);
+                    if (Classes.IsTeamFriendly(Classes.GetTeamFromString(teamedPlayers[ev.Target], this.plugin.Config), teamedPlayers[ev.Attacker]) && !this.plugin.Config.FriendlyFire)
+                    {
+                        ev.IsAllowed = false;
+                        ev.Attacker.ShowHint("You cant hurt teams teamed with you!");
+                        Log.Debug("Protected a player in " + teamedPlayers[ev.Target] + " from " + teamedPlayers[ev.Attacker], this.plugin.Config.Debug);
+                    }
                 }
-            }
-            catch (Exception)
-            {
-                Log.Debug("Player possibly left so we caught this error");
+                catch (Exception)
+                {
+                    Log.Debug("Player possibly left so we caught this error");
+                }
             }
         }
 
@@ -525,7 +608,7 @@ namespace TeamsEXILED
 
         public void RoundEnding(EndingRoundEventArgs ev)
         {
-            if (AllowNormalRoundEnd)
+            if (AllowNormalRoundEnd && this.plugin.Config.Debug)
             {
                 Log.Debug("List of teams:", this.plugin.Config.Debug);
                 foreach (KeyValuePair<Player, string> t in teamedPlayers)
@@ -533,19 +616,33 @@ namespace TeamsEXILED
                     Log.Debug(t.Value + " : " + t.Key, this.plugin.Config.Debug);
                 }
             }
+
             ev.IsAllowed = AllowNormalRoundEnd;
             ev.IsRoundEnded = AllowNormalRoundEnd;
             ev.LeadingTeam = leadingTeam;
         }
 
-        public void WaitingForPlayers()
+        public void OnEscaping(EscapingEventArgs ev)
         {
-            Timing.KillCoroutines(coroutineHandle);
-            Timing.KillCoroutines(respawnCoroutineHandle);
+            teamedPlayers[ev.Player] = Classes.ConvertToNormalTeamName(ev.NewRole).ToString().ToLower();
+        }
+
+        public void OnRestartRound()
+        {
+            foreach (var coroutine in coroutineHandle)
+            {
+                Timing.KillCoroutines(coroutine);
+            }
+
             AllowNormalRoundEnd = false;
             respawns = 0;
+            latestSpawn = null;
+            chosenTeam = null;
+            MainPlugin.rtconfig.translations.Ci = chaosTrans;
+            MainPlugin.rtconfig.translations.Ntf = mtfTrans;
             HasReference = false;
             teamedPlayers.Clear();
+            fixedpoints.Clear();
         }
         #endregion
     }

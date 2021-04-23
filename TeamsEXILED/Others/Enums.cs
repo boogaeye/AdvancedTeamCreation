@@ -14,6 +14,18 @@ namespace TeamsEXILED.Enums
         Normal,
         Escape,
         SCP106,
-        SurfaceNuke
+        SurfaceNuke,
+        PluginHandle,
+        SCP012,
+        SCP079,
+        SCP096,
+        SCP173,
+        Shelter
+    }
+
+    public enum EscapeRoles : sbyte
+    {
+        DClass = RoleType.ClassD,
+        Scientist = RoleType.Scientist
     }
 }

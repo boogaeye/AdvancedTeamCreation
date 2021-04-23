@@ -12,6 +12,7 @@ using Exiled.CustomItems.API.Features;
 using Exiled.API.Interfaces;
 using Interactables.Interobjects.DoorUtils;
 using TeamsEXILED.Events;
+using System.Linq;
 
 namespace TeamsEXILED
 {
@@ -25,6 +26,8 @@ namespace TeamsEXILED
         public Dictionary<Player, string> teamedPlayers = new Dictionary<Player, string>();
 
         public Teams chosenTeam;
+
+        public Teams latestSpawn;
 
         public Random random = new Random();
 
@@ -43,23 +46,13 @@ namespace TeamsEXILED
         public Respawning.SpawnableTeamType spawnableTeamType = Respawning.SpawnableTeamType.None;
         #endregion
         #region Fake Respawn Timer
-        CoroutineHandle coroutineHandle = new CoroutineHandle();
-        CoroutineHandle respawnCoroutineHandle = new CoroutineHandle();
+        List<CoroutineHandle> coroutineHandle = new List<CoroutineHandle>();
 
         public void OnRoundStart()
         {
-            if (coroutineHandle.IsRunning)
-            {
-                Timing.KillCoroutines(coroutineHandle);
-            }
-            if (respawnCoroutineHandle.IsRunning)
-            {
-                Timing.KillCoroutines(respawnCoroutineHandle);
-            }
-            Timing.RunCoroutine(Timer());
-            Timing.RunCoroutine(RespawnTimerPatch());
+            coroutineHandle.Add(Timing.RunCoroutine(Timer()));
+            coroutineHandle.Add(Timing.RunCoroutine(RespawnTimerPatch()));
         }
-        
         
         IEnumerator<float> Timer()
         {
@@ -109,25 +102,25 @@ namespace TeamsEXILED
         public void OnCreatingTeam(Events.EventArgs.CreatingTeamEventArgs ev)
         {
             Log.Debug("Creating Team Event Called", this.plugin.Config.Debug);
-            if (Teams.IsDefinedInConfig(ev.Team.Name, this.plugin.Config))
-            {
-                Log.Debug($"{ev.Team.Name} is defined in Normal Teams Config", this.plugin.Config.Debug);
-                foreach (NormalTeam t in this.plugin.Config.TeamRedefine)
-                {
-                    if (t.Team.ToString().ToLower() == ev.Team.Name && t.Active)
-                    {
-                        Log.Debug("Redefined Team!", this.plugin.Config.Debug);
-                        ev.Team = new Teams
-                        {
-                            Name = ev.Team.Name,
-                            Neutral = t.Neutral,
-                            Friendlys = t.Friendlys,
-                            Requirements = t.Requirements,
-                            teamLeaders = ev.Team.teamLeaders
-                        };
-                    }
-                }
-            }
+            //if (Teams.IsDefinedInConfig(ev.Team.Name, this.plugin.Config))
+            //{
+            //    Log.Debug($"{ev.Team.Name} is defined in Normal Teams Config", this.plugin.Config.Debug);
+            //    foreach (NormalTeam t in this.plugin.Config.TeamRedefine)
+            //    {
+            //        if (t.Team.ToString().ToLower() == ev.Team.Name && t.Active)
+            //        {
+            //            Log.Debug("Redefined Team!", this.plugin.Config.Debug);
+            //            ev.Team = new Teams
+            //            {
+            //                Name = ev.Team.Name,
+            //                Neutral = t.Neutral,
+            //                Friendlys = t.Friendlys,
+            //                Requirements = t.Requirements,
+            //                teamLeaders = ev.Team.teamLeaders
+            //            };
+            //        }
+            //    }
+            //}
         }
 
         public void RefNextTeamSpawn()
@@ -150,19 +143,21 @@ namespace TeamsEXILED
             if (chosenTeam.SpawnTypes.Contains(Respawn.NextKnownTeam) && chosenTeam.Active)
             {
                 Log.Debug("Next Known Spawn is " + Respawn.NextKnownTeam, this.plugin.Config.Debug);
-                Log.Debug("Next Known Chosen Team is " + chosenTeam.Name, this.plugin.Config.Debug);
                 if (random.Next(0, 100) < chosenTeam.Chance)
                 {
+                    Log.Debug("Next Known Chosen Team is " + chosenTeam.Name, this.plugin.Config.Debug);
                     return;
                 }
                 else
                 {
                     chosenTeam = null;
+                    Log.Debug("Next Known Chosen Team is " + Respawn.NextKnownTeam.ToString().ToLower(), this.plugin.Config.Debug);
                 }
             }
             else
             {
                 chosenTeam = null;
+                Log.Debug("Next Known Chosen Team is " + Respawn.NextKnownTeam.ToString().ToLower(), this.plugin.Config.Debug);
             }
         }
 
@@ -226,7 +221,7 @@ namespace TeamsEXILED
             teamedPlayers.Remove(ev.Player);
         }
 
-        public void OnRoleChange(ChangingRoleEventArgs ev)
+        public void OnRoleChange(ChangedRoleEventArgs ev)
         {
             if (ev.Player.IsOverwatchEnabled)
             {
@@ -277,22 +272,23 @@ namespace TeamsEXILED
                 {
                     tempPlayers.Add(i);
                 }
-                Timing.CallDelayed(1.5f, () =>
+                coroutineHandle.Add(Timing.CallDelayed(1.5f, () =>
                 {
                     ChangeTeamReferancing(tempPlayers, chosenTeam.Name);
-                });
+                }));
                 if (random.Next(0, 100) < chosenTeam.CassieMessageChaosAnnounceChance && ev.NextKnownTeam == Respawning.SpawnableTeamType.ChaosInsurgency)
                 {
                     Cassie.DelayedGlitchyMessage(chosenTeam.CassieMessageChaosMessage, 0, 0.25f, 0.25f);
                 }
             }
-            Timing.CallDelayed(3f, () =>
+            coroutineHandle.Add(Timing.CallDelayed(3f, () =>
             {
                 chosenTeam = null;
                 MainPlugin.rtconfig.translations.Ci = chaosTrans;
                 MainPlugin.rtconfig.translations.Ntf = mtfTrans;
-            });
-            HasReference = false;
+                HasReference = false;
+            }));
+            
         }
 
         void ChangeTeamReferancing(List<Player> p, string t)
@@ -355,10 +351,7 @@ namespace TeamsEXILED
                             p.SetRole(subteams.ModelRole, true);
                             p.Health = subteams.HP;
                             p.MaxHealth = subteams.HP;
-                            if (spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
-                            {
-                                p.ReferenceHub.characterClassManager.NetworkCurUnitName = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[respawns].UnitName;
-                            }
+                            
                             if (team.spawnLocation != Enums.SpawnLocation.Normal)
                             {
                                 string nameLooked = string.Empty;
@@ -374,7 +367,7 @@ namespace TeamsEXILED
                                     case Enums.SpawnLocation.SCP106:
                                         if (!Warhead.IsDetonated)
                                         {
-                                            nameLooked = "106_BOTTOM";
+                                            nameLooked = "HCZ_106";
                                         }
                                         break;
                                     case Enums.SpawnLocation.SurfaceNuke:
@@ -382,7 +375,12 @@ namespace TeamsEXILED
                                         zoff = 2;
                                         break;
                                 }
-                                if (DoorNametagExtension.NamedDoors.ContainsKey(nameLooked))
+                                if (nameLooked == "HCZ_106")
+                                {
+                                    var pos = Map.Rooms.FirstOrDefault(x => x.Name == nameLooked).Position;
+                                    p.Position = new UnityEngine.Vector3(pos.x, pos.y + 1, pos.z);
+                                }
+                                if (Map.GetDoorByName(nameLooked))
                                 {
                                     DoorNametagExtension.NamedDoors[nameLooked].TargetDoor.NetworkTargetState = true;
                                     p.Position = DoorNametagExtension.NamedDoors[nameLooked].gameObject.transform.position + new UnityEngine.Vector3(0 + xoff, 1 + yoff, 0 + zoff);
@@ -405,6 +403,10 @@ namespace TeamsEXILED
                                 p.Ammo[(int)a.Key] = a.Value;
                             }
                             p.ShowHint(subteams.RoleHint, 10);
+                            if (spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
+                            {
+                                Timing.CallDelayed(1f, () => p.ReferenceHub.characterClassManager.NetworkCurUnitName = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[respawns].UnitName);
+                            }
                             Timing.CallDelayed(0.2f, () =>
                             {
                                 p.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
@@ -421,7 +423,7 @@ namespace TeamsEXILED
 
         public void OnHurt(HurtingEventArgs ev)
         {
-            List<DamageTypes.DamageType> damageTypes = new List<DamageTypes.DamageType> { DamageTypes.Contain, DamageTypes.Bleeding, DamageTypes.Asphyxiation, DamageTypes.Decont, DamageTypes.Falldown, DamageTypes.Grenade, DamageTypes.Lure, DamageTypes.MicroHid, DamageTypes.Nuke, DamageTypes.Pocket, DamageTypes.Poison, DamageTypes.Recontainment, DamageTypes.Scp207, DamageTypes.Tesla, DamageTypes.None };
+            List<DamageTypes.DamageType> damageTypes = new List<DamageTypes.DamageType> { DamageTypes.Contain, DamageTypes.Bleeding, DamageTypes.Asphyxiation, DamageTypes.Decont, DamageTypes.Falldown, DamageTypes.Lure, DamageTypes.Nuke, DamageTypes.Pocket, DamageTypes.Poison, DamageTypes.Recontainment, DamageTypes.Scp207, DamageTypes.Tesla, DamageTypes.Wall, DamageTypes.None };
             if (damageTypes.Contains(ev.DamageType))
             {
                 return;
@@ -538,12 +540,23 @@ namespace TeamsEXILED
             ev.LeadingTeam = leadingTeam;
         }
 
-        public void WaitingForPlayers()
+        public void OnEscaping(EscapingEventArgs ev)
         {
-            Timing.KillCoroutines(coroutineHandle);
-            Timing.KillCoroutines(respawnCoroutineHandle);
+            teamedPlayers[ev.Player] = Classes.ConvertToNormalTeamName(ev.NewRole).ToString().ToLower();
+        }
+
+        public void OnRestartRound()
+        {
+            foreach (var coroutine in coroutineHandle)
+            {
+                Timing.KillCoroutines(coroutine);
+            }
             AllowNormalRoundEnd = false;
             respawns = 0;
+            latestSpawn = null;
+            chosenTeam = null;
+            MainPlugin.rtconfig.translations.Ci = chaosTrans;
+            MainPlugin.rtconfig.translations.Ntf = mtfTrans;
             HasReference = false;
             teamedPlayers.Clear();
         }

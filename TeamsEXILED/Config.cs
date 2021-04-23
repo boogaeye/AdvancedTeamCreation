@@ -14,7 +14,7 @@ namespace TeamsEXILED
     {
         public bool IsEnabled { get; set; } = true;
         [Description("if this is true then it will allow one player to be alive in the round when someone kills themselves(This is basically to give them another chance before ending the game)")]
-        public bool Allow1Player { get; set; } = false;
+        public bool Allow1Player { get; set; } = true;
         [Description("allows friendly teams to hurt eachother no matter what hurts them")]
         public bool FriendlyFire { get; set; } = false;
         public string TeamKillBroadcast { get; set; } = "You got teamkilled report this to the admins if you dont think its an accident";
@@ -199,7 +199,7 @@ namespace TeamsEXILED
             {
                 Active = true,
                 Team = Team.MTF,
-                Friendlys = new string[] { "opcf", "mtf", "rtc" },
+                Friendlys = new string[] { "opcf", "mtf", "rsc" },
                 Requirements = new string[] { "scp", "rsc", "chi", "cdp", "serpentshand", "tta"  },
                 Neutral = new string[]{ "aes", "goc", "gru" }
             },
@@ -232,7 +232,7 @@ namespace TeamsEXILED
                 Active = true,
                 Team = Team.SCP,
                 Friendlys = new string[] { "scp", "serpentshand" },
-                Requirements = new string[] { "scp", "rsc", "mtf", "cdp", "serpentshand", "tta", "opcf", "aes", "goc", "gru"  },
+                Requirements = new string[] { "rsc", "mtf", "cdp", "tta", "opcf", "aes", "goc", "gru"  },
                 Neutral = new string[]{ }
             }
         };

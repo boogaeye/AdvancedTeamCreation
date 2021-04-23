@@ -22,7 +22,7 @@ namespace TeamsEXILED
 
         public static MainPlugin Singleton;
 
-        public override Version RequiredExiledVersion { get; } = new Version("2.8.0.0");
+        public override Version RequiredExiledVersion { get; } = new Version("2.10.0");
 
         public override PluginPriority Priority { get; } = PluginPriority.High;
 

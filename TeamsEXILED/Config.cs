@@ -23,30 +23,12 @@ namespace TeamsEXILED
         [Description("All team names have to be lowercase otherwise IT WILL NOT LET YOU SPAWN CORRECTLY!")]
         public Teams[] Teams { get; set; } = new Teams[]{ new Teams() {
             Active = true,
-            Name = "serpentshand",
-            Subclasses = new Subteams[] { new Subteams {
-                Name = "commander", Ammo = new Dictionary<AmmoType, uint>(){ { AmmoType.Nato9, 200 } }, Inventory = new ItemType[]{ ItemType.GunProject90, ItemType.Radio, ItemType.Medkit, ItemType.Adrenaline }, HP = 100, ModelRole = RoleType.Tutorial, RoleName = "Serpents Hand Commander", RoleHint = "You are a commander of the serpents hand", CustomItemIds = new int[] { 9 } , NumOfAllowedPlayers = 1
-            }, new Subteams{
-                Name = "officer", Ammo = new Dictionary<AmmoType, uint>(){ { AmmoType.Nato9, 200 } }, Inventory = new ItemType[]{ ItemType.GunProject90, ItemType.Radio, ItemType.Medkit }, HP = 85, ModelRole = RoleType.Tutorial, RoleName = "Serpents Hand Officer", RoleHint = "You are an officer of the serpents hand", CustomItemIds = new int[] { 8 } , NumOfAllowedPlayers = 3
-            },
-            new Subteams{
-            Name = "rookie", Ammo = new Dictionary<AmmoType, uint>(){ { AmmoType.Nato9, 200 } }, Inventory = new ItemType[]{ ItemType.GunProject90, ItemType.Radio, ItemType.Medkit }, HP = 75, ModelRole = RoleType.Tutorial, RoleName = "Serpents Hand", RoleHint = "You are a rookie of the serpents hand", CustomItemIds = new int[] { 8 }
-            }
-            },
-            Friendlys = new string[] { "serpentshand", "scp" },
-            Requirements = new string[] { "goc", "mtf", "cdp", "chi", "gru", "tta", "rsc", "tta", "opcf", "aes" },
-            teamLeaders = LeadingTeam.Anomalies,
-            Chance = 95,
-            Color = "green"
-        }, 
-            new Teams() {
-            Active = true,
             Name = "goc",
             Subclasses = new Subteams[]{ new Subteams {
                 Name = "rookie", Ammo = new Dictionary<AmmoType, uint>(){ { AmmoType.Nato762, 200 } }, Inventory = new ItemType[]{ ItemType.KeycardNTFLieutenant, ItemType.Radio, ItemType.Medkit }, HP = 135, ModelRole = RoleType.ChaosInsurgency, RoleName = "<color=yellow>GOC</color>", RoleHint = "You are the GOC", CustomItemIds = new int[] { 5, 2, 2, 0, }
             } },
             Friendlys = new string[] { "goc" },
-            Requirements = new string[] { "serpentshand", "scp", "cdp", "tta", "rsc", "opcf", "aes" },
+            Requirements = new string[] { "scp", "cdp", "tta", "rsc", "opcf", "aes" },
             teamLeaders = LeadingTeam.FacilityForces,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.ChaosInsurgency },
             CassieMessageChaosMessage = "pitch_0.6 .g5 .g5 .g5 pitch_1 the g o c has entered the facility bell_end",
@@ -61,7 +43,7 @@ namespace TeamsEXILED
                 Name = "rookie", Ammo = new Dictionary<AmmoType, uint>(){ { AmmoType.Nato762, 200 } }, Inventory = new ItemType[]{ ItemType.GunE11SR, ItemType.KeycardChaosInsurgency, ItemType.Adrenaline, ItemType.WeaponManagerTablet, ItemType.GrenadeFlash }, HP = 150, ModelRole = RoleType.FacilityGuard, RoleName = "<color=yellow>GRU</color>", RoleHint = "", CustomItemIds = new int[] { 7, 6 }
             } },
             Friendlys = new string[] { "gru" },
-            Requirements = new string[] { "scp", "serpentshand", "tta", "cdp", "rsc", "aes" },
+            Requirements = new string[] { "scp", "tta", "cdp", "rsc", "aes" },
             teamLeaders = LeadingTeam.FacilityForces,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.NineTailedFox },
             CassieMessageMTFSpawn = ".g5 .g5 the g r u has entered the facility. there are {SCP} scpsubjects",
@@ -75,7 +57,7 @@ namespace TeamsEXILED
                 Name = "officer", Ammo = new Dictionary<AmmoType, uint>(){ { AmmoType.Nato9, 200 } }, Inventory = new ItemType[]{ ItemType.GunUSP, ItemType.KeycardFacilityManager, ItemType.Adrenaline, ItemType.WeaponManagerTablet }, HP = 100, ModelRole = RoleType.NtfScientist, RoleName = "<color=red>TTA</color>", RoleHint = "You are the TTA\nKill everything in sight", CustomItemIds = new int[] { 0, 0 }
             } },
             Friendlys = new string[] { "tta" },
-            Requirements = new string[] { "chi", "scp", "serpentshand", "goc", "gru", "mtf", "cdp", "rsc", "opcf", "aes" },
+            Requirements = new string[] { "chi", "scp", "goc", "gru", "mtf", "cdp", "rsc", "opcf", "aes" },
             teamLeaders = LeadingTeam.Anomalies,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.NineTailedFox, Respawning.SpawnableTeamType.ChaosInsurgency },
             CassieMessageMTFSpawn = "pitch_0.1 .g3 .g3 .g3 pitch_1 The Tactical Target Agent C has entered the facility bell_end",
@@ -123,7 +105,7 @@ namespace TeamsEXILED
                 },
             },
             Friendlys = new string[] { "opcf", "mtf" },
-            Requirements = new string[] { "chi", "scp", "serpentshand", "goc", "gru", "cdp", "tta", "aes" },
+            Requirements = new string[] { "chi", "scp", "goc", "gru", "cdp", "tta", "aes" },
             teamLeaders = LeadingTeam.FacilityForces,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.ChaosInsurgency },
             CassieMessageChaosAnnounceChance = 100,
@@ -182,7 +164,7 @@ namespace TeamsEXILED
                 },
             },
             Friendlys = new string[] { "aes" },
-            Requirements = new string[] { "scp", "serpentshand", "tta" },
+            Requirements = new string[] { "scp", "tta" },
             teamLeaders = LeadingTeam.FacilityForces,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.NineTailedFox },
             CassieMessageChaosAnnounceChance = 0,
@@ -200,7 +182,7 @@ namespace TeamsEXILED
                 Active = true,
                 Team = Team.MTF,
                 Friendlys = new string[] { "opcf", "mtf", "rsc" },
-                Requirements = new string[] { "scp", "rsc", "chi", "cdp", "serpentshand", "tta"  },
+                Requirements = new string[] { "scp", "rsc", "chi", "cdp", "tta"  },
                 Neutral = new string[]{ "aes", "goc", "gru" }
             },
             new NormalTeam()
@@ -208,7 +190,7 @@ namespace TeamsEXILED
                 Active = true,
                 Team = Team.CHI,
                 Friendlys = new string[] { "chi", "cdp" },
-                Requirements = new string[] { "scp", "rsc", "mtf", "cdp", "serpentshand", "tta", "opcf"  },
+                Requirements = new string[] { "scp", "rsc", "mtf", "cdp", "tta", "opcf"  },
                 Neutral = new string[]{ "aes", "goc", "gru" }
             },
             new NormalTeam()
@@ -216,7 +198,7 @@ namespace TeamsEXILED
                 Active = true,
                 Team = Team.CDP,
                 Friendlys = new string[] { "chi", "cdp" },
-                Requirements = new string[] { "scp", "rsc", "mtf", "serpentshand", "tta", "opcf"  },
+                Requirements = new string[] { "scp", "rsc", "mtf", "tta", "opcf"  },
                 Neutral = new string[]{ "aes", "goc", "gru" }
             },
             new NormalTeam()
@@ -224,14 +206,14 @@ namespace TeamsEXILED
                 Active = true,
                 Team = Team.RSC,
                 Friendlys = new string[] { "mtf", "rsc" },
-                Requirements = new string[] { "scp", "rsc", "mtf", "cdp", "serpentshand", "tta", "opcf"  },
+                Requirements = new string[] { "scp", "rsc", "mtf", "cdp", "tta", "opcf"  },
                 Neutral = new string[]{ "aes", "goc", "gru", "opcf" }
             },
             new NormalTeam()
             {
                 Active = true,
                 Team = Team.SCP,
-                Friendlys = new string[] { "scp", "serpentshand" },
+                Friendlys = new string[] { "scp" },
                 Requirements = new string[] { "rsc", "mtf", "cdp", "tta", "opcf", "aes", "goc", "gru"  },
                 Neutral = new string[]{ }
             }

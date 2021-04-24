@@ -20,6 +20,10 @@ namespace TeamsEXILED
     {
         public EventHandlers EventHandlers;
 
+        public TeamsEvents TeamsHandlers;
+
+        private Harmony Harmony;
+
         public static MainPlugin Singleton;
 
         public override Version RequiredExiledVersion { get; } = new Version("2.10.0");
@@ -34,86 +38,42 @@ namespace TeamsEXILED
 
         public static bool assemblyTimer = false;
 
-        public static bool asseblyUIU = false;
+        public static bool assemblyUIU = false;
 
-        public static UIURescueSquad.Config uiuConfig = new UIURescueSquad.Config();
-
-        public static RespawnTimer.Config rtconfig = new RespawnTimer.Config();
-
+        public static bool assemblySerpentHands = false;
 
         public override void OnEnabled()
         {
+            Singleton = this;
+            TeamsHandlers = new TeamsEvents(this);
             EventHandlers = new EventHandlers(this);
 
-            Singleton = this;
+            CheckPlugins();
+
+            Harmony = new Harmony($"teamsexiled.{DateTime.Now.Ticks}");
+            Harmony.PatchAll();
 
             Exiled.Events.Handlers.Server.EndingRound += EventHandlers.RoundEnding;
-
             Exiled.Events.Handlers.Server.RestartingRound += EventHandlers.OnRestartRound;
-
             Exiled.Events.Handlers.Player.Died += EventHandlers.OnDied;
-
             Exiled.Events.Handlers.Server.RespawningTeam += EventHandlers.OnRespawning;
-
             Exiled.Events.Handlers.Player.ChangedRole += EventHandlers.OnRoleChange;
-
             Exiled.Events.Handlers.Player.Hurting += EventHandlers.OnHurt;
-
             Exiled.Events.Handlers.Player.Verified += EventHandlers.OnVerified;
-
             Exiled.Events.Handlers.Player.Left += EventHandlers.OnLeave;
-
             Exiled.Events.Handlers.Map.AnnouncingNtfEntrance += EventHandlers.MTFSpawnAnnounce;
-
             Exiled.Events.Handlers.Server.RoundStarted += EventHandlers.OnRoundStart;
-
-            Events.EventArgs.SetTeam += EventHandlers.OnTeamSpawn;
-
-            Events.EventArgs.ReferencingTeam += EventHandlers.OnReferanceTeam;
-
-            Events.EventArgs.CreatingTeam += EventHandlers.OnCreatingTeam;
-
             Exiled.Events.Handlers.Server.SendingConsoleCommand += EventHandlers.OnSendingCommand;
+
+            Events.EventArgs.SetTeam += TeamsHandlers.OnTeamSpawn;
+            Events.EventArgs.ReferencingTeam += TeamsHandlers.OnReferanceTeam;
+            Events.EventArgs.CreatingTeam += TeamsHandlers.OnCreatingTeam;
+            
 
             if (!Server.FriendlyFire)
             {
                 Log.Warn("Friendly Fire Is heavily recommended to be enabled on server config as it can lead to problems with people not being able to finish around because a person is supposed to be their enemy");
             }
-
-            Timing.CallDelayed(2f, () =>
-            {
-                foreach (IPlugin<IConfig> plugin in Loader.Plugins)
-                {
-                    if (plugin.Name == "RespawnTimer" && plugin.Config.IsEnabled)
-                    {
-                        assemblyTimer = true;
-                        rtconfig = (RespawnTimer.Config)plugin.Config;
-                        Log.Debug("Got respawn timer configs", this.Config.Debug);
-                        EventHandlers.mtfTrans = rtconfig.translations.Ntf;
-                        EventHandlers.chaosTrans = rtconfig.translations.Ci;
-                    }
-                    if (plugin.Name == "UIU Rescue Squad" && plugin.Config.IsEnabled)
-                    {
-                        asseblyUIU = true;
-                        uiuConfig = (UIURescueSquad.Config)plugin.Config;
-                        uiuConfig.Probability = 0;
-                        Log.Debug("Converting UIU into a playable team", this.Config.Debug);
-                        //TeamConvert.ConvertPluginTeam(new Teams
-                        //{
-                        //    Active = true,
-                        //    Name = "uiu",
-                        //    SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.NineTailedFox },
-                        //    spawnLocation = Enums.SpawnLocation.PluginHandle,
-                        //    Chance = (ushort)uiuConfig.Probability,
-                        //    Color = uiuConfig.UiuUnitColor,
-                        //    Subclasses = new Subteams[] {
-                        //        new Subteams { Name = uiuConfig.UiuLeaderRank.ToLower(), Ammo = uiuConfig.UiuLeaderAmmo, HP = uiuConfig.UiuLeaderLife, RoleName = uiuConfig.UiuLeaderRank, RoleHint = uiuConfig.UiuBroadcast, ModelRole = RoleType.NtfCommander, NumOfAllowedPlayers = 1 },
-                        //        new Subteams {}
-                        //    },
-                        //});
-                    }
-                }
-            });
 
             base.OnEnabled();
         }
@@ -121,38 +81,54 @@ namespace TeamsEXILED
         public override void OnDisabled()
         {
             Exiled.Events.Handlers.Server.EndingRound -= EventHandlers.RoundEnding;
-
             Exiled.Events.Handlers.Player.Died -= EventHandlers.OnDied;
-
             Exiled.Events.Handlers.Server.RespawningTeam -= EventHandlers.OnRespawning;
-
             Exiled.Events.Handlers.Player.ChangedRole -= EventHandlers.OnRoleChange;
-
             Exiled.Events.Handlers.Player.Hurting -= EventHandlers.OnHurt;
-
             Exiled.Events.Handlers.Player.Verified -= EventHandlers.OnVerified;
-
             Exiled.Events.Handlers.Player.Left -= EventHandlers.OnLeave;
-
             Exiled.Events.Handlers.Map.AnnouncingNtfEntrance -= EventHandlers.MTFSpawnAnnounce;
-
             Exiled.Events.Handlers.Server.RestartingRound -= EventHandlers.OnRestartRound;
-
             Exiled.Events.Handlers.Server.RoundStarted -= EventHandlers.OnRoundStart;
-
-            Events.EventArgs.SetTeam -= EventHandlers.OnTeamSpawn;
-
-            Events.EventArgs.ReferencingTeam -= EventHandlers.OnReferanceTeam;
-
-            Events.EventArgs.CreatingTeam -= EventHandlers.OnCreatingTeam;
-
             Exiled.Events.Handlers.Server.SendingConsoleCommand -= EventHandlers.OnSendingCommand;
+
+            Events.EventArgs.SetTeam -= TeamsHandlers.OnTeamSpawn;
+            Events.EventArgs.ReferencingTeam -= TeamsHandlers.OnReferanceTeam;
+            Events.EventArgs.CreatingTeam -= TeamsHandlers.OnCreatingTeam;
+
+            Harmony.UnpatchAll();
+
+            Singleton = null;
+            EventHandlers = null;
+            TeamsHandlers = null;
+            Harmony = null;
 
             base.OnDisabled();
         }
 
-        public void OnReload()
+        public void CheckPlugins()
         {
+            foreach (IPlugin<IConfig> plugin in Loader.Plugins)
+            {
+                if (plugin.Name == "RespawnTimer" && plugin.Config.IsEnabled)
+                {
+                    assemblyTimer = true;
+                    Methods.StartRT();
+                    Log.Debug("RespawnTimer assembly found", this.Config.Debug);
+                }
+
+                if (plugin.Name == "UIU Rescue Squad" && plugin.Config.IsEnabled)
+                {
+                    assemblyUIU = true;
+                    Log.Debug("UIU assembly found", this.Config.Debug);
+                }
+
+                if (plugin.Name == "SerpentsHand" && plugin.Config.IsEnabled)
+                {
+                    assemblySerpentHands = true;
+                    Log.Debug("SerpentHands assembly found", this.Config.Debug);
+                }
+            }
         }
     }
 }

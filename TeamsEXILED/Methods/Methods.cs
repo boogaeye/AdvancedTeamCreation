@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TeamsEXILED.API;
 using Exiled.API.Features;
 using TeamsEXILED.Enums;
+using Exiled.API.Interfaces;
 
 namespace TeamsEXILED
 {
@@ -59,6 +60,39 @@ namespace TeamsEXILED
             }
 
             return name;
+        }
+
+        public static IConfig GetRespawnTimerCfg()
+        {
+            return Exiled.Loader.Loader.Plugins.First(x => x.Name == "RespawnTimer").Config;
+        }
+
+        public static IConfig GetUIUCfg()
+        {
+            return Exiled.Loader.Loader.Plugins.First(x => x.Name == "UIU Rescue Squad").Config;
+        }
+
+        public static IConfig GetSerpentCfg()
+        {
+            return Exiled.Loader.Loader.Plugins.First(x => x.Name == "SerpentsHand").Config;
+        }
+
+        public static void StartRT()
+        {
+            var cfg = (RespawnTimer.Config)GetRespawnTimerCfg();
+            Log.Debug("Got respawn timer configs", MainPlugin.Singleton.Config.Debug);
+            MainPlugin.Singleton.EventHandlers.mtfTrans = cfg.translations.Ntf;
+            MainPlugin.Singleton.EventHandlers.chaosTrans = cfg.translations.Ci;
+        }
+
+        public static bool IsUIU()
+        {
+            return UIURescueSquad.EventHandlers.IsSpawnable;
+        }
+
+        public static bool IsSerpentHand()
+        {
+            return SerpentsHand.EventHandlers.IsSpawnable;
         }
     }
 }

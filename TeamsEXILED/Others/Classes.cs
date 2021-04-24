@@ -16,26 +16,32 @@ namespace TeamsEXILED.Classes
             unit.UnitName = name;
             Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames.Remove(Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[index]);
             Respawning.NamingRules.UnitNamingRules.AllNamingRules[Respawning.SpawnableTeamType.NineTailedFox].AddCombination($"{unit.UnitName}", Respawning.SpawnableTeamType.NineTailedFox);
+
             foreach (var ply in Player.List.Where(x => x.ReferenceHub.characterClassManager.CurUnitName == unit.UnitName))
             {
                 ply.ReferenceHub.characterClassManager.NetworkCurUnitName = unit.UnitName;
             }
         }
+
         public void AddUnit(string name, Player[] players)
         {
             Respawning.NamingRules.UnitNamingRules.AllNamingRules[Respawning.SpawnableTeamType.NineTailedFox].AddCombination(name, Respawning.SpawnableTeamType.NineTailedFox);
+
             foreach (var ply in players)
             {
                 ply.ReferenceHub.characterClassManager.NetworkCurUnitName = name;
             }
         }
+
         public string[] GetFriendlyTeams(Teams team)
         {
             return team.Friendlys;
         }
+
         public static List<string> GetAllRequirements(string TeamFond, Config config)
         {
             List<string> team = new List<string>();
+
             foreach (Teams t in config.Teams)
             {
                 if (t.Requirements.Contains(TeamFond))
@@ -43,11 +49,14 @@ namespace TeamsEXILED.Classes
                     team.Add(t.Name);
                 }
             }
+
             return team;
         }
+
         public static List<string> GetAllNeutrals(string TeamFond, Config config)
         {
             List<string> team = new List<string>();
+
             foreach (Teams t in config.Teams)
             {
                 if (t.Neutral.Contains(TeamFond))
@@ -55,11 +64,14 @@ namespace TeamsEXILED.Classes
                     team.Add(t.Name);
                 }
             }
+
             return team;
         }
+
         public static List<string> GetAllFriendlyTeams(string TeamFond, Config config)
         {
             List<string> team = new List<string>();
+
             foreach (Teams t in config.Teams)
             {
                 if (t.Friendlys.Contains(TeamFond))
@@ -67,16 +79,20 @@ namespace TeamsEXILED.Classes
                     team.Add(t.Name);
                 }
             }
+
             return team;
         }
+
         public bool IsTeamFriendly(Teams i, string u)
         {
             return i.Friendlys.Contains(u);
         }
+
         public bool IsTeamEnemy(Teams i, String u)
         {
             return i.Requirements.Contains(u);
         }
+
         [Obsolete("No longer in use")]
         public static bool Exists(string look, string[] teams)
         {
@@ -84,8 +100,10 @@ namespace TeamsEXILED.Classes
             {
                 return true;
             }
+
             return false;
         }
+
         public Teams GetTeamFromString(string s, Config config)
         {
             foreach (Teams t in config.Teams)
@@ -95,6 +113,7 @@ namespace TeamsEXILED.Classes
                     return t;
                 }
             }
+
             if (Teams.IsDefinedInConfig(s, config))
             {
                 foreach (NormalTeam nt in config.TeamRedefine)
@@ -105,21 +124,28 @@ namespace TeamsEXILED.Classes
                     }
                 }
             }
+
             List<string> friendlys = new List<string>() { s };
-            foreach (string i in GetAllFriendlyTeams(s, config)) {
+
+            foreach (string i in GetAllFriendlyTeams(s, config)) 
+            {
                 friendlys.Add(i);
             }
+
             Teams teams = new Teams { Name = s, Requirements = GetAllRequirements(s, config).ToArray<string>(), Friendlys = friendlys.ToArray() };
             var handler = new Events.EventArgs.CreatingTeamEventArgs(teams);
             handler.StartInvoke();
             teams = handler.Team;
+
             return teams;
         }
+
         public Team ConvertToNormalTeamName(RoleType role)
         {
             RoleType[] mtf = { RoleType.NtfCadet, RoleType.NtfCommander, RoleType.NtfLieutenant, RoleType.NtfScientist, RoleType.FacilityGuard, RoleType.Scientist };
             RoleType[] ci = { RoleType.ChaosInsurgency, RoleType.ClassD };
             RoleType[] scp = { RoleType.Scp173, RoleType.Scp106, RoleType.Scp096, RoleType.Scp079, RoleType.Scp0492, RoleType.Scp049, RoleType.Scp93989, RoleType.Scp93953 };
+
             if (mtf.Contains(role))
             {
                 return Team.MTF;
@@ -132,6 +158,7 @@ namespace TeamsEXILED.Classes
             {
                 return Team.SCP;
             }
+
             return Team.TUT;
         }
     }

@@ -78,6 +78,7 @@ namespace TeamsEXILED.API
                     return true;
                 }
             }
+
             return false;
         }
         #endregion
@@ -109,6 +110,7 @@ namespace TeamsEXILED.API
         {
             PluginTeams.Add(team);
         }
+
         public static List<Teams> GetPluginTeams()
         {
             return PluginTeams;

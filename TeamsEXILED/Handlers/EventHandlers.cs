@@ -1,17 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Exiled.Loader;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs;
 using TeamsEXILED.API;
 using Exiled.API.Enums;
-using Exiled.Permissions.Extensions;
-using TeamsEXILED.Classes;
 using MEC;
-using Exiled.CustomItems.API.Features;
-using Exiled.API.Interfaces;
-using Interactables.Interobjects.DoorUtils;
-using TeamsEXILED.Events;
 using System.Linq;
 using TeamsEXILED.Enums;
 using UnityEngine;
@@ -126,22 +119,21 @@ namespace TeamsEXILED
 
         public void OnRespawning(RespawningTeamEventArgs ev)
         {
+            var team = chosenTeam;
+
             if (MainPlugin.assemblyUIU == true)
             {
                 if (Methods.IsUIU())
                 {
-                    coroutineHandle.Add(Timing.CallDelayed(3f, () =>
+                    if (MainPlugin.assemblyTimer)
                     {
-                        if (MainPlugin.assemblyTimer)
-                        {
-                            var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
-                            cfg.translations.Ci = chaosTrans;
-                            cfg.translations.Ntf = mtfTrans;
-                        }
+                        var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
+                        cfg.translations.Ci = chaosTrans;
+                        cfg.translations.Ntf = mtfTrans;
+                    }
 
-                        chosenTeam = null;
-                        HasReference = false;
-                    }));
+                    chosenTeam = null;
+                    HasReference = false;
                     return;
                 }
             }
@@ -150,18 +142,15 @@ namespace TeamsEXILED
             {
                 if (Methods.IsSerpentHand())
                 {
-                    coroutineHandle.Add(Timing.CallDelayed(3f, () =>
+                    if (MainPlugin.assemblyTimer)
                     {
-                        if (MainPlugin.assemblyTimer)
-                        {
-                            var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
-                            cfg.translations.Ci = chaosTrans;
-                            cfg.translations.Ntf = mtfTrans;
-                        }
+                        var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
+                        cfg.translations.Ci = chaosTrans;
+                        cfg.translations.Ntf = mtfTrans;
+                    }
 
-                        chosenTeam = null;
-                        HasReference = false;
-                    }));
+                    chosenTeam = null;
+                    HasReference = false;
                     return;
                 }
             }
@@ -179,9 +168,9 @@ namespace TeamsEXILED
                 respawns++;
             }
 
-            if (chosenTeam != null)
+            if (team != null)
             {
-                Log.Debug("Spawned " + chosenTeam.Name, this.plugin.Config.Debug);
+                Log.Debug("Spawned " + team.Name, this.plugin.Config.Debug);
                 List<Player> tempPlayers = new List<Player>();
 
                 foreach (Player i in ev.Players)
@@ -191,27 +180,24 @@ namespace TeamsEXILED
 
                 coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
                 {
-                    MainPlugin.Singleton.TmMethods.ChangeTeamReferancing(tempPlayers, chosenTeam.Name);
+                    MainPlugin.Singleton.TmMethods.ChangeTeamReferancing(tempPlayers, team.Name);
                 }));
 
-                if (random.Next(0, 100) < chosenTeam.CassieMessageChaosAnnounceChance && ev.NextKnownTeam == Respawning.SpawnableTeamType.ChaosInsurgency)
+                if (random.Next(0, 100) <= chosenTeam.CassieMessageChaosAnnounceChance && ev.NextKnownTeam == Respawning.SpawnableTeamType.ChaosInsurgency)
                 {
                     Cassie.DelayedGlitchyMessage(chosenTeam.CassieMessageChaosMessage, 0, 0.25f, 0.25f);
                 }
             }
             
-            coroutineHandle.Add(Timing.CallDelayed(3f, () =>
+            if (MainPlugin.assemblyTimer)
             {
-                if (MainPlugin.assemblyTimer)
-                {
-                    var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
-                    cfg.translations.Ci = chaosTrans;
-                    cfg.translations.Ntf = mtfTrans;
-                }
+                var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
+                cfg.translations.Ci = chaosTrans;
+                cfg.translations.Ntf = mtfTrans;
+            }
 
-                chosenTeam = null;
-                HasReference = false;
-            }));
+            chosenTeam = null;
+            HasReference = false;
         }
 
         public void OnHurt(HurtingEventArgs ev)
@@ -257,7 +243,7 @@ namespace TeamsEXILED
 
                 if (teamedPlayers[ev.Target] == teamedPlayers[ev.Killer])
                 {
-                    ev.Target.Broadcast(5, this.plugin.InternalTranslation.d);
+                    ev.Target.Broadcast(5, this.plugin.Config.TeamKillBroadcast);
                 }
                 else
                 {

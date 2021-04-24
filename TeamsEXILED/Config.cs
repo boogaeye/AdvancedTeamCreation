@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using Exiled.API.Interfaces;
 using TeamsEXILED.API;
@@ -16,6 +12,8 @@ namespace TeamsEXILED
 
         [Description("if this is true then it will allow one player to be alive in the round when someone kills themselves(This is basically to give them another chance before ending the game)")]
         public bool Allow1Player { get; set; } = false;
+        public string TeamKillBroadcast { get; set; } = "You got teamkilled report this to the admins if you dont think its an accident";
+        public string KilledByNonfriendlyPlayer { get; set; } = "You didnt get team killed you where probably killed by someone who looks like you but isnt";
 
         [Description("allows friendly teams to hurt eachother no matter what hurts them")]
         public bool FriendlyFire { get; set; } = false;

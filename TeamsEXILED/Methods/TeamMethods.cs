@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TeamsEXILED.API;
 using Exiled.API.Features;
-using TeamsEXILED.Enums;
-using Exiled.API.Interfaces;
-using Exiled.CustomItems.API.Features;
-using Exiled.API.Enums;
 using MEC;
 
 namespace TeamsEXILED
@@ -81,7 +74,7 @@ namespace TeamsEXILED
                 Log.Debug("Next Known Spawn is " + spawnableTeamType, MainPlugin.Singleton.Config.Debug);
                 Log.Debug("Next Known Chosen Team is " + MainPlugin.Singleton.EventHandlers.chosenTeam.Name, MainPlugin.Singleton.Config.Debug);
 
-                if (MainPlugin.Singleton.EventHandlers.random.Next(0, 100) < MainPlugin.Singleton.EventHandlers.chosenTeam.Chance)
+                if (MainPlugin.Singleton.EventHandlers.random.Next(0, 100) <= MainPlugin.Singleton.EventHandlers.chosenTeam.Chance)
                 {
                     return;
                 }

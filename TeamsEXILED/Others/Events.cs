@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TeamsEXILED.API;
+﻿using TeamsEXILED.API;
 using Exiled.API.Features;
 
 namespace TeamsEXILED.Events

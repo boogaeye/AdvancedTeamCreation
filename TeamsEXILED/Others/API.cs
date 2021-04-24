@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Exiled.API.Enums;
-using Exiled.CustomItems.API.Features;
 using TeamsEXILED.Enums;
-using TeamsEXILED.Events;
 using Respawning;
 
 namespace TeamsEXILED.API

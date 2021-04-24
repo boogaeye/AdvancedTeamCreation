@@ -269,7 +269,15 @@ namespace TeamsEXILED
                             p.Ammo[(int)a.Key] = a.Value;
                         }
 
-                        p.ShowHint(subteams.RoleHint, 10);
+                        if (MainPlugin.Singleton.Config.UseHints)
+                        {
+                            p.ShowHint(subteams.RoleHint, 10);
+                        }
+                        else
+                        {
+                            p.Broadcast(10, subteams.RoleHint);
+                        }
+                        
 
                         if (MainPlugin.Singleton.EventHandlers.spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
                         {

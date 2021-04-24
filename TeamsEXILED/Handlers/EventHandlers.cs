@@ -259,7 +259,7 @@ namespace TeamsEXILED
 
                 if (teamedPlayers[ev.Target] == teamedPlayers[ev.Killer])
                 {
-                    ev.Target.Broadcast(5, this.plugin.Config.TeamKillBroadcast);
+                    ev.Target.Broadcast(5, this.plugin.InternalTranslation.d);
                 }
                 else
                 {
@@ -281,15 +281,7 @@ namespace TeamsEXILED
 
                 if (ev.Target == ev.Killer)
                 {
-                    int alive = 0;
-
-                    foreach (Player p in Player.List)
-                    {
-                        if (p.IsAlive)
-                        {
-                            alive++;
-                        }
-                    }
+                    var alive = Player.List.Where(x => x.IsAlive).ToList().Count;
 
                     if (alive == 1 && this.plugin.Config.Allow1Player)
                     {

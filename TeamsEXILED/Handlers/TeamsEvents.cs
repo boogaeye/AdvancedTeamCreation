@@ -36,25 +36,25 @@ namespace TeamsEXILED
         public void OnCreatingTeam(Events.EventArgs.CreatingTeamEventArgs ev)
         {
             Log.Debug("Creating Team Event Called", this.plugin.Config.Debug);
-            //if (Teams.IsDefinedInConfig(ev.Team.Name, this.plugin.Config))
-            //{
-            //    Log.Debug($"{ev.Team.Name} is defined in Normal Teams Config", this.plugin.Config.Debug);
-            //    foreach (NormalTeam t in this.plugin.Config.TeamRedefine)
-            //    {
-            //        if (t.Team.ToString().ToLower() == ev.Team.Name && t.Active)
-            //        {
-            //            Log.Debug("Redefined Team!", this.plugin.Config.Debug);
-            //            ev.Team = new Teams
-            //            {
-            //                Name = ev.Team.Name,
-            //                Neutral = t.Neutral,
-            //                Friendlys = t.Friendlys,
-            //                Requirements = t.Requirements,
-            //                teamLeaders = ev.Team.teamLeaders
-            //            };
-            //        }
-            //    }
-            //}
+            /*if (Teams.IsDefinedInConfig(ev.Team.Name, this.plugin.Config))
+            {
+                Log.Debug($"{ev.Team.Name} is defined in Normal Teams Config", this.plugin.Config.Debug);
+                foreach (NormalTeam t in this.plugin.Config.TeamRedefine)
+                {
+                    if (t.Team.ToString().ToLower() == ev.Team.Name && t.Active)
+                    {
+                        Log.Debug("Redefined Team!", this.plugin.Config.Debug);
+                        ev.Team = new Teams
+                        {
+                            Name = ev.Team.Name,
+                            Neutral = t.Neutral,
+                            Friendlys = t.Friendlys,
+                            Requirements = t.Requirements,
+                            teamLeaders = ev.Team.teamLeaders
+                        };
+                    }
+                }
+            }*/
         }
 
         public void OnTeamSpawn(Events.EventArgs.SetTeamEventArgs ev)

@@ -35,6 +35,7 @@ namespace TeamsEXILED.API
         public int NumOfAllowedPlayers { get; set; } = -1;
         #endregion
     }
+
     public class Teams
     {
         #region team Config Zone
@@ -83,6 +84,7 @@ namespace TeamsEXILED.API
         }
         #endregion
     }
+
     public class NormalTeam
     {
         #region NTeam config zone
@@ -100,6 +102,7 @@ namespace TeamsEXILED.API
         public LeadingTeam TeamLeaders { get; set; } = LeadingTeam.Anomalies;
         #endregion
     }
+
     public class TeamConvert
     {
         #region vars
@@ -117,6 +120,7 @@ namespace TeamsEXILED.API
         }
         #endregion
     }
+
     public class CustomItemHandler
     {
         public static void ItemHandler(Item itemType)

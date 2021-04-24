@@ -25,11 +25,15 @@ namespace TeamsEXILED
                     switch (Respawn.NextKnownTeam)
                     {
                         case Respawning.SpawnableTeamType.NineTailedFox:
+                        {
                             cfg.translations.Ntf = $"<color={MainPlugin.Singleton.EventHandlers.chosenTeam.Color}>{MainPlugin.Singleton.EventHandlers.chosenTeam.Name}</color>";
                             break;
+                        }
                         case Respawning.SpawnableTeamType.ChaosInsurgency:
+                        {
                             cfg.translations.Ci = $"<color={MainPlugin.Singleton.EventHandlers.chosenTeam.Color}>{MainPlugin.Singleton.EventHandlers.chosenTeam.Name}</color>";
                             break;
+                        }
                     }
                 }
             }

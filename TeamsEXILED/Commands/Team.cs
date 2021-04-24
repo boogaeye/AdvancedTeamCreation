@@ -27,6 +27,7 @@ namespace TeamsEXILED.Commands
                 response = MainPlugin.Singleton.EventHandlers.teamedPlayers[ply];
                 return true;
             }
+
             response = "<color=red>You dont have permission for this command</color>";
             return false;
         }

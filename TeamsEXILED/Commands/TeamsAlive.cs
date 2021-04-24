@@ -29,8 +29,10 @@ namespace TeamsEXILED.Commands
                 {
                     response = response + "\n" + t.Value + " : " + t.Key.Nickname;
                 }
+
                 return true;
             }
+
             response = "<color=red>You dont have permission for this command</color>";
             return false;
         }

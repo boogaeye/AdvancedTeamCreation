@@ -13,13 +13,18 @@ namespace TeamsEXILED
     public class Config : IConfig
     {
         public bool IsEnabled { get; set; } = true;
+
         [Description("if this is true then it will allow one player to be alive in the round when someone kills themselves(This is basically to give them another chance before ending the game)")]
-        public bool Allow1Player { get; set; } = true;
+        public bool Allow1Player { get; set; } = false;
+
         [Description("allows friendly teams to hurt eachother no matter what hurts them")]
         public bool FriendlyFire { get; set; } = false;
-        public string TeamKillBroadcast { get; set; } = "You got teamkilled report this to the admins if you dont think its an accident";
-        public string KilledByNonfriendlyPlayer { get; set; } = "You didnt get team killed you where probably killed by someone who looks like you but isnt";
+
+        [Description("If enabled the RoleHint message will be displayed as a hint, else as a broadcast")]
+        public bool UseHints { get; set; } = true;
+
         public bool Debug { get; set; } = false;
+
         [Description("All team names have to be lowercase otherwise IT WILL NOT LET YOU SPAWN CORRECTLY!")]
         public Teams[] Teams { get; set; } = new Teams[]{ new Teams() {
             Active = true,
@@ -176,6 +181,7 @@ namespace TeamsEXILED
             CassieMessageMTFSpawn = "cassie pitch_0.6 .g3 .g3 pitch_1 the arrival of the anomaly emergency squad {nato} {unit} has entered the facility. pitch_0.96 please escort2 all scpsubjects to surface zone. pitch_1 all scpsubjects need to be secured. please wait inside of your designated evacuation shelters until this emergency has been completed. there are {SCP} scpsubjects remaining."
         }
         };
+
         public NormalTeam[] TeamRedefine { get; set; } = new NormalTeam[] {
             new NormalTeam()
             {

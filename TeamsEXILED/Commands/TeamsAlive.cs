@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CommandSystem;
-using TeamsEXILED.API;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 
@@ -21,7 +17,7 @@ namespace TeamsEXILED.Commands
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            Player ply = Player.Get((sender as CommandSender));
+            Player ply = Player.Get(sender as CommandSender);
             if (ply.CheckPermission("ATC.teamsalive"))
             {
                 response = "";
@@ -29,8 +25,10 @@ namespace TeamsEXILED.Commands
                 {
                     response = response + "\n" + t.Value + " : " + t.Key.Nickname;
                 }
+
                 return true;
             }
+
             response = "<color=red>You dont have permission for this command</color>";
             return false;
         }

@@ -70,8 +70,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Desktop\scp-sl\SCPSL_Data\Managed\Mirror.dll</HintPath>
     </Reference>
-    <Reference Include="RespawnTimer">
-      <HintPath>..\..\..\..\Downloads\RespawnTimer.dll</HintPath>
+    <Reference Include="RespawnTimer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Users\jorge\Downloads\virus para pikatu\RespawnTimer.dll</HintPath>
+    </Reference>
+    <Reference Include="SerpentsHand, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Users\jorge\Downloads\virus para pikatu\SerpentsHand.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -82,8 +87,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="UIURescueSquad">
-      <HintPath>..\..\..\..\Downloads\UIURescueSquad.dll</HintPath>
+    <Reference Include="UIURescueSquad, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Users\jorge\Downloads\UIURescueSquad.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -97,12 +103,18 @@
     <Compile Include="Commands\TeamsAlive.cs" />
     <Compile Include="Commands\Team.cs" />
     <Compile Include="Commands\ForceTeam.cs" />
+    <Compile Include="Patches\RefNextTeam.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="EventHandlers.cs" />
+    <Compile Include="Handlers\TeamsEvents.cs" />
+    <Compile Include="Handlers\EventHandlers.cs" />
     <Compile Include="MainPlugin.cs" />
+    <Compile Include="Methods\RTimerMethods.cs" />
+    <Compile Include="Methods\TeamMethods.cs" />
     <Compile Include="Others\Classes.cs" />
     <Compile Include="Others\Enums.cs" />
     <Compile Include="Others\Events.cs" />
+    <Compile Include="Methods\Methods.cs" />
+    <Compile Include="Others\Points.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Others\API.cs" />
   </ItemGroup>

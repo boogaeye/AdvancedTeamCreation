@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CommandSystem;
-using TeamsEXILED.API;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 
@@ -24,9 +19,10 @@ namespace TeamsEXILED.Commands
             Player ply = Player.Get((sender as CommandSender));
             if (ply.CheckPermission("ATC.team"))
             {
-                response = MainPlugin.Singleton.EventHandlers.teamedPlayers[ply];
+                response = "<color=cyan>Team:</color>" + $"<b><color=white>{MainPlugin.Singleton.EventHandlers.teamedPlayers[ply]}</color></b>";
                 return true;
             }
+
             response = "<color=red>You dont have permission for this command</color>";
             return false;
         }

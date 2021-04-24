@@ -51,8 +51,6 @@ namespace TeamsEXILED
         public Respawning.SpawnableTeamType spawnableTeamType = Respawning.SpawnableTeamType.None;
 
         #endregion
-        #region Fake Respawn Timer
-
         public void OnRoundStart()
         {
             if (MainPlugin.assemblyTimer)
@@ -89,7 +87,7 @@ namespace TeamsEXILED
         }
 
         // This is for development
-        public void OnSendingCommand(SendingConsoleCommandEventArgs ev)
+        /*public void OnSendingCommand(SendingConsoleCommandEventArgs ev)
         {
             if (ev.Name == "point")
             {
@@ -104,11 +102,7 @@ namespace TeamsEXILED
                 Log.Info($"Room: {ev.Player.CurrentRoom.Name} Pos:{p2} Rotation:{lastr}");
                 ev.ReturnMessage = $"Room: {ev.Player.CurrentRoom.Name} Pos:{p2} Rotation:{lastr}";
             }
-        }
-        
-
-        #endregion
-        #region Base Plugin
+        }*/
 
         public void OnVerified(VerifiedEventArgs ev)
         {
@@ -376,6 +370,5 @@ namespace TeamsEXILED
             teamedPlayers.Clear();
             fixedpoints.Clear();
         }
-        #endregion
     }
 }

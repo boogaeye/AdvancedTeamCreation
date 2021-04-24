@@ -74,8 +74,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Users\jorge\Downloads\virus para pikatu\RespawnTimer.dll</HintPath>
     </Reference>
-    <Reference Include="SerpentsHand">
-      <HintPath>C:\Users\jorge\Downloads\SerpentsHand.dll</HintPath>
+    <Reference Include="SerpentsHand, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Users\jorge\Downloads\virus para pikatu\SerpentsHand.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />

@@ -16,6 +16,7 @@ using System.Linq;
 using TeamsEXILED.Enums;
 using UnityEngine;
 using System.Globalization;
+using Exiled.API.Extensions;
 
 namespace TeamsEXILED
 {
@@ -72,6 +73,38 @@ namespace TeamsEXILED
                     ev.IsAllowed = false;
                     ev.Player.ShowHint("Couldnt spawn you in because you are already spawning in");
                 }
+            }
+        }
+
+        public void OnAddingInventoryItems(Events.EventArgs.AddingInventoryItemsEventArgs ev)
+        {
+            Log.Debug($"Giving Inventory Items of the subclass {ev.Subteam.Name}, to {ev.Player.Nickname}", this.plugin.Config.Debug);
+            if (ev.IsAllowed == false)
+            {
+                return;
+            }
+
+            ev.Player.ClearInventory();
+
+            foreach (string i in ev.Subteam.Inventory)
+            {
+                if (ItemType.TryParse<ItemType>(i, out ItemType item))
+                {
+                    ev.Player.AddItem(item);
+                }
+                else if (int.TryParse(i, out int citem))
+                {
+                    CustomItem.TryGive(ev.Player, citem, plugin.Config.DisplayDescription);
+                }
+                else
+                {
+                    Log.Error($"The config item {i} of the subteam {ev.Subteam.Name} isn't valid");
+                }
+            }
+
+            foreach (KeyValuePair<AmmoType, uint> a in ev.Subteam.Ammo)
+            {
+                ev.Player.Ammo[(int)a.Key] = a.Value;
             }
         }
     }

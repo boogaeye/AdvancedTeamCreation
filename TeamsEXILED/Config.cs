@@ -23,6 +23,9 @@ namespace TeamsEXILED
         [Description("If enabled the RoleHint message will be displayed as a hint, else as a broadcast")]
         public bool UseHints { get; set; } = true;
 
+        [Description("Should display the description of the customitem when given?")]
+        public bool DisplayDescription { get; set; } = false;
+
         public bool Debug { get; set; } = false;
 
         [Description("All team names have to be lowercase otherwise IT WILL NOT LET YOU SPAWN CORRECTLY!")]
@@ -30,7 +33,7 @@ namespace TeamsEXILED
             Active = true,
             Name = "goc",
             Subclasses = new Subteams[]{ new Subteams {
-                Name = "rookie", Ammo = new Dictionary<AmmoType, uint>(){ { AmmoType.Nato762, 200 } }, Inventory = new ItemType[]{ ItemType.KeycardNTFLieutenant, ItemType.Radio, ItemType.Medkit }, HP = 135, ModelRole = RoleType.ChaosInsurgency, RoleName = "<color=yellow>GOC</color>", RoleHint = "You are the GOC", CustomItemIds = new int[] { 5, 2, 2, 0, }
+                Name = "rookie", Ammo = new Dictionary<AmmoType, uint>(){ { AmmoType.Nato762, 200 } }, Inventory = new string[]{ "KeycardNTFLieutenant", "Radio", "Medkit", "5", "2", "2", "0" }, HP = 135, ModelRole = RoleType.ChaosInsurgency, RoleName = "<color=yellow>GOC</color>", RoleMessage = "You are the GOC"
             } },
             Friendlys = new string[] { "goc" },
             Requirements = new string[] { "scp", "cdp", "tta", "rsc", "opcf", "aes" },
@@ -45,7 +48,7 @@ namespace TeamsEXILED
             Active = true,
             Name = "gru",
             Subclasses = new Subteams[]{ new Subteams {
-                Name = "rookie", Ammo = new Dictionary<AmmoType, uint>(){ { AmmoType.Nato762, 200 } }, Inventory = new ItemType[]{ ItemType.GunE11SR, ItemType.KeycardChaosInsurgency, ItemType.Adrenaline, ItemType.WeaponManagerTablet, ItemType.GrenadeFlash }, HP = 150, ModelRole = RoleType.FacilityGuard, RoleName = "<color=yellow>GRU</color>", RoleHint = "", CustomItemIds = new int[] { 7, 6 }
+                Name = "rookie", Ammo = new Dictionary<AmmoType, uint>(){ { AmmoType.Nato762, 200 } }, Inventory = new string[]{ "GunE11SR", "KeycardChaosInsurgency", "Adrenaline", "WeaponManagerTablet", "GrenadeFlash", "7", "6" }, HP = 150, ModelRole = RoleType.FacilityGuard, RoleName = "<color=yellow>GRU</color>", RoleMessage = ""
             } },
             Friendlys = new string[] { "gru" },
             Requirements = new string[] { "scp", "tta", "cdp", "rsc", "aes" },
@@ -59,7 +62,7 @@ namespace TeamsEXILED
             Active = true,
             Name = "tta",
             Subclasses = new Subteams[]{ new Subteams {
-                Name = "officer", Ammo = new Dictionary<AmmoType, uint>(){ { AmmoType.Nato9, 200 } }, Inventory = new ItemType[]{ ItemType.GunUSP, ItemType.KeycardFacilityManager, ItemType.Adrenaline, ItemType.WeaponManagerTablet }, HP = 100, ModelRole = RoleType.NtfScientist, RoleName = "<color=red>TTA</color>", RoleHint = "You are the TTA\nKill everything in sight", CustomItemIds = new int[] { 0, 0 }
+                Name = "officer", Ammo = new Dictionary<AmmoType, uint>(){ { AmmoType.Nato9, 200 } }, Inventory = new string[]{ "GunUSP", "KeycardFacilityManager", "Adrenaline", "WeaponManagerTablet", "0", "0" }, HP = 100, ModelRole = RoleType.NtfScientist, RoleName = "<color=red>TTA</color>", RoleMessage = "You are the TTA\nKill everything in sight"
             } },
             Friendlys = new string[] { "tta" },
             Requirements = new string[] { "chi", "scp", "goc", "gru", "mtf", "cdp", "rsc", "opcf", "aes" },
@@ -81,9 +84,8 @@ namespace TeamsEXILED
                     HP = 160,
                     ModelRole = RoleType.FacilityGuard,
                     RoleName = "OPCF Commander",
-                    RoleHint = "You are part of the branch of the NTF\n<color=blue>Operation Chaos Force</color>\nKill everything you see and help the MTF",
-                    Inventory = new ItemType[]{ ItemType.GunLogicer, ItemType.GunProject90, ItemType.KeycardChaosInsurgency, ItemType.Radio, ItemType.Medkit, ItemType.Medkit },
-                    CustomItemIds = new int[]{ 0 },
+                    RoleMessage = "You are part of the branch of the NTF\n<color=blue>Operation Chaos Force</color>\nKill everything you see and help the MTF",
+                    Inventory = new string[]{ "GunLogicer", "GunProject90", "KeycardChaosInsurgency", "Radio", "Medkit", "Medkit", "0" },
                     NumOfAllowedPlayers = 1
                 },
                 new Subteams{
@@ -92,9 +94,8 @@ namespace TeamsEXILED
                     HP = 120,
                     ModelRole = RoleType.NtfLieutenant,
                     RoleName = "OPCF Officer",
-                    RoleHint = "You are part of the branch of the NTF\n<color=blue>Operation Chaos Force</color>\nKill everything you see and help the MTF",
-                    Inventory = new ItemType[]{ ItemType.GunLogicer, ItemType.GunProject90, ItemType.KeycardNTFLieutenant, ItemType.Radio, ItemType.Medkit, ItemType.Painkillers },
-                    CustomItemIds = new int[]{ 0 },
+                    RoleMessage = "You are part of the branch of the NTF\n<color=blue>Operation Chaos Force</color>\nKill everything you see and help the MTF",
+                    Inventory = new string[]{ "GunLogicer", "GunProject90", "KeycardNTFLieutenant", "Radio", "Medkit", "Painkillers", "0" },
                     NumOfAllowedPlayers = 2
                 },
                 new Subteams{
@@ -103,9 +104,8 @@ namespace TeamsEXILED
                     HP = 100,
                     ModelRole = RoleType.NtfCadet,
                     RoleName = "OPCF Cadet",
-                    RoleHint = "You are part of the branch of the NTF\n<color=blue>Operation Chaos Force</color>\nKill everything you see and help the MTF",
-                    Inventory = new ItemType[]{ ItemType.GunProject90, ItemType.KeycardGuard, ItemType.Radio, ItemType.Painkillers, ItemType.GrenadeFlash },
-                    CustomItemIds = new int[]{ 0 },
+                    RoleMessage = "You are part of the branch of the NTF\n<color=blue>Operation Chaos Force</color>\nKill everything you see and help the MTF",
+                    Inventory = new string[]{ "GunProject90", "KeycardGuard", "Radio", "Painkillers", "GrenadeFlash", "0" },
                     NumOfAllowedPlayers = -1
                 },
             },
@@ -129,9 +129,8 @@ namespace TeamsEXILED
                     HP = 100,
                     ModelRole = RoleType.ChaosInsurgency,
                     RoleName = "AES Commander",
-                    RoleHint = "You are to eliminate all scp subjects",
-                    Inventory = new ItemType[]{ ItemType.GunProject90, ItemType.KeycardO5, ItemType.Medkit, ItemType.Medkit, ItemType.WeaponManagerTablet, ItemType.Radio },
-                    CustomItemIds = new int[]{ 6 },
+                    RoleMessage = "You are to eliminate all scp subjects",
+                    Inventory = new string[]{ "GunProject90", "KeycardO5", "Medkit", "Medkit", "WeaponManagerTablet", "Radio", "6" },
                     NumOfAllowedPlayers = 1
                 },
                 new Subteams{
@@ -140,9 +139,8 @@ namespace TeamsEXILED
                     HP = 100,
                     ModelRole = RoleType.ChaosInsurgency,
                     RoleName = "AES First Officer",
-                    RoleHint = "You are to eliminate all scp subjects",
-                    Inventory = new ItemType[]{ ItemType.GunProject90, ItemType.KeycardChaosInsurgency, ItemType.Medkit, ItemType.Medkit, ItemType.WeaponManagerTablet, ItemType.Radio },
-                    CustomItemIds = new int[]{ },
+                    RoleMessage = "You are to eliminate all scp subjects",
+                    Inventory = new string[]{ "GunProject90", "KeycardChaosInsurgency", "Medkit", "Medkit", "WeaponManagerTablet", "Radio" },
                     NumOfAllowedPlayers = 1
                 },
                 new Subteams{
@@ -151,9 +149,8 @@ namespace TeamsEXILED
                     HP = 100,
                     ModelRole = RoleType.ChaosInsurgency,
                     RoleName = "AES Officer",
-                    RoleHint = "You are to eliminate all scp subjects",
-                    Inventory = new ItemType[]{ ItemType.GunMP7, ItemType.KeycardZoneManager, ItemType.Medkit, ItemType.Medkit, ItemType.WeaponManagerTablet },
-                    CustomItemIds = new int[]{ },
+                    RoleMessage = "You are to eliminate all scp subjects",
+                    Inventory = new string[]{ "GunMP7", "KeycardZoneManager", "Medkit", "Medkit", "WeaponManagerTablet" },
                     NumOfAllowedPlayers = 2
                 },
                 new Subteams{
@@ -162,9 +159,8 @@ namespace TeamsEXILED
                     HP = 100,
                     ModelRole = RoleType.ChaosInsurgency,
                     RoleName = "AES rookie",
-                    RoleHint = "You are to eliminate all scp subjects",
-                    Inventory = new ItemType[]{ ItemType.GunMP7, ItemType.KeycardZoneManager, ItemType.Medkit, ItemType.WeaponManagerTablet, ItemType.WeaponManagerTablet },
-                    CustomItemIds = new int[]{ },
+                    RoleMessage = "You are to eliminate all scp subjects",
+                    Inventory = new string[]{ "GunMP7", "KeycardZoneManager", "Medkit", "WeaponManagerTablet", "WeaponManagerTablet" },
                     NumOfAllowedPlayers = -1
                 },
             },

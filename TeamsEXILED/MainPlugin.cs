@@ -26,6 +26,9 @@ namespace TeamsEXILED
 
         public static MainPlugin Singleton;
 
+        public Classes.Classes Classes = new Classes.Classes();
+        public TeamMethods TmMethods = new TeamMethods();
+
         public override Version RequiredExiledVersion { get; } = new Version("2.10.0");
 
         public override PluginPriority Priority { get; } = PluginPriority.High;
@@ -65,6 +68,7 @@ namespace TeamsEXILED
             Exiled.Events.Handlers.Server.RoundStarted += EventHandlers.OnRoundStart;
 
             Events.EventArgs.SetTeam += TeamsHandlers.OnTeamSpawn;
+            Events.EventArgs.AddingInventoryItems += TeamsHandlers.OnAddingInventoryItems;
             Events.EventArgs.ReferencingTeam += TeamsHandlers.OnReferanceTeam;
             Events.EventArgs.CreatingTeam += TeamsHandlers.OnCreatingTeam;
             
@@ -91,6 +95,7 @@ namespace TeamsEXILED
             Exiled.Events.Handlers.Server.RoundStarted -= EventHandlers.OnRoundStart;
 
             Events.EventArgs.SetTeam -= TeamsHandlers.OnTeamSpawn;
+            Events.EventArgs.AddingInventoryItems -= TeamsHandlers.OnAddingInventoryItems;
             Events.EventArgs.ReferencingTeam -= TeamsHandlers.OnReferanceTeam;
             Events.EventArgs.CreatingTeam -= TeamsHandlers.OnCreatingTeam;
 

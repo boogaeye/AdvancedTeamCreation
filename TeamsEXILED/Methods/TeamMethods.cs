@@ -99,7 +99,7 @@ namespace TeamsEXILED
         public void RefNextTeamSpawn(string teamname)
         {
             Log.Debug("Getting Team Referances", MainPlugin.Singleton.Config.Debug);
-            MainPlugin.Singleton.EventHandlers.chosenTeam = MainPlugin.Singleton.EventHandlers.Classes.GetTeamFromString(teamname, MainPlugin.Singleton.Config);
+            MainPlugin.Singleton.EventHandlers.chosenTeam = MainPlugin.Singleton.Classes.GetTeamFromString(teamname, MainPlugin.Singleton.Config);
 
             if (!Respawn.IsSpawning && MainPlugin.Singleton.EventHandlers.chosenTeam.Active)
             {
@@ -249,35 +249,17 @@ namespace TeamsEXILED
                             }
                         }
 
-                        p.ClearInventory();
-
-                        foreach (ItemType i in subteams.Inventory)
-                        {
-                            p.AddItem(i);
-                        }
-
-                        if (subteams.CustomItemIds.Length != 0)
-                        {
-                            foreach (int it in subteams.CustomItemIds)
-                            {
-                                CustomItem.TryGive(p, it, true);
-                            }
-                        }
-
-                        foreach (KeyValuePair<AmmoType, uint> a in subteams.Ammo)
-                        {
-                            p.Ammo[(int)a.Key] = a.Value;
-                        }
+                        var ihandler = new Events.EventArgs.AddingInventoryItemsEventArgs(p, subteams);
+                        ihandler.StartInvoke();
 
                         if (MainPlugin.Singleton.Config.UseHints)
                         {
-                            p.ShowHint(subteams.RoleHint, 10);
+                            p.ShowHint(subteams.RoleMessage, 10);
                         }
                         else
                         {
-                            p.Broadcast(10, subteams.RoleHint);
+                            p.Broadcast(10, subteams.RoleMessage);
                         }
-                        
 
                         if (MainPlugin.Singleton.EventHandlers.spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
                         {

@@ -52,7 +52,7 @@ namespace TeamsEXILED.Commands
                                 if (Player.Get(arguments.ToList()[2].ToLower()).IsVerified)
                                 {
                                     response = "<color=green>Changed players Team!!!</color>";
-                                    MainPlugin.Singleton.EventHandlers.TmMethods.ChangeTeam(Player.Get(arguments.ToList()[2].ToLower()), arguments.ToList()[0].ToLower(), arguments.ToList()[1].ToLower());
+                                    MainPlugin.Singleton.TmMethods.ChangeTeam(Player.Get(arguments.ToList()[2].ToLower()), arguments.ToList()[0].ToLower(), arguments.ToList()[1].ToLower());
                                     return true;
                                 }
                                 return false;

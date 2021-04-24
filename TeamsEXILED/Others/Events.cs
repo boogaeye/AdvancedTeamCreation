@@ -16,6 +16,7 @@ namespace TeamsEXILED.Events
         public static event TeamEvent<SetTeamEventArgs> SetTeam;
         public static event TeamEvent<CreatingTeamEventArgs> CreatingTeam;
         public static event TeamEvent<TeamReferencedEventArgs> ReferencingTeam;
+        public static event TeamEvent<AddingInventoryItemsEventArgs> AddingInventoryItems;
 
         public class SetTeamEventArgs : System.EventArgs
         {
@@ -69,6 +70,27 @@ namespace TeamsEXILED.Events
             public void StartInvoke()
             {
                 ReferencingTeam.Invoke(this);
+            }
+        }
+
+        public class AddingInventoryItemsEventArgs : System.EventArgs
+        {
+            public AddingInventoryItemsEventArgs(Player ply, Subteams subteam, bool isAllowed = true, bool forceTeam = false)
+            {
+                Subteam = subteam;
+                IsAllowed = isAllowed;
+                ForceTeam = forceTeam;
+                Player = ply;
+            }
+
+            public Player Player { get; set; }
+            public Subteams Subteam { get; set; }
+            public bool ForceTeam { get; set; }
+            public bool IsAllowed { get; set; }
+
+            public void StartInvoke()
+            {
+                AddingInventoryItems.Invoke(this);
             }
         }
     }

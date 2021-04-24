@@ -37,8 +37,6 @@ namespace TeamsEXILED
         public Teams latestSpawn;
 
         public System.Random random = new System.Random();
-        public Classes.Classes Classes = new Classes.Classes();
-        public TeamMethods TmMethods = new TeamMethods();
 
         public LeadingTeam leadingTeam = LeadingTeam.Draw;
 
@@ -170,7 +168,7 @@ namespace TeamsEXILED
 
             if (!HasReference)
             {
-                TmMethods.RefNextTeamSpawn(ev.NextKnownTeam);
+                MainPlugin.Singleton.TmMethods.RefNextTeamSpawn(ev.NextKnownTeam);
                 Log.Debug("Possible admin spawn due to No Team Reference yet", this.plugin.Config.Debug);
             }
 
@@ -193,7 +191,7 @@ namespace TeamsEXILED
 
                 coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
                 {
-                    TmMethods.ChangeTeamReferancing(tempPlayers, chosenTeam.Name);
+                    MainPlugin.Singleton.TmMethods.ChangeTeamReferancing(tempPlayers, chosenTeam.Name);
                 }));
 
                 if (random.Next(0, 100) < chosenTeam.CassieMessageChaosAnnounceChance && ev.NextKnownTeam == Respawning.SpawnableTeamType.ChaosInsurgency)
@@ -222,7 +220,7 @@ namespace TeamsEXILED
             {
                 try
                 {
-                    if (Classes.IsTeamFriendly(Classes.GetTeamFromString(teamedPlayers[ev.Target], this.plugin.Config), teamedPlayers[ev.Attacker]) && !this.plugin.Config.FriendlyFire)
+                    if (MainPlugin.Singleton.Classes.IsTeamFriendly(MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Target], this.plugin.Config), teamedPlayers[ev.Attacker]) && !this.plugin.Config.FriendlyFire)
                     {
                         ev.IsAllowed = false;
                         ev.Attacker.ShowHint("You cant hurt teams teamed with you!");
@@ -246,7 +244,7 @@ namespace TeamsEXILED
                     Cassie.Message(chosenTeam.CassieMessageMTFSpawn.Replace("{SCP}", ev.ScpsLeft.ToString()).Replace("{unit}", ev.UnitNumber.ToString()).Replace("{nato}", "nato_" + ev.UnitName[0].ToString()), isNoisy: false);
                 }
 
-                Classes.RenameUnit(respawns, chosenTeam.Name.ToUpper() + "-" + ev.UnitNumber.ToString());
+                MainPlugin.Singleton.Classes.RenameUnit(respawns, chosenTeam.Name.ToUpper() + "-" + ev.UnitNumber.ToString());
                 Map.ChangeUnitColor(respawns, chosenTeam.Color);
             }
         }
@@ -268,11 +266,11 @@ namespace TeamsEXILED
 
                 teamedPlayers[ev.Target] = "Dead";
 
-                foreach (string t in Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Requirements)
+                foreach (string t in MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Requirements)
                 {
                     Log.Debug("got " + t + " from enemies", this.plugin.Config.Debug);
 
-                    if (TmMethods.TeamExists(t))
+                    if (MainPlugin.Singleton.TmMethods.TeamExists(t))
                     {
                         Log.Debug("This team is an enemy of this team stopping the round from ending", this.plugin.Config.Debug);
                         return;
@@ -300,11 +298,11 @@ namespace TeamsEXILED
                 }
 
                 AllowNormalRoundEnd = true;
-                leadingTeam = Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).teamLeaders;
+                leadingTeam = MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).teamLeaders;
 
-                foreach (string a in Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Neutral)
+                foreach (string a in MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Neutral)
                 {
-                    if (TmMethods.TeamExists(a))
+                    if (MainPlugin.Singleton.TmMethods.TeamExists(a))
                     {
                         leadingTeam = LeadingTeam.Draw;
                     }
@@ -336,7 +334,7 @@ namespace TeamsEXILED
 
         public void OnEscaping(EscapingEventArgs ev)
         {
-            teamedPlayers[ev.Player] = Classes.ConvertToNormalTeamName(ev.NewRole).ToString().ToLower();
+            teamedPlayers[ev.Player] = MainPlugin.Singleton.Classes.ConvertToNormalTeamName(ev.NewRole).ToString().ToLower();
         }
 
         public void OnRestartRound()

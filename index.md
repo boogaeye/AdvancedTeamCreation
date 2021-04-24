@@ -19,4 +19,7 @@ Advanced Team Creation
 ```YML
 this plugin supports:
 - Respawn Timer
+- UIURescueSquad
+- SerpentHands
+- CustomItems
 ```

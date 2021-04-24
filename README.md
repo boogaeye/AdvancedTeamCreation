@@ -10,6 +10,7 @@ https://github.com/boogaeye/AdvancedTeamCreation/wiki
   - RespawnTimer
   - UIURescueSquad
   - SerpentHands
+  - CustomItems
 
 Default Config:
 

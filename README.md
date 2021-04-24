@@ -6,6 +6,11 @@
 - **Visit the wiki to get the best description:**
 https://github.com/boogaeye/AdvancedTeamCreation/wiki
 
+- **Compatibilities:**
+  - RespawnTimer
+  - UIURescueSquad
+  - SerpentHands
+
 Default Config:
 
 ```yml

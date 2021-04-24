@@ -8,8 +8,6 @@ https://github.com/boogaeye/AdvancedTeamCreation/wiki
 
 Default Config:
 
-Welcome to the AdvancedTeamSpawning wiki!
-
 ```yml
 
 advanced_team_creation:

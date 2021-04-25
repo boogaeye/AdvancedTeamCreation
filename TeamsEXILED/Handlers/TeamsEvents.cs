@@ -31,15 +31,6 @@ namespace TeamsEXILED
                 ev.IsAllowed = false;
                 ev.Player.ShowHint("Couldnt spawn you in before the round started");
             }
-
-            if (MainPlugin.Singleton.EventHandlers.HasReference)
-            {
-                if (ev.Player.Role == RoleType.Spectator)
-                {
-                    ev.IsAllowed = false;
-                    ev.Player.ShowHint("Couldnt spawn you in because you are already spawning in");
-                }
-            }
         }
 
         public void OnAddingInventoryItems(Events.EventArgs.AddingInventoryItemsEventArgs ev)
@@ -54,13 +45,13 @@ namespace TeamsEXILED
 
             foreach (string i in ev.Subteam.Inventory)
             {
-                if (ItemType.TryParse<ItemType>(i, out ItemType item))
-                {
-                    ev.Player.AddItem(item);
-                }
-                else if (int.TryParse(i, out int citem))
+                if (int.TryParse(i, out int citem))
                 {
                     CustomItem.TryGive(ev.Player, citem, plugin.Config.DisplayDescription);
+                }
+                else if (ItemType.TryParse<ItemType>(i, out ItemType item))
+                {
+                    ev.Player.AddItem(item);
                 }
                 else
                 {

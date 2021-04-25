@@ -110,33 +110,30 @@ namespace TeamsEXILED
         {
             //finding teams
             var team = MainPlugin.Singleton.Config.Teams.First(x => x.Name == t);
-            if (team.Name != null)
-            {
-                Log.Debug("Got team " + team.Name + " from referance method", MainPlugin.Singleton.Config.Debug);
-                Dictionary<Player, string> switchList = new Dictionary<Player, string>();
-                int i = 0;
-                int selectedSubclass = 0;
+            Log.Debug("Got team " + team.Name + " from referance method", MainPlugin.Singleton.Config.Debug);
+            Dictionary<Player, string> switchList = new Dictionary<Player, string>();
+            int i = 0;
+            int selectedSubclass = 0;
 
-                foreach (Player y in p)
+            foreach (Player y in p)
+            {
+                i++;
+                if (team.Subclasses[selectedSubclass].NumOfAllowedPlayers > i && team.Subclasses[selectedSubclass].NumOfAllowedPlayers != -1)
                 {
-                    i++;
-                    if (team.Subclasses[selectedSubclass].NumOfAllowedPlayers > i && team.Subclasses[selectedSubclass].NumOfAllowedPlayers != -1)
-                    {
-                        ChangeTeam(y, t, team.Subclasses[selectedSubclass].Name);
-                        Log.Debug("allowed subteam " + team.Subclasses[selectedSubclass].Name + " from referance method", MainPlugin.Singleton.Config.Debug);
-                    }
-                    else if (team.Subclasses[selectedSubclass].NumOfAllowedPlayers == -1)
-                    {
-                        ChangeTeam(y, t, team.Subclasses[selectedSubclass].Name);
-                        Log.Debug("allowed subteam " + team.Subclasses[selectedSubclass].Name + " from referance method with -1 players allowed(making everyone else this role)", MainPlugin.Singleton.Config.Debug);
-                    }
-                    else
-                    {
-                        ChangeTeam(y, t, team.Subclasses[selectedSubclass].Name);
-                        i = 0;
-                        selectedSubclass++;
-                        Log.Debug("allowed subteam " + team.Subclasses[selectedSubclass].Name + " from referance method reseting method as selected subclass no longer allows more players to be this role", MainPlugin.Singleton.Config.Debug);
-                    }
+                    ChangeTeam(y, t, team.Subclasses[selectedSubclass].Name);
+                    Log.Debug("allowed subteam " + team.Subclasses[selectedSubclass].Name + " from referance method", MainPlugin.Singleton.Config.Debug);
+                }
+                else if (team.Subclasses[selectedSubclass].NumOfAllowedPlayers == -1)
+                {
+                    ChangeTeam(y, t, team.Subclasses[selectedSubclass].Name);
+                    Log.Debug("allowed subteam " + team.Subclasses[selectedSubclass].Name + " from referance method with -1 players allowed(making everyone else this role)", MainPlugin.Singleton.Config.Debug);
+                }
+                else
+                {
+                    ChangeTeam(y, t, team.Subclasses[selectedSubclass].Name);
+                    i = 0;
+                    selectedSubclass++;
+                    Log.Debug("allowed subteam " + team.Subclasses[selectedSubclass].Name + " from referance method reseting method as selected subclass no longer allows more players to be this role", MainPlugin.Singleton.Config.Debug);
                 }
             }
         }
@@ -153,128 +150,148 @@ namespace TeamsEXILED
             t = handler.Team;
             s = handler.Subclass;
             if (!handler.IsAllowed) return;
-            //Finding teems and seeing if the string exists
             var team = MainPlugin.Singleton.Config.Teams.First(x => x.Name == t);
+            var subteams = team.Subclasses.First(x => x.Name == s);
 
-            if (team != null)
+            //If found it will give you everything defined here
+            p.SetRole(subteams.ModelRole, true);
+            p.Health = subteams.HP;
+            p.MaxHealth = subteams.HP;
+
+            if (team.spawnLocation != Enums.SpawnLocation.Normal)
             {
-                //Finding subteams and seeing if the string exists
-                foreach (Subteams subteams in team.Subclasses)
+                var point = MainPlugin.Singleton.EventHandlers.fixedpoints.First(x => x.Type == team.spawnLocation);
+                switch (team.spawnLocation)
                 {
-                    if (subteams.Name == s)
-                    {
-                        //If found it will give you everything defined here
-                        p.SetRole(subteams.ModelRole, true);
-                        p.Health = subteams.HP;
-                        p.MaxHealth = subteams.HP;
-
-                        if (team.spawnLocation != Enums.SpawnLocation.Normal)
+                    case Enums.SpawnLocation.Escape:
                         {
-                            var point = MainPlugin.Singleton.EventHandlers.fixedpoints.First(x => x.Type == team.spawnLocation);
-                            switch (team.spawnLocation)
+                            p.Position = point.Position;
+                            p.Rotations = point.Direction;
+                            break;
+                        }
+                    case Enums.SpawnLocation.SCP106:
+                        {
+                            if (!Warhead.IsDetonated)
                             {
-                                case Enums.SpawnLocation.Escape:
-                                    {
-                                        p.Position = point.Position;
-                                        p.Rotations = point.Direction;
-                                        break;
-                                    }
-                                case Enums.SpawnLocation.SCP106:
-                                    {
-                                        if (!Warhead.IsDetonated)
-                                        {
-                                            p.Position = point.Position;
-                                            p.Rotations = point.Direction;
-                                        }
-                                        break;
-                                    }
-                                case Enums.SpawnLocation.SurfaceNuke:
-                                    {
-                                        p.Position = point.Position;
-                                        p.Rotations = point.Direction;
-                                        break;
-                                    }
-                                case Enums.SpawnLocation.SCP012:
-                                    {
-                                        if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
-                                        {
-                                            p.Position = point.Position;
-                                            p.Rotations = point.Direction;
-                                        }
-                                        break;
-                                    }
-                                case Enums.SpawnLocation.SCP079:
-                                    {
-                                        if (!Warhead.IsDetonated)
-                                        {
-                                            p.Position = point.Position;
-                                            p.Rotations = point.Direction;
-                                        }
-                                        break;
-                                    }
-                                case Enums.SpawnLocation.SCP096:
-                                    {
-                                        if (!Warhead.IsDetonated)
-                                        {
-                                            p.Position = point.Position;
-                                            p.Rotations = point.Direction;
-                                        }
-                                        break;
-                                    }
-                                case Enums.SpawnLocation.SCP173:
-                                    {
-                                        if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
-                                        {
-                                            p.Position = point.Position;
-                                            p.Rotations = point.Direction;
-                                        }
-                                        break;
-                                    }
-                                case Enums.SpawnLocation.Shelter:
-                                    {
-                                        if (!Warhead.IsDetonated)
-                                        {
-                                            p.Position = point.Position;
-                                            p.Rotations = point.Direction;
-                                        }
-                                        break;
-                                    }
+                                p.Position = point.Position;
+                                p.Rotations = point.Direction;
                             }
+                            break;
                         }
-
-                        var ihandler = new Events.EventArgs.AddingInventoryItemsEventArgs(p, subteams);
-                        ihandler.StartInvoke();
-
-                        if (MainPlugin.Singleton.Config.UseHints)
+                    case Enums.SpawnLocation.SurfaceNuke:
                         {
-                            p.ShowHint(subteams.RoleMessage, 10);
+                            p.Position = point.Position;
+                            p.Rotations = point.Direction;
+                            break;
                         }
-                        else
+                    case Enums.SpawnLocation.SCP012:
                         {
-                            p.Broadcast(10, subteams.RoleMessage);
+                            if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
+                            {
+                                p.Position = point.Position;
+                                p.Rotations = point.Direction;
+                            }
+                            break;
                         }
-
-                        if (MainPlugin.Singleton.EventHandlers.spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
+                    case Enums.SpawnLocation.SCP079:
                         {
-                            MainPlugin.Singleton.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(1f, () => p.ReferenceHub.characterClassManager.NetworkCurUnitName = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[MainPlugin.Singleton.EventHandlers.respawns].UnitName));
+                            if (!Warhead.IsDetonated)
+                            {
+                                p.Position = point.Position;
+                                p.Rotations = point.Direction;
+                            }
+                            break;
                         }
-
-                        MainPlugin.Singleton.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
+                    case Enums.SpawnLocation.SCP096:
                         {
-                            p.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
-                            p.CustomInfo = subteams.RoleName;
-                            MainPlugin.Singleton.EventHandlers.teamedPlayers[p] = t;
-                            Log.Debug("Changing player " + p.Nickname + " to " + t, MainPlugin.Singleton.Config.Debug);
-                        }));
-                    }
+                            if (!Warhead.IsDetonated)
+                            {
+                                p.Position = point.Position;
+                                p.Rotations = point.Direction;
+                            }
+                            break;
+                        }
+                    case Enums.SpawnLocation.SCP173:
+                        {
+                            if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
+                            {
+                                p.Position = point.Position;
+                                p.Rotations = point.Direction;
+                            }
+                            break;
+                        }
+                    case Enums.SpawnLocation.Shelter:
+                        {
+                            if (!Warhead.IsDetonated)
+                            {
+                                p.Position = point.Position;
+                                p.Rotations = point.Direction;
+                            }
+                            break;
+                        }
                 }
-                //delay needed so it overrides normal teams
             }
+
+            var ihandler = new Events.EventArgs.AddingInventoryItemsEventArgs(p, subteams);
+            ihandler.StartInvoke();
+
+            if (MainPlugin.Singleton.Config.UseHints)
+            {
+                p.ShowHint(subteams.RoleMessage, 10);
+            }
+            else
+            {
+                p.Broadcast(10, subteams.RoleMessage);
+            }
+
+            if (MainPlugin.Singleton.EventHandlers.spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
+            {
+                p.ReferenceHub.characterClassManager.NetworkCurUnitName = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[MainPlugin.Singleton.EventHandlers.respawns].UnitName;
+            }
+
+            p.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
+            p.CustomInfo = subteams.RoleName;
+            MainPlugin.Singleton.EventHandlers.teamedPlayers[p] = t;
+            Log.Debug("Changing player " + p.Nickname + " to " + t, MainPlugin.Singleton.Config.Debug);
         }
 
         public bool TeamExists(string team)
         {
             return MainPlugin.Singleton.EventHandlers.teamedPlayers.ContainsValue(team);
+        }
+
+        public void RemoveTeamReference()
+        {
+            if (MainPlugin.Singleton.EventHandlers.RemoveChosenTeam != null)
+            {
+                if (MainPlugin.Singleton.EventHandlers.RemoveChosenTeam.IsRunning)
+                {
+                    Timing.KillCoroutines(MainPlugin.Singleton.EventHandlers.RemoveChosenTeam);
+                }
+
+                var cor = Timing.RunCoroutine(RemoveReferenceCouroutine());
+                MainPlugin.Singleton.EventHandlers.RemoveChosenTeam = cor;
+                MainPlugin.Singleton.EventHandlers.coroutineHandle.Add(cor);
+            }
+        }
+
+        private IEnumerator<float> RemoveReferenceCouroutine()
+        {
+            yield return Timing.WaitForSeconds(5f);
+            if (MainPlugin.assemblyTimer)
+            {
+                DefaultTimerConfig();
+            }
+
+            MainPlugin.Singleton.EventHandlers.chosenTeam = null;
+            MainPlugin.Singleton.EventHandlers.HasReference = false;
+        }
+
+        public void DefaultTimerConfig()
+        {
+            var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
+            cfg.translations.Ci = MainPlugin.Singleton.EventHandlers.chaosTrans;
+            cfg.translations.Ntf = MainPlugin.Singleton.EventHandlers.mtfTrans;
         }
     }
 }

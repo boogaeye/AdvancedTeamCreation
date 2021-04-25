@@ -18,7 +18,7 @@ namespace TeamsEXILED.Commands
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            Player ply = Player.Get((sender as CommandSender));
+            Player ply = Player.Get(sender as CommandSender);
 
             if (arguments.ToList().Count == 0)
             {

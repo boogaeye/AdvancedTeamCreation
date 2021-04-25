@@ -89,5 +89,15 @@ namespace TeamsEXILED
         {
             return SerpentsHand.EventHandlers.IsSpawnable;
         }
+
+        public static void SpawneableUIUToFalse()
+        {
+            UIURescueSquad.EventHandlers.IsSpawnable = false;
+        }
+
+        public static void SpawneableSerpentToFalse()
+        {
+            SerpentsHand.EventHandlers.IsSpawnable = false;
+        }
     }
 }

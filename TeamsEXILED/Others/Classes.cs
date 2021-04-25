@@ -86,7 +86,7 @@ namespace TeamsEXILED.Classes
             return i.Friendlys.Contains(u);
         }
 
-        public bool IsTeamEnemy(Teams i, String u)
+        public bool IsTeamEnemy(Teams i, string u)
         {
             return i.Requirements.Contains(u);
         }

@@ -26,6 +26,8 @@ namespace TeamsEXILED
         public List<RoomPoint> fixedpoints = new List<RoomPoint>();
         public List<CoroutineHandle> coroutineHandle = new List<CoroutineHandle>();
 
+        public CoroutineHandle RemoveChosenTeam;
+
         public Teams chosenTeam;
         public Teams latestSpawn;
 
@@ -35,6 +37,7 @@ namespace TeamsEXILED
 
         public bool AllowNormalRoundEnd = false;
         public bool HasReference = false;
+        public bool ForcedTeam = false;
 
         public int respawns = 0;
 
@@ -119,21 +122,34 @@ namespace TeamsEXILED
 
         public void OnRespawning(RespawningTeamEventArgs ev)
         {
-            var team = chosenTeam;
+            if (ForcedTeam)
+            {
+                ForcedTeam = false;
+
+                ev.NextKnownTeam = chosenTeam.SpawnTypes.FirstOrDefault();
+
+                if (MainPlugin.assemblyUIU)
+                {
+                    if (Methods.IsUIU())
+                    {
+                        Methods.SpawneableUIUToFalse();
+                    }
+                }
+
+                if (MainPlugin.assemblySerpentHands)
+                {
+                    if (Methods.IsSerpentHand())
+                    {
+                        Methods.SpawneableSerpentToFalse();
+                    }
+                }
+            }
 
             if (MainPlugin.assemblyUIU == true)
             {
                 if (Methods.IsUIU())
                 {
-                    if (MainPlugin.assemblyTimer)
-                    {
-                        var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
-                        cfg.translations.Ci = chaosTrans;
-                        cfg.translations.Ntf = mtfTrans;
-                    }
-
-                    chosenTeam = null;
-                    HasReference = false;
+                    MainPlugin.Singleton.TmMethods.RemoveTeamReference();
                     return;
                 }
             }
@@ -142,15 +158,7 @@ namespace TeamsEXILED
             {
                 if (Methods.IsSerpentHand())
                 {
-                    if (MainPlugin.assemblyTimer)
-                    {
-                        var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
-                        cfg.translations.Ci = chaosTrans;
-                        cfg.translations.Ntf = mtfTrans;
-                    }
-
-                    chosenTeam = null;
-                    HasReference = false;
+                    MainPlugin.Singleton.TmMethods.RemoveTeamReference();
                     return;
                 }
             }
@@ -168,9 +176,9 @@ namespace TeamsEXILED
                 respawns++;
             }
 
-            if (team != null)
+            if (chosenTeam != null)
             {
-                Log.Debug("Spawned " + team.Name, this.plugin.Config.Debug);
+                Log.Debug("Spawned " + chosenTeam.Name, this.plugin.Config.Debug);
                 List<Player> tempPlayers = new List<Player>();
 
                 foreach (Player i in ev.Players)
@@ -178,26 +186,15 @@ namespace TeamsEXILED
                     tempPlayers.Add(i);
                 }
 
-                coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
-                {
-                    MainPlugin.Singleton.TmMethods.ChangeTeamReferancing(tempPlayers, team.Name);
-                }));
+                coroutineHandle.Add(Timing.CallDelayed(0.2f, () => MainPlugin.Singleton.TmMethods.ChangeTeamReferancing(tempPlayers, chosenTeam.Name)));
 
                 if (random.Next(0, 100) <= chosenTeam.CassieMessageChaosAnnounceChance && ev.NextKnownTeam == Respawning.SpawnableTeamType.ChaosInsurgency)
                 {
                     Cassie.DelayedGlitchyMessage(chosenTeam.CassieMessageChaosMessage, 0, 0.25f, 0.25f);
                 }
             }
-            
-            if (MainPlugin.assemblyTimer)
-            {
-                var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
-                cfg.translations.Ci = chaosTrans;
-                cfg.translations.Ntf = mtfTrans;
-            }
 
-            chosenTeam = null;
-            HasReference = false;
+            MainPlugin.Singleton.TmMethods.RemoveTeamReference();
         }
 
         public void OnHurt(HurtingEventArgs ev)
@@ -327,9 +324,7 @@ namespace TeamsEXILED
         {
             if (MainPlugin.assemblyTimer)
             {
-                var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
-                cfg.translations.Ci = chaosTrans;
-                cfg.translations.Ntf = mtfTrans;
+                MainPlugin.Singleton.TmMethods.DefaultTimerConfig();
             }
 
             foreach (var coroutine in coroutineHandle)
@@ -342,7 +337,9 @@ namespace TeamsEXILED
             respawns = 0;
             latestSpawn = null;
             chosenTeam = null;
-           
+            ForcedTeam = false;
+
+            coroutineHandle.Clear();
             teamedPlayers.Clear();
             fixedpoints.Clear();
         }

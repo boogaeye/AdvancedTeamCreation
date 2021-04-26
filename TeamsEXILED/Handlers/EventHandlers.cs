@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs;
 using TeamsEXILED.API;
+using TeamsEXILED.Handlers;
 using Exiled.API.Enums;
 using MEC;
 using System.Linq;
@@ -150,6 +151,7 @@ namespace TeamsEXILED
                 if (Methods.IsUIU())
                 {
                     MainPlugin.Singleton.TmMethods.RemoveTeamReference();
+                    TeamConvert.SetPlayerTeamName(ev.Players, "uiu");
                     return;
                 }
             }
@@ -159,6 +161,7 @@ namespace TeamsEXILED
                 if (Methods.IsSerpentHand())
                 {
                     MainPlugin.Singleton.TmMethods.RemoveTeamReference();
+                    TeamConvert.SetPlayerTeamName(ev.Players, "serpentshand");
                     return;
                 }
             }
@@ -238,7 +241,7 @@ namespace TeamsEXILED
             {
                 Log.Debug(teamedPlayers[ev.Killer], this.plugin.Config.Debug);
 
-                if (teamedPlayers[ev.Target] == teamedPlayers[ev.Killer])
+                if (MainPlugin.Singleton.Classes.IsTeamFriendly(MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config), teamedPlayers[ev.Target]))
                 {
                     ev.Target.Broadcast(5, this.plugin.Config.TeamKillBroadcast);
                 }
@@ -249,31 +252,43 @@ namespace TeamsEXILED
 
                 teamedPlayers[ev.Target] = "Dead";
 
-                foreach (string t in MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Requirements)
+                RoundEndingHandler roundHandle = new RoundEndingHandler { leadingTeam = MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).teamLeaders, reason = "Death Event Called", TeamHandle = MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config), TeamsAlive = teamedPlayers.Values.ToArray() };
+                
+                foreach (string t in roundHandle.TeamsAlive)
                 {
-                    Log.Debug("got " + t + " from enemies", this.plugin.Config.Debug);
-
-                    if (MainPlugin.Singleton.TmMethods.TeamExists(t))
+                    if (MainPlugin.Singleton.Classes.GetTeamFromString(t, this.plugin.Config).Requirements.ToList().Contains(t))
                     {
-                        Log.Debug("This team is an enemy of this team stopping the round from ending", this.plugin.Config.Debug);
+                        Log.Debug($"Stopped Round from ending heres some information\n Triggered Team: {roundHandle.TeamHandle.Name}\n Stopping Team: {t}\n Reason: {roundHandle.reason}\n Hope this works", this.plugin.Config.Debug);
                         return;
                     }
                 }
+                
+                
+                //foreach (string t in MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Requirements)
+                //{
+                //    Log.Debug("got " + t + " from enemies", this.plugin.Config.Debug);
 
-                if (ev.Target == ev.Killer)
-                {
-                    var alive = Player.List.Where(x => x.IsAlive).ToList().Count;
+                //    if (MainPlugin.Singleton.TmMethods.TeamExists(t))
+                //    {
+                //        Log.Debug("This team is an enemy of this team stopping the round from ending", this.plugin.Config.Debug);
+                //        return;
+                //    }
+                //}
 
-                    if (alive == 1 && this.plugin.Config.Allow1Player)
-                    {
-                        return;
-                    }
+                //if (ev.Target == ev.Killer)
+                //{
+                //    var alive = Player.List.Where(x => x.IsAlive).ToList().Count;
 
-                    if (alive > 1)
-                    {
-                        return;
-                    }
-                }
+                //    if (alive == 1 && this.plugin.Config.Allow1Player)
+                //    {
+                //        return;
+                //    }
+
+                //    if (alive > 1)
+                //    {
+                //        return;
+                //    }
+                //}
 
                 if (AllowNormalRoundEnd)
                 {
@@ -281,15 +296,14 @@ namespace TeamsEXILED
                 }
 
                 AllowNormalRoundEnd = true;
-                leadingTeam = MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).teamLeaders;
 
-                foreach (string a in MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Neutral)
-                {
-                    if (MainPlugin.Singleton.TmMethods.TeamExists(a))
-                    {
-                        leadingTeam = LeadingTeam.Draw;
-                    }
-                }
+                //foreach (string a in MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Neutral)
+                //{
+                //    if (MainPlugin.Singleton.TmMethods.TeamExists(a))
+                //    {
+                //        leadingTeam = LeadingTeam.Draw;
+                //    }
+                //}
 
                 Round.ForceEnd();
             }

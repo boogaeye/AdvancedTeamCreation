@@ -33,7 +33,7 @@ namespace TeamsEXILED.Handlers
             }
             else
             {
-                Log.Debug("Next Known Spawn is " + Respawn.NextKnownTeam, MainPlugin.Singleton.Config.Debug);
+                Log.Debug("Next Known Spawn is " + ev.Spawning, MainPlugin.Singleton.Config.Debug);
 
                 if (MainPlugin.Singleton.EventHandlers.random.Next(0, 100) <= ev.Team.Chance)
                 {

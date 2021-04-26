@@ -8,16 +8,20 @@ namespace TeamsEXILED
 {
     public class TeamMethods
     {
+        
         public void RefNextTeamSpawn()
         {
             Log.Debug("Getting Team Referances", MainPlugin.Singleton.Config.Debug);
-            var list = MainPlugin.Singleton.Config.Teams.Where(x => x.SpawnTypes.Contains(Respawn.NextKnownTeam) && x.Active == true).ToList();
+            var list = MainPlugin.Singleton.Config.Teams.Where(x => x.SpawnTypes.ToList().Contains(Respawn.NextKnownTeam) && x.Active == true).ToList();
+            Log.Debug("Got list", MainPlugin.Singleton.Config.Debug);
             var team = list[MainPlugin.Singleton.EventHandlers.random.Next(0, list.Count)];
+            Log.Debug("Got team", MainPlugin.Singleton.Config.Debug);
 
-            var handler = new Events.General.ReferencingTeamEventArgs(MainPlugin.Singleton.EventHandlers.chosenTeam)
+            var handler = new Events.General.ReferencingTeamEventArgs(MainPlugin.Singleton.EventHandlers.chosenTeam, Respawning.SpawnableTeamType.None)
             {
                 Team = team
             };
+            Log.Debug("Got Handler and invoking", MainPlugin.Singleton.Config.Debug);
 
             handler.StartInvoke();
         }
@@ -28,9 +32,10 @@ namespace TeamsEXILED
             var list = MainPlugin.Singleton.Config.Teams.Where(x => x.SpawnTypes.Contains(spawnableTeamType) && x.Active == true).ToList();
             var team = list[MainPlugin.Singleton.EventHandlers.random.Next(0, list.Count)];
 
-            var handler = new Events.General.ReferencingTeamEventArgs(MainPlugin.Singleton.EventHandlers.chosenTeam)
+            var handler = new Events.General.ReferencingTeamEventArgs(MainPlugin.Singleton.EventHandlers.chosenTeam, spawnableTeamType)
             {
-                Team = team
+                Team = team,
+                Spawning = spawnableTeamType
             };
 
             handler.StartInvoke();

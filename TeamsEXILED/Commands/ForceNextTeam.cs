@@ -49,7 +49,7 @@ namespace TeamsEXILED.Commands
                 }
 
 
-                var handler = new Events.General.ReferencingTeamEventArgs(MainPlugin.Singleton.EventHandlers.chosenTeam)
+                var handler = new Events.General.ReferencingTeamEventArgs(MainPlugin.Singleton.EventHandlers.chosenTeam, Respawning.SpawnableTeamType.None)
                 {
                     Team = team,
                     ForceTeam = true

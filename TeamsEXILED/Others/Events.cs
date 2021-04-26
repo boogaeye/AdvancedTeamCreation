@@ -38,16 +38,18 @@ namespace TeamsEXILED.Events
 
         public class ReferencingTeamEventArgs : System.EventArgs
         {
-            public ReferencingTeamEventArgs(Teams teams, bool isAllowed = true, bool forceTeam = false)
+            public ReferencingTeamEventArgs(Teams teams, Respawning.SpawnableTeamType spawnableTeam, bool isAllowed = true, bool forceTeam = false)
             {
                 Team = teams;
                 IsAllowed = isAllowed;
                 ForceTeam = forceTeam;
+                Spawning = spawnableTeam;
             }
 
             public Teams Team { get; set; }
             public bool ForceTeam { get; set; }
             public bool IsAllowed { get; set; }
+            public Respawning.SpawnableTeamType Spawning { get; set; }
 
             public void StartInvoke()
             {

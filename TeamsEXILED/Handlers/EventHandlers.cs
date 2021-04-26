@@ -299,7 +299,7 @@ namespace TeamsEXILED
                 if (latestSpawn.escapeChange.ToList().Contains((EscapeRoles)ev.Player.Role))
                 {
                     ev.IsAllowed = false;
-                    MainPlugin.Singleton.TmMethods.ChangeTeam(ev.Player, latestSpawn, latestSpawn.Subclasses.First());
+                    MainPlugin.Singleton.TmMethods.ChangeTeam(ev.Player, latestSpawn, latestSpawn.Subclasses.First(), true);
                 }
             }
         }

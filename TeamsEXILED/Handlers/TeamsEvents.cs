@@ -173,10 +173,12 @@ namespace TeamsEXILED.Handlers
             {
                 return;
             }
+
             if (ev.KeepInv)
             {
                 ev.Player.DropItems();
             }
+
             ev.Player.ClearInventory();
 
             foreach (string i in ev.Subteam.Inventory)

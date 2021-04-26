@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs;
 using TeamsEXILED.API;
+using TeamsEXILED.Handlers;
 using Exiled.API.Enums;
 using MEC;
 using System.Linq;
 using TeamsEXILED.Enums;
 using UnityEngine;
 using System.Globalization;
+using static TeamsEXILED.Events.General;
 
 namespace TeamsEXILED
 {
@@ -26,6 +28,8 @@ namespace TeamsEXILED
         public List<RoomPoint> fixedpoints = new List<RoomPoint>();
         public List<CoroutineHandle> coroutineHandle = new List<CoroutineHandle>();
 
+        public CoroutineHandle RemoveChosenTeam;
+
         public Teams chosenTeam;
         public Teams latestSpawn;
 
@@ -35,6 +39,7 @@ namespace TeamsEXILED
 
         public bool AllowNormalRoundEnd = false;
         public bool HasReference = false;
+        public bool ForcedTeam = false;
 
         public int respawns = 0;
 
@@ -102,16 +107,15 @@ namespace TeamsEXILED
 
         public void OnLeave(LeftEventArgs ev)
         {
-            teamedPlayers.Remove(ev.Player);
+            if (ev.Player != null)
+            {
+                teamedPlayers.Remove(ev.Player);
+                Methods.CheckRoundEnd();
+            }
         }
 
         public void OnRoleChange(ChangedRoleEventArgs ev)
         {
-            if (ev.Player.IsOverwatchEnabled)
-            {
-                return;
-            }
-
             ev.Player.CustomInfo = string.Empty;
             ev.Player.ReferenceHub.nicknameSync.ShownPlayerInfo |= PlayerInfoArea.Role;
             teamedPlayers[ev.Player] = ev.Player.Team.ToString().ToLower();
@@ -119,21 +123,50 @@ namespace TeamsEXILED
 
         public void OnRespawning(RespawningTeamEventArgs ev)
         {
-            var team = chosenTeam;
+            // Need this, because ev.Players isn't working for methods
+            List<Player> tempPlayers = new List<Player>();
+
+            foreach (Player i in ev.Players)
+            {
+                if (i.IsOverwatchEnabled == false)
+                {
+                    tempPlayers.Add(i);
+                }
+            }
+
+            if (ForcedTeam && HasReference)
+            {
+                ForcedTeam = false;
+
+                ev.NextKnownTeam = chosenTeam.SpawnTypes.FirstOrDefault();
+
+                if (MainPlugin.assemblyUIU)
+                {
+                    if (Methods.IsUIU())
+                    {
+                        Methods.SpawneableUIUToFalse();
+                    }
+                }
+
+                if (MainPlugin.assemblySerpentHands)
+                {
+                    if (Methods.IsSerpentHand())
+                    {
+                        Methods.SpawneableSerpentToFalse();
+                    }
+                }
+            }
 
             if (MainPlugin.assemblyUIU == true)
             {
                 if (Methods.IsUIU())
                 {
-                    if (MainPlugin.assemblyTimer)
+                    MainPlugin.Singleton.TmMethods.RemoveTeamReference();
+                    coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
                     {
-                        var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
-                        cfg.translations.Ci = chaosTrans;
-                        cfg.translations.Ntf = mtfTrans;
-                    }
-
-                    chosenTeam = null;
-                    HasReference = false;
+                        TeamConvert.SetPlayerTeamName(tempPlayers, "uiu");
+                    }));
+                    
                     return;
                 }
             }
@@ -142,15 +175,12 @@ namespace TeamsEXILED
             {
                 if (Methods.IsSerpentHand())
                 {
-                    if (MainPlugin.assemblyTimer)
+                    MainPlugin.Singleton.TmMethods.RemoveTeamReference();
+                    coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
                     {
-                        var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
-                        cfg.translations.Ci = chaosTrans;
-                        cfg.translations.Ntf = mtfTrans;
-                    }
-
-                    chosenTeam = null;
-                    HasReference = false;
+                        TeamConvert.SetPlayerTeamName(tempPlayers, "serpentshand");
+                    }));
+                    
                     return;
                 }
             }
@@ -168,36 +198,19 @@ namespace TeamsEXILED
                 respawns++;
             }
 
-            if (team != null)
+            if (chosenTeam != null)
             {
-                Log.Debug("Spawned " + team.Name, this.plugin.Config.Debug);
-                List<Player> tempPlayers = new List<Player>();
+                Log.Debug("Spawned " + chosenTeam.Name, this.plugin.Config.Debug);
 
-                foreach (Player i in ev.Players)
-                {
-                    tempPlayers.Add(i);
-                }
-
-                coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
-                {
-                    MainPlugin.Singleton.TmMethods.ChangeTeamReferancing(tempPlayers, team.Name);
-                }));
+                coroutineHandle.Add(Timing.CallDelayed(0.2f, () => MainPlugin.Singleton.TmMethods.ChangePlysToTeam(tempPlayers, chosenTeam)));
 
                 if (random.Next(0, 100) <= chosenTeam.CassieMessageChaosAnnounceChance && ev.NextKnownTeam == Respawning.SpawnableTeamType.ChaosInsurgency)
                 {
                     Cassie.DelayedGlitchyMessage(chosenTeam.CassieMessageChaosMessage, 0, 0.25f, 0.25f);
                 }
             }
-            
-            if (MainPlugin.assemblyTimer)
-            {
-                var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
-                cfg.translations.Ci = chaosTrans;
-                cfg.translations.Ntf = mtfTrans;
-            }
 
-            chosenTeam = null;
-            HasReference = false;
+            MainPlugin.Singleton.TmMethods.RemoveTeamReference();
         }
 
         public void OnHurt(HurtingEventArgs ev)
@@ -206,10 +219,10 @@ namespace TeamsEXILED
             {
                 try
                 {
-                    if (MainPlugin.Singleton.Classes.IsTeamFriendly(MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Target], this.plugin.Config), teamedPlayers[ev.Attacker]) && !this.plugin.Config.FriendlyFire)
+                    if (MainPlugin.Singleton.Classes.IsTeamFriendly(MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Target]), teamedPlayers[ev.Attacker]) && !this.plugin.Config.FriendlyFire)
                     {
                         ev.IsAllowed = false;
-                        ev.Attacker.ShowHint("You cant hurt teams teamed with you!");
+                        ev.Attacker.ShowHint("You can't hurt teams teamed with you!");
                         Log.Debug("Protected a player in " + teamedPlayers[ev.Target] + " from " + teamedPlayers[ev.Attacker], this.plugin.Config.Debug);
                     }
                 }
@@ -241,7 +254,7 @@ namespace TeamsEXILED
             {
                 Log.Debug(teamedPlayers[ev.Killer], this.plugin.Config.Debug);
 
-                if (teamedPlayers[ev.Target] == teamedPlayers[ev.Killer])
+                if (MainPlugin.Singleton.Classes.IsTeamFriendly(MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Killer]), teamedPlayers[ev.Target]))
                 {
                     ev.Target.Broadcast(5, this.plugin.Config.TeamKillBroadcast);
                 }
@@ -252,49 +265,7 @@ namespace TeamsEXILED
 
                 teamedPlayers[ev.Target] = "Dead";
 
-                foreach (string t in MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Requirements)
-                {
-                    Log.Debug("got " + t + " from enemies", this.plugin.Config.Debug);
-
-                    if (MainPlugin.Singleton.TmMethods.TeamExists(t))
-                    {
-                        Log.Debug("This team is an enemy of this team stopping the round from ending", this.plugin.Config.Debug);
-                        return;
-                    }
-                }
-
-                if (ev.Target == ev.Killer)
-                {
-                    var alive = Player.List.Where(x => x.IsAlive).ToList().Count;
-
-                    if (alive == 1 && this.plugin.Config.Allow1Player)
-                    {
-                        return;
-                    }
-
-                    if (alive > 1)
-                    {
-                        return;
-                    }
-                }
-
-                if (AllowNormalRoundEnd)
-                {
-                    return;
-                }
-
-                AllowNormalRoundEnd = true;
-                leadingTeam = MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).teamLeaders;
-
-                foreach (string a in MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Killer], this.plugin.Config).Neutral)
-                {
-                    if (MainPlugin.Singleton.TmMethods.TeamExists(a))
-                    {
-                        leadingTeam = LeadingTeam.Draw;
-                    }
-                }
-
-                Round.ForceEnd();
+                Methods.CheckRoundEnd();
             }
             catch (Exception)
             {
@@ -327,9 +298,7 @@ namespace TeamsEXILED
         {
             if (MainPlugin.assemblyTimer)
             {
-                var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
-                cfg.translations.Ci = chaosTrans;
-                cfg.translations.Ntf = mtfTrans;
+                MainPlugin.Singleton.TmMethods.DefaultTimerConfig();
             }
 
             foreach (var coroutine in coroutineHandle)
@@ -342,7 +311,9 @@ namespace TeamsEXILED
             respawns = 0;
             latestSpawn = null;
             chosenTeam = null;
-           
+            ForcedTeam = false;
+
+            coroutineHandle.Clear();
             teamedPlayers.Clear();
             fixedpoints.Clear();
         }

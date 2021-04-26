@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Exiled.API.Features;
 using MEC;
+using System.Linq;
 
 namespace TeamsEXILED
 {
@@ -13,9 +14,16 @@ namespace TeamsEXILED
             {
                 yield return Timing.WaitForSeconds(cfg.Interval - 0.01f);
 
+                var rteam = Respawn.NextKnownTeam;
+
+                if (MainPlugin.Singleton.EventHandlers.ForcedTeam)
+                {
+                    rteam = MainPlugin.Singleton.EventHandlers.chosenTeam.SpawnTypes.FirstOrDefault();
+                }
+
                 if (MainPlugin.Singleton.EventHandlers.HasReference && MainPlugin.Singleton.EventHandlers.chosenTeam != null)
                 {
-                    switch (Respawn.NextKnownTeam)
+                    switch (rteam)
                     {
                         case Respawning.SpawnableTeamType.NineTailedFox:
                         {

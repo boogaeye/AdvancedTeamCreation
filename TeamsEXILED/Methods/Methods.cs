@@ -2,6 +2,8 @@
 using Exiled.API.Features;
 using TeamsEXILED.Enums;
 using Exiled.API.Interfaces;
+using MEC;
+using UnityEngine;
 
 namespace TeamsEXILED
 {
@@ -88,6 +90,53 @@ namespace TeamsEXILED
         public static bool IsSerpentHand()
         {
             return SerpentsHand.EventHandlers.IsSpawnable;
+        }
+
+        public static void SpawneableUIUToFalse()
+        {
+            UIURescueSquad.EventHandlers.IsSpawnable = false;
+        }
+
+        public static void SpawneableSerpentToFalse()
+        {
+            SerpentsHand.EventHandlers.IsSpawnable = false;
+        }
+
+        public static void CheckRoundEnd()
+        {
+            if (RoundSummary.singleton._roundEnded)
+            {
+                return;
+            }
+
+            var teamedPlayers = MainPlugin.Singleton.EventHandlers.teamedPlayers;
+
+            // Checking round for end
+            foreach (string t in teamedPlayers.Values)
+            {
+                var team = MainPlugin.Singleton.Classes.GetTeamFromString(t);
+                foreach (var te in teamedPlayers.Values)
+                {
+                    if (team.Requirements.Contains(te))
+                    {
+                        Log.Debug($"Stopped Round from ending heres some information\n Triggered Team: {t}\n Stopping Team: {t}\n Hope this works", MainPlugin.Singleton.Config.Debug);
+                        return;
+                    }
+                }
+            }
+
+            if (!MainPlugin.Singleton.EventHandlers.AllowNormalRoundEnd)
+            {
+                MainPlugin.Singleton.EventHandlers.AllowNormalRoundEnd = true;
+            }
+
+            MainPlugin.Singleton.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
+            {
+                if (!RoundSummary.singleton._roundEnded)
+                {
+                    Round.ForceEnd();
+                }
+            }));
         }
     }
 }

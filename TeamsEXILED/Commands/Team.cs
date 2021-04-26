@@ -16,10 +16,10 @@ namespace TeamsEXILED.Commands
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            Player ply = Player.Get((sender as CommandSender));
+            Player ply = Player.Get(sender as CommandSender);
             if (ply.CheckPermission("ATC.team"))
             {
-                response = "<color=cyan>Team:</color>" + $"<b><color=white>{MainPlugin.Singleton.EventHandlers.teamedPlayers[ply]}</color></b>";
+                response = "<color=cyan>Team: </color>" + $"<b><color=white>{MainPlugin.Singleton.EventHandlers.teamedPlayers[ply]}</color></b>";
                 return true;
             }
 

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using Exiled.API.Enums;
 using TeamsEXILED.Enums;
 using Respawning;
+using Exiled.API.Features;
 
 namespace TeamsEXILED.API
 {
@@ -97,18 +98,13 @@ namespace TeamsEXILED.API
 
     public class TeamConvert
     {
-        #region vars
-        public static List<Teams> PluginTeams = new List<Teams>();
-        #endregion
         #region Static zone
-        public static void ConvertPluginTeam(Teams team)
+        public static void SetPlayerTeamName(List<Player> player, string name)
         {
-            PluginTeams.Add(team);
-        }
-
-        public static List<Teams> GetPluginTeams()
-        {
-            return PluginTeams;
+            foreach (Player p in player)
+            {
+                MainPlugin.Singleton.EventHandlers.teamedPlayers[p] = name;
+            }
         }
         #endregion
     }

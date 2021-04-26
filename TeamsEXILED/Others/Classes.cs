@@ -36,46 +36,37 @@ namespace TeamsEXILED.Classes
             return team.Friendlys;
         }
 
-        public static List<string> GetAllRequirements(string TeamFond, Config config)
+        public static List<string> GetAllRequirements(string TeamFond)
         {
             List<string> team = new List<string>();
 
-            foreach (Teams t in config.Teams)
+            foreach (Teams t in MainPlugin.Singleton.Config.Teams.Where(x => x.Requirements.Contains(TeamFond)))
             {
-                if (t.Requirements.Contains(TeamFond))
-                {
-                    team.Add(t.Name);
-                }
+                team.Add(t.Name);
             }
 
             return team;
         }
 
-        public static List<string> GetAllNeutrals(string TeamFond, Config config)
+        public static List<string> GetAllNeutrals(string TeamFond)
         {
             List<string> team = new List<string>();
 
-            foreach (Teams t in config.Teams)
+            foreach (Teams t in MainPlugin.Singleton.Config.Teams.Where(x => x.Neutral.Contains(TeamFond)))
             {
-                if (t.Neutral.Contains(TeamFond))
-                {
-                    team.Add(t.Name);
-                }
+                team.Add(t.Name);
             }
 
             return team;
         }
 
-        public static List<string> GetAllFriendlyTeams(string TeamFond, Config config)
+        public static List<string> GetAllFriendlyTeams(string TeamFond)
         {
             List<string> team = new List<string>();
 
-            foreach (Teams t in config.Teams)
+            foreach (Teams t in MainPlugin.Singleton.Config.Teams.Where(x => x.Friendlys.Contains(TeamFond)))
             {
-                if (t.Friendlys.Contains(TeamFond))
-                {
-                    team.Add(t.Name);
-                }
+                team.Add(t.Name);
             }
 
             return team;
@@ -86,56 +77,28 @@ namespace TeamsEXILED.Classes
             return i.Friendlys.Contains(u);
         }
 
-        public bool IsTeamEnemy(Teams i, String u)
+        public bool IsTeamEnemy(Teams i, string u)
         {
             return i.Requirements.Contains(u);
         }
 
-        [Obsolete("No longer in use")]
-        public static bool Exists(string look, string[] teams)
+        public bool IsTeamNeutral(Teams i, string u)
         {
-            if (teams.Contains(look))
-            {
-                return true;
-            }
-
-            return false;
+            return i.Neutral.Contains(u);
         }
 
-        public Teams GetTeamFromString(string s, Config config)
+        public Teams GetTeamFromString(string s)
         {
-            foreach (Teams t in config.Teams)
+            Teams team = null;
+            foreach (Teams t in MainPlugin.Singleton.Config.Teams)
             {
-                if (t.Name == s)
+                if (t.Name.ToLower() == s.ToLower())
                 {
-                    return t;
+                    team = t;
                 }
             }
 
-            if (Teams.IsDefinedInConfig(s, config))
-            {
-                foreach (NormalTeam nt in config.TeamRedefine)
-                {
-                    if (nt.Team.ToString().ToLower() == s)
-                    {
-                        return new Teams { Active = nt.Active, Name = nt.Team.ToString().ToLower(), Friendlys = nt.Friendlys, Requirements = nt.Requirements, Neutral = nt.Neutral, teamLeaders = nt.TeamLeaders };
-                    }
-                }
-            }
-
-            List<string> friendlys = new List<string>() { s };
-
-            foreach (string i in GetAllFriendlyTeams(s, config)) 
-            {
-                friendlys.Add(i);
-            }
-
-            Teams teams = new Teams { Name = s, Requirements = GetAllRequirements(s, config).ToArray<string>(), Friendlys = friendlys.ToArray() };
-            var handler = new Events.EventArgs.CreatingTeamEventArgs(teams);
-            handler.StartInvoke();
-            teams = handler.Team;
-
-            return teams;
+            return team;
         }
 
         public Team ConvertToNormalTeamName(RoleType role)

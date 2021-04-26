@@ -150,7 +150,7 @@ namespace TeamsEXILED.Handlers
                 p.Broadcast(10, subteams.RoleMessage);
             }
 
-            Timing.CallDelayed(0.2f, () =>
+            MainPlugin.Singleton.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(0.2f, () => 
             {
                 if (MainPlugin.Singleton.EventHandlers.spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
                 {
@@ -161,7 +161,7 @@ namespace TeamsEXILED.Handlers
                 p.CustomInfo = subteams.RoleName;
                 MainPlugin.Singleton.EventHandlers.teamedPlayers[p] = ev.Team.Name;
             }
-            );
+            ));
 
             Log.Debug("Changing player " + p.Nickname + " to " + ev.Team.Name, MainPlugin.Singleton.Config.Debug);
         }

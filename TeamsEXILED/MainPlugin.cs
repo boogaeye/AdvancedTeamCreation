@@ -58,6 +58,7 @@ namespace TeamsEXILED
             Exiled.Events.Handlers.Player.Left += EventHandlers.OnLeave;
             Exiled.Events.Handlers.Map.AnnouncingNtfEntrance += EventHandlers.MTFSpawnAnnounce;
             Exiled.Events.Handlers.Server.RoundStarted += EventHandlers.OnRoundStart;
+            Exiled.Events.Handlers.Player.Escaping += EventHandlers.OnEscaping;
 
             Events.General.SettingPlayerTeam += TeamsHandlers.OnSettingPlayerTeam;
             Events.General.AddingInventoryItems += TeamsHandlers.OnAddingInventoryItems;
@@ -84,6 +85,7 @@ namespace TeamsEXILED
             Exiled.Events.Handlers.Map.AnnouncingNtfEntrance -= EventHandlers.MTFSpawnAnnounce;
             Exiled.Events.Handlers.Server.RestartingRound -= EventHandlers.OnRestartRound;
             Exiled.Events.Handlers.Server.RoundStarted -= EventHandlers.OnRoundStart;
+            Exiled.Events.Handlers.Player.Escaping -= EventHandlers.OnEscaping;
 
             Events.General.SettingPlayerTeam -= TeamsHandlers.OnSettingPlayerTeam;
             Events.General.AddingInventoryItems -= TeamsHandlers.OnAddingInventoryItems;

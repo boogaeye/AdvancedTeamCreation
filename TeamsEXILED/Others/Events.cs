@@ -15,18 +15,20 @@ namespace TeamsEXILED.Events
 
         public class SettingPlayerTeamEventArgs : System.EventArgs
         {
-            public SettingPlayerTeamEventArgs(Teams team, Subteams subclass, Player player, bool isAllowed = true)
+            public SettingPlayerTeamEventArgs(Teams team, Subteams subclass, Player player, bool isAllowed = true, bool escaping = false)
             {
                 Team = team;
                 Subclass = subclass;
                 Player = player;
                 IsAllowed = isAllowed;
+                Escaping = escaping;
             }
 
             public Teams Team { get; set; }
             public Subteams Subclass { get; set; }
             public Player Player { get; }
             public bool IsAllowed { get; set; }
+            public bool Escaping { get; set; }
 
             public void StartInvoke()
             {
@@ -55,18 +57,20 @@ namespace TeamsEXILED.Events
 
         public class AddingInventoryItemsEventArgs : System.EventArgs
         {
-            public AddingInventoryItemsEventArgs(Player ply, Subteams subteam, bool isAllowed = true, bool forceTeam = false)
+            public AddingInventoryItemsEventArgs(Player ply, Subteams subteam, bool isAllowed = true, bool forceTeam = false, bool keepInv = false)
             {
                 Subteam = subteam;
                 IsAllowed = isAllowed;
                 ForceTeam = forceTeam;
                 Player = ply;
+                KeepInv = keepInv;
             }
 
             public Player Player { get; }
             public Subteams Subteam { get; set; }
             public bool ForceTeam { get; set; }
             public bool IsAllowed { get; set; }
+            public bool KeepInv { get; set; }
 
             public void StartInvoke()
             {

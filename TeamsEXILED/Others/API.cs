@@ -4,6 +4,7 @@ using Exiled.API.Enums;
 using TeamsEXILED.Enums;
 using Respawning;
 using Exiled.API.Features;
+using System.Linq;
 
 namespace TeamsEXILED.API
 {
@@ -74,6 +75,10 @@ namespace TeamsEXILED.API
             }
 
             return false;
+        }
+        public Subteams GetSubteamByString(string name)
+        {
+            return this.Subclasses.First(x => x.Name == name);
         }
         #endregion
     }

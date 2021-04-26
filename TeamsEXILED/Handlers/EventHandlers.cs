@@ -109,8 +109,9 @@ namespace TeamsEXILED
         {
             if (ev.Player != null)
             {
+                Methods.CheckRoundEnd(ev.Player);
                 teamedPlayers.Remove(ev.Player);
-                Methods.CheckRoundEnd();
+                
             }
         }
 
@@ -191,6 +192,8 @@ namespace TeamsEXILED
                 Log.Debug("Possible admin spawn due to No Team Reference yet", this.plugin.Config.Debug);
             }
 
+            latestSpawn = chosenTeam;
+
             spawnableTeamType = ev.NextKnownTeam;
 
             if (ev.NextKnownTeam == Respawning.SpawnableTeamType.NineTailedFox)
@@ -265,7 +268,7 @@ namespace TeamsEXILED
 
                 teamedPlayers[ev.Target] = "Dead";
 
-                Methods.CheckRoundEnd();
+                Methods.CheckRoundEnd(ev.Killer);
             }
             catch (Exception)
             {
@@ -292,6 +295,14 @@ namespace TeamsEXILED
         public void OnEscaping(EscapingEventArgs ev)
         {
             teamedPlayers[ev.Player] = MainPlugin.Singleton.Classes.ConvertToNormalTeamName(ev.NewRole).ToString().ToLower();
+            if (latestSpawn != null)
+            {
+                if (latestSpawn.escapeChange.ToList().Contains((EscapeRoles)ev.Player.Role))
+                {
+                    ev.IsAllowed = false;
+                    MainPlugin.Singleton.TmMethods.ChangeTeam(ev.Player, latestSpawn, latestSpawn.Subclasses.First());
+                }
+            }
         }
 
         public void OnRestartRound()

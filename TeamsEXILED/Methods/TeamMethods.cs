@@ -65,9 +65,9 @@ namespace TeamsEXILED
             }
         }
 
-        public void ChangeTeam(Player p, Teams t, Subteams s)
+        public void ChangeTeam(Player p, Teams t, Subteams s, bool keepInv = false)
         {
-            var handler = new Events.General.SettingPlayerTeamEventArgs(t, s, p);
+            var handler = new Events.General.SettingPlayerTeamEventArgs(t, s, p, escaping:keepInv);
             handler.StartInvoke();
         }
 

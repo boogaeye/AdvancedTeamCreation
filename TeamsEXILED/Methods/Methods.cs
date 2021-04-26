@@ -102,7 +102,7 @@ namespace TeamsEXILED
             SerpentsHand.EventHandlers.IsSpawnable = false;
         }
 
-        public static void CheckRoundEnd()
+        public static void CheckRoundEnd(Player ender)
         {
             if (RoundSummary.singleton._roundEnded)
             {
@@ -112,19 +112,16 @@ namespace TeamsEXILED
             var teamedPlayers = MainPlugin.Singleton.EventHandlers.teamedPlayers;
 
             // Checking round for end
-            foreach (string t in teamedPlayers.Values)
+            var team = MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ender]);
+            foreach (var te in teamedPlayers.Values)
             {
-                var team = MainPlugin.Singleton.Classes.GetTeamFromString(t);
-                foreach (var te in teamedPlayers.Values)
+                if (team.Requirements.Contains(te))
                 {
-                    if (team.Requirements.Contains(te))
-                    {
-                        Log.Debug($"Stopped Round from ending heres some information\n Triggered Team: {t}\n Stopping Team: {t}\n Hope this works", MainPlugin.Singleton.Config.Debug);
-                        return;
-                    }
+                    Log.Debug($"Stopped Round from ending heres some information\n Triggered Team: {team.Name}\n Stopping Team: {te}\n Hope this works", MainPlugin.Singleton.Config.Debug);
+                    return;
                 }
             }
-
+            
             if (!MainPlugin.Singleton.EventHandlers.AllowNormalRoundEnd)
             {
                 MainPlugin.Singleton.EventHandlers.AllowNormalRoundEnd = true;

@@ -138,7 +138,7 @@ namespace TeamsEXILED.Handlers
                 }
             }
 
-            var ihandler = new Events.General.AddingInventoryItemsEventArgs(p, subteams);
+            var ihandler = new Events.General.AddingInventoryItemsEventArgs(p, subteams, keepInv:ev.Escaping);
             ihandler.StartInvoke();
 
             if (MainPlugin.Singleton.Config.UseHints)
@@ -173,7 +173,10 @@ namespace TeamsEXILED.Handlers
             {
                 return;
             }
-
+            if (ev.KeepInv)
+            {
+                ev.Player.DropItems();
+            }
             ev.Player.ClearInventory();
 
             foreach (string i in ev.Subteam.Inventory)

@@ -111,7 +111,6 @@ namespace TeamsEXILED
             {
                 Methods.CheckRoundEnd(ev.Player);
                 teamedPlayers.Remove(ev.Player);
-                
             }
         }
 

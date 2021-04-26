@@ -6,7 +6,6 @@
         Escape,
         SCP106,
         SurfaceNuke,
-        PluginHandle,
         SCP012,
         SCP079,
         SCP096,

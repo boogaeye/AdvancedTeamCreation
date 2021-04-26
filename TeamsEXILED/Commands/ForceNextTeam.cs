@@ -48,9 +48,14 @@ namespace TeamsEXILED.Commands
                     return false;
                 }
 
-                MainPlugin.Singleton.EventHandlers.ForcedTeam = true;
-                MainPlugin.Singleton.EventHandlers.HasReference = true;
-                MainPlugin.Singleton.EventHandlers.chosenTeam = team;
+
+                var handler = new Events.General.ReferencingTeamEventArgs(MainPlugin.Singleton.EventHandlers.chosenTeam)
+                {
+                    Team = team,
+                    ForceTeam = true
+                };
+
+                handler.StartInvoke();
 
                 response = $"<color=green> Done, {arguments.At(0)} team forced";
 

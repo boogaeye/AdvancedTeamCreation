@@ -20,14 +20,14 @@ namespace TeamsEXILED.Commands
         {
             Player ply = Player.Get(sender as CommandSender);
 
-            if (arguments.ToList().Count == 0)
-            {
-                response = "<color=blue>forceteam <teamName> <subteamName> <playerId></color>";
-                return false;
-            }
-
             if (ply.CheckPermission("ATC.forceteam"))
             {
+                if (arguments.ToList().Count == 0)
+                {
+                    response = "<color=blue>forceteam <teamName> <subteamName> <playerId></color>";
+                    return false;
+                }
+
                 response = "<color=red>Error Team Does Not Exist</color>";
                 foreach (Teams t in MainPlugin.Singleton.Config.Teams)
                 {
@@ -36,6 +36,36 @@ namespace TeamsEXILED.Commands
                         if (!t.Active && !ply.CheckPermission("ATC.bypass"))
                         {
                             response = "<color=red>Error you cant force team this team as you dont have the ATC.bypass Permission</color>";
+                            return false;
+                        }
+
+                        Teams team = null;
+                        foreach (var tm in MainPlugin.Singleton.Config.Teams)
+                        {
+                            if (tm.Name.ToLower() == arguments.ToList()[0].ToLower())
+                            {
+                                team = tm;
+                            }
+                        }
+
+                        if (team == null)
+                        {
+                            response = "<color=red>Team not found</color>";
+                            return false;
+                        }
+
+                        Subteams steam = null;
+                        foreach (var sb in team.Subclasses)
+                        {
+                            if (sb.Name.ToLower() == arguments.ToList()[0].ToLower())
+                            {
+                                steam = sb;
+                            }
+                        }
+
+                        if (steam == null)
+                        {
+                            response = "<color=red>SubClass not found</color>";
                             return false;
                         }
 
@@ -49,7 +79,7 @@ namespace TeamsEXILED.Commands
                                 if (Player.Get(arguments.ToList()[2].ToLower()).IsVerified)
                                 {
                                     response = "<color=green>Changed players Team!!!</color>";
-                                    MainPlugin.Singleton.TmMethods.ChangeTeam(Player.Get(arguments.ToList()[2].ToLower()), arguments.ToList()[0].ToLower(), arguments.ToList()[1].ToLower());
+                                    MainPlugin.Singleton.TmMethods.ChangeTeam(Player.Get(arguments.ToList()[2].ToLower()), team, st);
                                     return true;
                                 }
                                 return false;

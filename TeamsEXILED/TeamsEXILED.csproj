@@ -104,7 +104,6 @@
     <Compile Include="Commands\TeamsAlive.cs" />
     <Compile Include="Commands\Team.cs" />
     <Compile Include="Commands\ForceTeam.cs" />
-    <Compile Include="Handlers\RoundEndingHandler.cs" />
     <Compile Include="Patches\RefNextTeam.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Handlers\TeamsEvents.cs" />

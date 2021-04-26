@@ -1,21 +1,21 @@
 ﻿using TeamsEXILED.API;
 using Exiled.API.Features;
+using Exiled.API.Enums;
 
 namespace TeamsEXILED.Events
 {
     public delegate void TeamEvent();
     public delegate void TeamEvent<TEventArgs>(TEventArgs eventArgs) where TEventArgs : System.EventArgs;
 
-    public class EventArgs
+    public class General
     {
-        public static event TeamEvent<SetTeamEventArgs> SetTeam;
-        public static event TeamEvent<CreatingTeamEventArgs> CreatingTeam;
-        public static event TeamEvent<TeamReferencedEventArgs> ReferencingTeam;
+        public static event TeamEvent<SettingPlayerTeamEventArgs> SettingPlayerTeam;
+        public static event TeamEvent<ReferencingTeamEventArgs> ReferencingTeam;
         public static event TeamEvent<AddingInventoryItemsEventArgs> AddingInventoryItems;
 
-        public class SetTeamEventArgs : System.EventArgs
+        public class SettingPlayerTeamEventArgs : System.EventArgs
         {
-            public SetTeamEventArgs(string team, string subclass, Player player, bool isAllowed = true)
+            public SettingPlayerTeamEventArgs(Teams team, Subteams subclass, Player player, bool isAllowed = true)
             {
                 Team = team;
                 Subclass = subclass;
@@ -23,35 +23,20 @@ namespace TeamsEXILED.Events
                 IsAllowed = isAllowed;
             }
 
-            public string Team { get; set; }
-            public string Subclass { get; set; }
+            public Teams Team { get; set; }
+            public Subteams Subclass { get; set; }
             public Player Player { get; }
             public bool IsAllowed { get; set; }
 
             public void StartInvoke()
             {
-                SetTeam?.Invoke(this);
+                SettingPlayerTeam?.Invoke(this);
             }
         }
 
-        public class CreatingTeamEventArgs : System.EventArgs
+        public class ReferencingTeamEventArgs : System.EventArgs
         {
-            public CreatingTeamEventArgs(Teams team)
-            {
-                Team = team;
-            }
-
-            public Teams Team { get; set; }
-
-            public void StartInvoke()
-            {
-                CreatingTeam.Invoke(this);
-            }
-        }
-
-        public class TeamReferencedEventArgs : System.EventArgs
-        {
-            public TeamReferencedEventArgs(Teams teams, bool isAllowed = true, bool forceTeam = false)
+            public ReferencingTeamEventArgs(Teams teams, bool isAllowed = true, bool forceTeam = false)
             {
                 Team = teams;
                 IsAllowed = isAllowed;
@@ -78,7 +63,7 @@ namespace TeamsEXILED.Events
                 Player = ply;
             }
 
-            public Player Player { get; set; }
+            public Player Player { get; }
             public Subteams Subteam { get; set; }
             public bool ForceTeam { get; set; }
             public bool IsAllowed { get; set; }

@@ -4,6 +4,7 @@ using Exiled.Loader;
 using Exiled.API.Enums;
 using HarmonyLib;
 using Exiled.API.Interfaces;
+using TeamsEXILED.Handlers;
 
 namespace TeamsEXILED
 {
@@ -58,10 +59,9 @@ namespace TeamsEXILED
             Exiled.Events.Handlers.Map.AnnouncingNtfEntrance += EventHandlers.MTFSpawnAnnounce;
             Exiled.Events.Handlers.Server.RoundStarted += EventHandlers.OnRoundStart;
 
-            Events.EventArgs.SetTeam += TeamsHandlers.OnTeamSpawn;
-            Events.EventArgs.AddingInventoryItems += TeamsHandlers.OnAddingInventoryItems;
-            Events.EventArgs.ReferencingTeam += TeamsHandlers.OnReferanceTeam;
-            Events.EventArgs.CreatingTeam += TeamsHandlers.OnCreatingTeam;
+            Events.General.SettingPlayerTeam += TeamsHandlers.OnSettingPlayerTeam;
+            Events.General.AddingInventoryItems += TeamsHandlers.OnAddingInventoryItems;
+            Events.General.ReferencingTeam += TeamsHandlers.OnReferencingTeam;
             
 
             if (!Server.FriendlyFire)
@@ -85,10 +85,9 @@ namespace TeamsEXILED
             Exiled.Events.Handlers.Server.RestartingRound -= EventHandlers.OnRestartRound;
             Exiled.Events.Handlers.Server.RoundStarted -= EventHandlers.OnRoundStart;
 
-            Events.EventArgs.SetTeam -= TeamsHandlers.OnTeamSpawn;
-            Events.EventArgs.AddingInventoryItems -= TeamsHandlers.OnAddingInventoryItems;
-            Events.EventArgs.ReferencingTeam -= TeamsHandlers.OnReferanceTeam;
-            Events.EventArgs.CreatingTeam -= TeamsHandlers.OnCreatingTeam;
+            Events.General.SettingPlayerTeam -= TeamsHandlers.OnSettingPlayerTeam;
+            Events.General.AddingInventoryItems -= TeamsHandlers.OnAddingInventoryItems;
+            Events.General.ReferencingTeam -= TeamsHandlers.OnReferencingTeam;
 
             Harmony.UnpatchAll();
 

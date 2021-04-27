@@ -271,6 +271,7 @@ namespace TeamsEXILED
             }
             catch (Exception)
             {
+                teamedPlayers[ev.Target] = "Dead";
                 Log.Debug("Caught On died error. this probably happened because someone left", this.plugin.Config.Debug);
             }
         }
@@ -293,6 +294,7 @@ namespace TeamsEXILED
 
         public void OnEscaping(EscapingEventArgs ev)
         {
+            //setting team due to RoleChangeEventArgs not changing the team
             teamedPlayers[ev.Player] = MainPlugin.Singleton.Classes.ConvertToNormalTeamName(ev.NewRole).ToString().ToLower();
             if (latestSpawn != null)
             {

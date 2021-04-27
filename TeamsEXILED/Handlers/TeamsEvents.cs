@@ -24,7 +24,10 @@ namespace TeamsEXILED.Handlers
             {
                 return;
             }
-
+            if (ev.Team == null)
+            {
+                return;
+            }
             if (ev.ForceTeam)
             {
                 MainPlugin.Singleton.EventHandlers.chosenTeam = ev.Team;
@@ -37,9 +40,9 @@ namespace TeamsEXILED.Handlers
 
                 if (MainPlugin.Singleton.EventHandlers.random.Next(0, 100) <= ev.Team.Chance)
                 {
-                    Log.Debug("Next Known Chosen Team is " + MainPlugin.Singleton.EventHandlers.chosenTeam.Name, MainPlugin.Singleton.Config.Debug);
                     MainPlugin.Singleton.EventHandlers.chosenTeam = ev.Team;
                     MainPlugin.Singleton.EventHandlers.HasReference = true;
+                    Log.Debug("Next Known Chosen Team is " + MainPlugin.Singleton.EventHandlers.chosenTeam.Name, MainPlugin.Singleton.Config.Debug);
                 }
                 else
                 {

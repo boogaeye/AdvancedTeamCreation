@@ -29,7 +29,13 @@ namespace TeamsEXILED
         public void RefNextTeamSpawn(Respawning.SpawnableTeamType spawnableTeamType)
         {
             Log.Debug("Getting Team Referances", MainPlugin.Singleton.Config.Debug);
+            Log.Debug($"Spawning on side {spawnableTeamType}", MainPlugin.Singleton.Config.Debug);
             var list = MainPlugin.Singleton.Config.Teams.Where(x => x.SpawnTypes.Contains(spawnableTeamType) && x.Active == true).ToList();
+            if (list.Count == 0)
+            {
+                MainPlugin.Singleton.EventHandlers.HasReference = true;
+                return;
+            }
             var team = list[MainPlugin.Singleton.EventHandlers.random.Next(0, list.Count)];
 
             var handler = new Events.General.ReferencingTeamEventArgs(MainPlugin.Singleton.EventHandlers.chosenTeam, spawnableTeamType)

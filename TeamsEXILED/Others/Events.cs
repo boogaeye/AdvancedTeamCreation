@@ -1,6 +1,5 @@
 ﻿using TeamsEXILED.API;
 using Exiled.API.Features;
-using Exiled.API.Enums;
 
 namespace TeamsEXILED.Events
 {
@@ -15,20 +14,20 @@ namespace TeamsEXILED.Events
 
         public class SettingPlayerTeamEventArgs : System.EventArgs
         {
-            public SettingPlayerTeamEventArgs(Teams team, Subteams subclass, Player player, bool isAllowed = true, bool escaping = false)
+            public SettingPlayerTeamEventArgs(Teams team, Subteams subclass, Player player, bool isAllowed = true, bool keepItems = false)
             {
                 Team = team;
                 Subclass = subclass;
                 Player = player;
                 IsAllowed = isAllowed;
-                Escaping = escaping;
+                KeepItems = keepItems;
             }
 
             public Teams Team { get; set; }
             public Subteams Subclass { get; set; }
             public Player Player { get; }
             public bool IsAllowed { get; set; }
-            public bool Escaping { get; set; }
+            public bool KeepItems { get; set; }
 
             public void StartInvoke()
             {

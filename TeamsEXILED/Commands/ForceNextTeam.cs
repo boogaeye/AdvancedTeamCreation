@@ -49,9 +49,8 @@ namespace TeamsEXILED.Commands
                 }
 
 
-                var handler = new Events.General.ReferencingTeamEventArgs(MainPlugin.Singleton.EventHandlers.chosenTeam, Respawning.SpawnableTeamType.None)
+                var handler = new Events.General.ReferencingTeamEventArgs(team, team.SpawnTypes.FirstOrDefault())
                 {
-                    Team = team,
                     ForceTeam = true
                 };
 

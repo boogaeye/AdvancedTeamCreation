@@ -24,10 +24,12 @@ namespace TeamsEXILED.Handlers
             {
                 return;
             }
+
             if (ev.Team == null)
             {
                 return;
             }
+
             if (ev.ForceTeam)
             {
                 MainPlugin.Singleton.EventHandlers.chosenTeam = ev.Team;
@@ -141,7 +143,8 @@ namespace TeamsEXILED.Handlers
                 }
             }
 
-            var ihandler = new Events.General.AddingInventoryItemsEventArgs(p, subteams, keepInv:ev.Escaping);
+            var ihandler = new Events.General.AddingInventoryItemsEventArgs(p, subteams, keepInv:ev.KeepItems);
+
             ihandler.StartInvoke();
 
             if (MainPlugin.Singleton.Config.UseHints)

@@ -8,7 +8,7 @@ namespace TeamsEXILED
 {
     public class TeamMethods
     {
-        
+        // Not in use
         public void RefNextTeamSpawn()
         {
             Log.Debug("Getting Team Referances", MainPlugin.Singleton.Config.Debug);
@@ -36,13 +36,10 @@ namespace TeamsEXILED
                 MainPlugin.Singleton.EventHandlers.HasReference = true;
                 return;
             }
+
             var team = list[MainPlugin.Singleton.EventHandlers.random.Next(0, list.Count)];
 
-            var handler = new Events.General.ReferencingTeamEventArgs(MainPlugin.Singleton.EventHandlers.chosenTeam, spawnableTeamType)
-            {
-                Team = team,
-                Spawning = spawnableTeamType
-            };
+            var handler = new Events.General.ReferencingTeamEventArgs(team, spawnableTeamType);
 
             handler.StartInvoke();
         }
@@ -78,7 +75,7 @@ namespace TeamsEXILED
 
         public void ChangeTeam(Player p, Teams t, Subteams s, bool keepInv = false)
         {
-            var handler = new Events.General.SettingPlayerTeamEventArgs(t, s, p, escaping:keepInv);
+            var handler = new Events.General.SettingPlayerTeamEventArgs(t, s, p, keepItems:keepInv);
             handler.StartInvoke();
         }
 

@@ -58,7 +58,7 @@ namespace TeamsEXILED.API
         [Description("Sets where this team spawns")]
         public SpawnLocation spawnLocation { get; set; } = SpawnLocation.Normal;
         [Description("makes it where if this team is the latest spawn it will spawn the assigned escapees to this team if they are defined in this config")]
-        public EscapeRoles[] escapeChange { get; set; } = { EscapeRoles.Scientist, EscapeRoles.DClass };
+        public RoleType[] escapeChange { get; set; } = { RoleType.Scientist, RoleType.ClassD };
         public string Color { get; set; } = "cyan";
         [Description("the chance this team will spawn if its been selected")]
         public ushort Chance { get; set; } = 50;

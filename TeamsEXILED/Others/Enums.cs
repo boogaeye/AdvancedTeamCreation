@@ -12,10 +12,4 @@
         SCP173,
         Shelter
     }
-
-    public enum EscapeRoles : sbyte
-    {
-        DClass = RoleType.ClassD,
-        Scientist = RoleType.Scientist
-    }
 }

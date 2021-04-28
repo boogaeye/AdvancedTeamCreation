@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using TeamsEXILED.Enums;
 
-namespace TeamsEXILED
+namespace TeamsEXILED.API
 {
     public class RoomPoint
     {

@@ -29,7 +29,7 @@ namespace TeamsEXILED.Commands
                 }
 
                 response = "<color=red>Error Team Does Not Exist</color>";
-                foreach (Teams t in MainPlugin.Singleton.Config.Teams)
+                foreach (Teams t in MainPlugin.Singleton.Config.TeamsConfigs.Teams)
                 {
                     if (t.Name == arguments.ToList()[0].ToLower())
                     {
@@ -40,7 +40,7 @@ namespace TeamsEXILED.Commands
                         }
 
                         Teams team = null;
-                        foreach (var tm in MainPlugin.Singleton.Config.Teams)
+                        foreach (var tm in MainPlugin.Singleton.Config.TeamsConfigs.Teams)
                         {
                             if (tm.Name.ToLower() == arguments.ToList()[0].ToLower())
                             {
@@ -79,7 +79,7 @@ namespace TeamsEXILED.Commands
                                 if (Player.Get(arguments.ToList()[2].ToLower()).IsVerified)
                                 {
                                     response = "<color=green>Changed players Team!!!</color>";
-                                    MainPlugin.Singleton.TmMethods.ChangeTeam(Player.Get(arguments.ToList()[2].ToLower()), team, st);
+                                    TeamMethods.ChangeTeam(Player.Get(arguments.ToList()[2].ToLower()), team, st);
                                     return true;
                                 }
                                 return false;

@@ -5,6 +5,7 @@ using Exiled.API.Enums;
 using HarmonyLib;
 using Exiled.API.Interfaces;
 using TeamsEXILED.Handlers;
+using TeamsEXILED.API;
 
 namespace TeamsEXILED
 {
@@ -17,9 +18,6 @@ namespace TeamsEXILED
         private Harmony Harmony;
 
         public static MainPlugin Singleton;
-
-        public Classes.Classes Classes = new Classes.Classes();
-        public TeamMethods TmMethods = new TeamMethods();
 
         public override Version RequiredExiledVersion { get; } = new Version("2.10.0");
 
@@ -43,6 +41,7 @@ namespace TeamsEXILED
             TeamsHandlers = new TeamsEvents(this);
             EventHandlers = new EventHandlers(this);
 
+            Config.LoadTeamsConfig();
             CheckPlugins();
 
             Harmony = new Harmony($"teamsexiled.{DateTime.Now.Ticks}");
@@ -60,10 +59,9 @@ namespace TeamsEXILED
             Exiled.Events.Handlers.Server.RoundStarted += EventHandlers.OnRoundStart;
             Exiled.Events.Handlers.Player.Escaping += EventHandlers.OnEscaping;
 
-            Events.General.SettingPlayerTeam += TeamsHandlers.OnSettingPlayerTeam;
-            Events.General.AddingInventoryItems += TeamsHandlers.OnAddingInventoryItems;
-            Events.General.ReferencingTeam += TeamsHandlers.OnReferencingTeam;
-            
+            TeamEvents.SettingPlayerTeam += TeamsHandlers.OnSettingPlayerTeam;
+            TeamEvents.AddingInventoryItems += TeamsHandlers.OnAddingInventoryItems;
+            TeamEvents.ReferencingTeam += TeamsHandlers.OnReferencingTeam;
 
             if (!Server.FriendlyFire)
             {
@@ -87,9 +85,9 @@ namespace TeamsEXILED
             Exiled.Events.Handlers.Server.RoundStarted -= EventHandlers.OnRoundStart;
             Exiled.Events.Handlers.Player.Escaping -= EventHandlers.OnEscaping;
 
-            Events.General.SettingPlayerTeam -= TeamsHandlers.OnSettingPlayerTeam;
-            Events.General.AddingInventoryItems -= TeamsHandlers.OnAddingInventoryItems;
-            Events.General.ReferencingTeam -= TeamsHandlers.OnReferencingTeam;
+            TeamEvents.SettingPlayerTeam -= TeamsHandlers.OnSettingPlayerTeam;
+            TeamEvents.AddingInventoryItems -= TeamsHandlers.OnAddingInventoryItems;
+            TeamEvents.ReferencingTeam -= TeamsHandlers.OnReferencingTeam;
 
             Harmony.UnpatchAll();
 
@@ -99,6 +97,12 @@ namespace TeamsEXILED
             Harmony = null;
 
             base.OnDisabled();
+        }
+
+        public override void OnReloaded()
+        {
+            Config.LoadTeamsConfig();
+            CheckPlugins();
         }
 
         public void CheckPlugins()

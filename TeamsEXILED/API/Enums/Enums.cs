@@ -1,4 +1,4 @@
-﻿namespace TeamsEXILED.Enums
+﻿namespace TeamsEXILED.API
 {
     public enum SpawnLocation
     {

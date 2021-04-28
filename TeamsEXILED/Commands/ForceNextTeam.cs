@@ -30,7 +30,7 @@ namespace TeamsEXILED.Commands
 
                 Teams team = null;
 
-                foreach (var tm in MainPlugin.Singleton.Config.Teams)
+                foreach (var tm in MainPlugin.Singleton.Config.TeamsConfigs.Teams)
                 {
                     if (tm.Name == arguments.At(0))
                     {
@@ -41,7 +41,7 @@ namespace TeamsEXILED.Commands
                 if (team == null)
                 {
                     response = "<color=red>The name of the team isn't valid.</color> Teams:";
-                    foreach (var tm in MainPlugin.Singleton.Config.Teams)
+                    foreach (var tm in MainPlugin.Singleton.Config.TeamsConfigs.Teams)
                     {
                         response += "\n" + tm.Name;
                     }
@@ -49,7 +49,7 @@ namespace TeamsEXILED.Commands
                 }
 
 
-                var handler = new Events.General.ReferencingTeamEventArgs(team, team.SpawnTypes.FirstOrDefault())
+                var handler = new TeamEvents.ReferencingTeamEventArgs(team, team.SpawnTypes.FirstOrDefault())
                 {
                     ForceTeam = true
                 };

@@ -1,9 +1,10 @@
 ﻿using System.Linq;
 using Exiled.API.Features;
-using TeamsEXILED.Enums;
 using Exiled.API.Interfaces;
 using MEC;
 using UnityEngine;
+using TeamsEXILED.API;
+using System.Collections.Generic;
 
 namespace TeamsEXILED
 {
@@ -59,6 +60,39 @@ namespace TeamsEXILED
             return name;
         }
 
+        public static IEnumerator<float> RespawnTimerPatch()
+        {
+            var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
+            while (Round.IsStarted)
+            {
+                yield return Timing.WaitForSeconds(cfg.Interval - 0.01f);
+
+                var rteam = Respawn.NextKnownTeam;
+
+                if (MainPlugin.Singleton.EventHandlers.ForcedTeam)
+                {
+                    rteam = MainPlugin.Singleton.EventHandlers.chosenTeam.SpawnTypes.FirstOrDefault();
+                }
+
+                if (MainPlugin.Singleton.EventHandlers.HasReference && MainPlugin.Singleton.EventHandlers.chosenTeam != null)
+                {
+                    switch (rteam)
+                    {
+                        case Respawning.SpawnableTeamType.NineTailedFox:
+                            {
+                                cfg.translations.Ntf = $"<color={MainPlugin.Singleton.EventHandlers.chosenTeam.Color}>{MainPlugin.Singleton.EventHandlers.chosenTeam.Name}</color>";
+                                break;
+                            }
+                        case Respawning.SpawnableTeamType.ChaosInsurgency:
+                            {
+                                cfg.translations.Ci = $"<color={MainPlugin.Singleton.EventHandlers.chosenTeam.Color}>{MainPlugin.Singleton.EventHandlers.chosenTeam.Name}</color>";
+                                break;
+                            }
+                    }
+                }
+            }
+        }
+
         public static IConfig GetRespawnTimerCfg()
         {
             return Exiled.Loader.Loader.Plugins.First(x => x.Name == "RespawnTimer").Config;
@@ -102,7 +136,7 @@ namespace TeamsEXILED
             SerpentsHand.EventHandlers.IsSpawnable = false;
         }
 
-        public static void CheckRoundEnd(Player ender)
+        public static void CheckRoundEnd(Teams team)
         {
             if (RoundSummary.singleton._roundEnded)
             {
@@ -112,7 +146,6 @@ namespace TeamsEXILED
             var teamedPlayers = MainPlugin.Singleton.EventHandlers.teamedPlayers;
 
             // Checking round for end
-            var team = MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ender]);
             foreach (var te in teamedPlayers.Values)
             {
                 if (team.Requirements.Contains(te))

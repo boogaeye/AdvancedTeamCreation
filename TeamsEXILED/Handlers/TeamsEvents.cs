@@ -4,6 +4,7 @@ using Exiled.API.Enums;
 using Exiled.CustomItems.API.Features;
 using System.Linq;
 using MEC;
+using TeamsEXILED.API;
 
 namespace TeamsEXILED.Handlers
 {
@@ -16,7 +17,7 @@ namespace TeamsEXILED.Handlers
             this.plugin = plugin;
         }
 
-        public void OnReferencingTeam(Events.General.ReferencingTeamEventArgs ev)
+        public void OnReferencingTeam(TeamEvents.ReferencingTeamEventArgs ev)
         {
             Log.Debug($"Forceteam: {ev.ForceTeam}\nIsAllowed: {ev.IsAllowed}\nTeamName: {ev.Team.Name}", this.plugin.Config.Debug);
 
@@ -53,7 +54,7 @@ namespace TeamsEXILED.Handlers
             }
         }
 
-        public void OnSettingPlayerTeam(Events.General.SettingPlayerTeamEventArgs ev)
+        public void OnSettingPlayerTeam(TeamEvents.SettingPlayerTeamEventArgs ev)
         {
             if (!Round.IsStarted)
             {
@@ -69,18 +70,18 @@ namespace TeamsEXILED.Handlers
             p.Health = subteams.HP;
             p.MaxHealth = subteams.HP;
 
-            if (team.spawnLocation != Enums.SpawnLocation.Normal)
+            if (team.spawnLocation != SpawnLocation.Normal)
             {
                 var point = MainPlugin.Singleton.EventHandlers.fixedpoints.First(x => x.Type == team.spawnLocation);
                 switch (team.spawnLocation)
                 {
-                    case Enums.SpawnLocation.Escape:
+                    case SpawnLocation.Escape:
                         {
                             p.Position = point.Position;
                             p.Rotations = point.Direction;
                             break;
                         }
-                    case Enums.SpawnLocation.SCP106:
+                    case SpawnLocation.SCP106:
                         {
                             if (!Warhead.IsDetonated)
                             {
@@ -89,13 +90,13 @@ namespace TeamsEXILED.Handlers
                             }
                             break;
                         }
-                    case Enums.SpawnLocation.SurfaceNuke:
+                    case SpawnLocation.SurfaceNuke:
                         {
                             p.Position = point.Position;
                             p.Rotations = point.Direction;
                             break;
                         }
-                    case Enums.SpawnLocation.SCP012:
+                    case SpawnLocation.SCP012:
                         {
                             if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
                             {
@@ -104,7 +105,7 @@ namespace TeamsEXILED.Handlers
                             }
                             break;
                         }
-                    case Enums.SpawnLocation.SCP079:
+                    case SpawnLocation.SCP079:
                         {
                             if (!Warhead.IsDetonated)
                             {
@@ -113,7 +114,7 @@ namespace TeamsEXILED.Handlers
                             }
                             break;
                         }
-                    case Enums.SpawnLocation.SCP096:
+                    case SpawnLocation.SCP096:
                         {
                             if (!Warhead.IsDetonated)
                             {
@@ -122,7 +123,7 @@ namespace TeamsEXILED.Handlers
                             }
                             break;
                         }
-                    case Enums.SpawnLocation.SCP173:
+                    case SpawnLocation.SCP173:
                         {
                             if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
                             {
@@ -131,7 +132,7 @@ namespace TeamsEXILED.Handlers
                             }
                             break;
                         }
-                    case Enums.SpawnLocation.Shelter:
+                    case SpawnLocation.Shelter:
                         {
                             if (!Warhead.IsDetonated)
                             {
@@ -143,7 +144,7 @@ namespace TeamsEXILED.Handlers
                 }
             }
 
-            var ihandler = new Events.General.AddingInventoryItemsEventArgs(p, subteams, keepInv:ev.KeepItems);
+            var ihandler = new TeamEvents.AddingInventoryItemsEventArgs(p, subteams, keepInv:ev.KeepItems);
 
             ihandler.StartInvoke();
 
@@ -172,7 +173,7 @@ namespace TeamsEXILED.Handlers
             Log.Debug("Changing player " + p.Nickname + " to " + ev.Team.Name, MainPlugin.Singleton.Config.Debug);
         }
 
-        public void OnAddingInventoryItems(Events.General.AddingInventoryItemsEventArgs ev)
+        public void OnAddingInventoryItems(TeamEvents.AddingInventoryItemsEventArgs ev)
         {
             Log.Debug($"Giving Inventory Items of the subclass {ev.Subteam.Name}, to {ev.Player.Nickname}", this.plugin.Config.Debug);
             if (ev.IsAllowed == false)

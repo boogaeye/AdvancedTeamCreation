@@ -6,18 +6,18 @@ using MEC;
 
 namespace TeamsEXILED
 {
-    public class TeamMethods
+    public static class TeamMethods
     {
         // Not in use
-        public void RefNextTeamSpawn()
+        public static void RefNextTeamSpawn()
         {
             Log.Debug("Getting Team Referances", MainPlugin.Singleton.Config.Debug);
-            var list = MainPlugin.Singleton.Config.Teams.Where(x => x.SpawnTypes.ToList().Contains(Respawn.NextKnownTeam) && x.Active == true).ToList();
+            var list = MainPlugin.Singleton.Config.TeamsConfigs.Teams.Where(x => x.SpawnTypes.ToList().Contains(Respawn.NextKnownTeam) && x.Active == true).ToList();
             Log.Debug("Got list", MainPlugin.Singleton.Config.Debug);
             var team = list[MainPlugin.Singleton.EventHandlers.random.Next(0, list.Count)];
             Log.Debug("Got team", MainPlugin.Singleton.Config.Debug);
 
-            var handler = new Events.General.ReferencingTeamEventArgs(MainPlugin.Singleton.EventHandlers.chosenTeam, Respawning.SpawnableTeamType.None)
+            var handler = new TeamEvents.ReferencingTeamEventArgs(MainPlugin.Singleton.EventHandlers.chosenTeam, Respawning.SpawnableTeamType.None)
             {
                 Team = team
             };
@@ -26,11 +26,11 @@ namespace TeamsEXILED
             handler.StartInvoke();
         }
 
-        public void RefNextTeamSpawn(Respawning.SpawnableTeamType spawnableTeamType)
+        public static void RefNextTeamSpawn(Respawning.SpawnableTeamType spawnableTeamType)
         {
             Log.Debug("Getting Team Referances", MainPlugin.Singleton.Config.Debug);
             Log.Debug($"Spawning on side {spawnableTeamType}", MainPlugin.Singleton.Config.Debug);
-            var list = MainPlugin.Singleton.Config.Teams.Where(x => x.SpawnTypes.Contains(spawnableTeamType) && x.Active == true).ToList();
+            var list = MainPlugin.Singleton.Config.TeamsConfigs.Teams.Where(x => x.SpawnTypes.Contains(spawnableTeamType) && x.Active == true).ToList();
             if (list.Count == 0)
             {
                 MainPlugin.Singleton.EventHandlers.HasReference = true;
@@ -39,12 +39,12 @@ namespace TeamsEXILED
 
             var team = list[MainPlugin.Singleton.EventHandlers.random.Next(0, list.Count)];
 
-            var handler = new Events.General.ReferencingTeamEventArgs(team, spawnableTeamType);
+            var handler = new TeamEvents.ReferencingTeamEventArgs(team, spawnableTeamType);
 
             handler.StartInvoke();
         }
 
-        public void ChangePlysToTeam(List<Player> p, Teams team)
+        public static void ChangePlysToTeam(List<Player> p, Teams team)
         {
             //finding teams
             Log.Debug("Got team " + team.Name + " from referance method", MainPlugin.Singleton.Config.Debug);
@@ -73,18 +73,13 @@ namespace TeamsEXILED
             }
         }
 
-        public void ChangeTeam(Player p, Teams t, Subteams s, bool keepInv = false)
+        public static void ChangeTeam(Player p, Teams t, Subteams s, bool keepInv = false)
         {
-            var handler = new Events.General.SettingPlayerTeamEventArgs(t, s, p, keepItems:keepInv);
+            var handler = new TeamEvents.SettingPlayerTeamEventArgs(t, s, p, keepItems:keepInv);
             handler.StartInvoke();
         }
 
-        public bool TeamExists(string team)
-        {
-            return MainPlugin.Singleton.EventHandlers.teamedPlayers.ContainsValue(team);
-        }
-
-        public void RemoveTeamReference()
+        public static void RemoveTeamReference()
         {
             if (MainPlugin.Singleton.EventHandlers.RemoveChosenTeam != null)
             {
@@ -99,7 +94,7 @@ namespace TeamsEXILED
             }
         }
 
-        private IEnumerator<float> RemoveReferenceCouroutine()
+        private static IEnumerator<float> RemoveReferenceCouroutine()
         {
             yield return Timing.WaitForSeconds(5f);
             if (MainPlugin.assemblyTimer)
@@ -111,11 +106,54 @@ namespace TeamsEXILED
             MainPlugin.Singleton.EventHandlers.HasReference = false;
         }
 
-        public void DefaultTimerConfig()
+        public static void DefaultTimerConfig()
         {
             var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
             cfg.translations.Ci = MainPlugin.Singleton.EventHandlers.chaosTrans;
             cfg.translations.Ntf = MainPlugin.Singleton.EventHandlers.mtfTrans;
         }
+
+        public static NormalTeam[] TeamRedefine = new NormalTeam[] {
+            new NormalTeam()
+            {
+                Active = true,
+                Team = Team.MTF,
+                Friendlys = new string[] { "opcf", "mtf", "rsc" },
+                Requirements = new string[] { "scp", "rsc", "chi", "cdp", "tta"  },
+                Neutral = new string[]{ "aes", "goc", "gru" }
+            },
+            new NormalTeam()
+            {
+                Active = true,
+                Team = Team.CHI,
+                Friendlys = new string[] { "chi", "cdp" },
+                Requirements = new string[] { "scp", "rsc", "mtf", "cdp", "tta", "opcf"  },
+                Neutral = new string[]{ "aes", "goc", "gru" }
+            },
+            new NormalTeam()
+            {
+                Active = true,
+                Team = Team.CDP,
+                Friendlys = new string[] { "chi", "cdp" },
+                Requirements = new string[] { "scp", "rsc", "mtf", "tta", "opcf"  },
+                Neutral = new string[]{ "aes", "goc", "gru" }
+            },
+            new NormalTeam()
+            {
+                Active = true,
+                Team = Team.RSC,
+                Friendlys = new string[] { "mtf", "rsc" },
+                Requirements = new string[] { "scp", "rsc", "mtf", "cdp", "tta", "opcf"  },
+                Neutral = new string[]{ "aes", "goc", "gru", "opcf" }
+            },
+            new NormalTeam()
+            {
+                Active = true,
+                Team = Team.SCP,
+                Friendlys = new string[] { "scp" },
+                Requirements = new string[] { "rsc", "mtf", "cdp", "tta", "opcf", "aes", "goc", "gru"  },
+                Neutral = new string[]{ }
+            }
+        };
     }
 }

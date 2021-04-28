@@ -7,10 +7,8 @@ using TeamsEXILED.Handlers;
 using Exiled.API.Enums;
 using MEC;
 using System.Linq;
-using TeamsEXILED.Enums;
 using UnityEngine;
 using System.Globalization;
-using static TeamsEXILED.Events.General;
 
 namespace TeamsEXILED
 {
@@ -51,7 +49,7 @@ namespace TeamsEXILED
         {
             if (MainPlugin.assemblyTimer)
             {
-                coroutineHandle.Add(Timing.RunCoroutine(RTimerMethods.RespawnTimerPatch()));
+                coroutineHandle.Add(Timing.RunCoroutine(Methods.RespawnTimerPatch()));
             }
 
             foreach (SpawnLocation sp in (SpawnLocation[])Enum.GetValues(typeof(SpawnLocation)))
@@ -109,7 +107,7 @@ namespace TeamsEXILED
         {
             if (ev.Player != null)
             {
-                Methods.CheckRoundEnd(ev.Player);
+                Methods.CheckRoundEnd(Extensions.GetTeamFromString(teamedPlayers[ev.Player]));
                 teamedPlayers.Remove(ev.Player);
             }
         }
@@ -161,10 +159,10 @@ namespace TeamsEXILED
             {
                 if (Methods.IsUIU())
                 {
-                    MainPlugin.Singleton.TmMethods.RemoveTeamReference();
+                    TeamMethods.RemoveTeamReference();
                     coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
                     {
-                        TeamConvert.SetPlayerTeamName(tempPlayers, "uiu");
+                        Extensions.SetPlayerTeamName(tempPlayers, "uiu");
                     }));
                     
                     return;
@@ -175,10 +173,10 @@ namespace TeamsEXILED
             {
                 if (Methods.IsSerpentHand())
                 {
-                    MainPlugin.Singleton.TmMethods.RemoveTeamReference();
+                    TeamMethods.RemoveTeamReference();
                     coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
                     {
-                        TeamConvert.SetPlayerTeamName(tempPlayers, "serpentshand");
+                        Extensions.SetPlayerTeamName(tempPlayers, "serpentshand");
                     }));
                     
                     return;
@@ -187,7 +185,7 @@ namespace TeamsEXILED
 
             if (!HasReference)
             {
-                MainPlugin.Singleton.TmMethods.RefNextTeamSpawn(ev.NextKnownTeam);
+                TeamMethods.RefNextTeamSpawn(ev.NextKnownTeam);
                 Log.Debug("Possible admin spawn due to No Team Reference yet", this.plugin.Config.Debug);
             }
 
@@ -204,7 +202,7 @@ namespace TeamsEXILED
             {
                 Log.Debug("Spawned " + chosenTeam.Name, this.plugin.Config.Debug);
 
-                coroutineHandle.Add(Timing.CallDelayed(0.2f, () => MainPlugin.Singleton.TmMethods.ChangePlysToTeam(tempPlayers, chosenTeam)));
+                coroutineHandle.Add(Timing.CallDelayed(0.2f, () => TeamMethods.ChangePlysToTeam(tempPlayers, chosenTeam)));
 
                 if (random.Next(0, 100) <= chosenTeam.CassieMessageChaosAnnounceChance && ev.NextKnownTeam == Respawning.SpawnableTeamType.ChaosInsurgency)
                 {
@@ -212,7 +210,7 @@ namespace TeamsEXILED
                 }
             }
 
-            MainPlugin.Singleton.TmMethods.RemoveTeamReference();
+            TeamMethods.RemoveTeamReference();
         }
 
         public void OnHurt(HurtingEventArgs ev)
@@ -221,7 +219,7 @@ namespace TeamsEXILED
             {
                 try
                 {
-                    if (MainPlugin.Singleton.Classes.IsTeamFriendly(MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Target]), teamedPlayers[ev.Attacker]) && !this.plugin.Config.FriendlyFire)
+                    if (Extensions.IsTeamFriendly(Extensions.GetTeamFromString(teamedPlayers[ev.Target]), teamedPlayers[ev.Attacker]) && !this.plugin.Config.FriendlyFire)
                     {
                         ev.IsAllowed = false;
                         ev.Attacker.ShowHint("You can't hurt teams teamed with you!");
@@ -245,7 +243,7 @@ namespace TeamsEXILED
                     Cassie.Message(chosenTeam.CassieMessageMTFSpawn.Replace("{SCP}", ev.ScpsLeft.ToString()).Replace("{unit}", ev.UnitNumber.ToString()).Replace("{nato}", "nato_" + ev.UnitName[0].ToString()), isNoisy: false);
                 }
 
-                MainPlugin.Singleton.Classes.RenameUnit(respawns, chosenTeam.Name.ToUpper() + "-" + ev.UnitNumber.ToString());
+                Extensions.RenameUnit(respawns, chosenTeam.Name.ToUpper() + "-" + ev.UnitNumber.ToString());
                 Map.ChangeUnitColor(respawns, chosenTeam.Color);
             }
         }
@@ -254,9 +252,9 @@ namespace TeamsEXILED
         {
             try
             {
-                Log.Debug(teamedPlayers[ev.Killer], this.plugin.Config.Debug);
+                Log.Debug(ev.Killer.AdvancedTeam(), this.plugin.Config.Debug);
 
-                if (MainPlugin.Singleton.Classes.IsTeamFriendly(MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Killer]), teamedPlayers[ev.Target]))
+                if (Extensions.IsTeamFriendly(ev.Killer.AdvancedTeam(), ev.Target.AdvancedTeam().Name))
                 {
                     ev.Target.Broadcast(5, this.plugin.Config.TeamKillBroadcast);
                 }
@@ -265,15 +263,15 @@ namespace TeamsEXILED
                     ev.Target.Broadcast(5, this.plugin.Config.KilledByNonfriendlyPlayer);
                 }
 
-                teamedPlayers[ev.Target] = "Dead";
+                ev.Target.SetPlayerTeamName("Dead");
 
-                Methods.CheckRoundEnd(ev.Killer);
+                Methods.CheckRoundEnd(ev.Killer.AdvancedTeam());
             }
             catch (Exception)
             {
                 if (ev.Target != null)
                 {
-                    teamedPlayers[ev.Target] = "Dead";
+                    ev.Target.SetPlayerTeamName("Dead");
                 }
                 
                 Log.Debug("Caught On died error. this probably happened because someone left", this.plugin.Config.Debug);
@@ -298,15 +296,15 @@ namespace TeamsEXILED
 
         public void OnEscaping(EscapingEventArgs ev)
         {
-            //setting team due to RoleChangeEventArgs not changing the team
-            teamedPlayers[ev.Player] = MainPlugin.Singleton.Classes.ConvertToNormalTeamName(ev.NewRole).ToString().ToLower();
+            // Setting team due to RoleChangeEventArgs not changing the team
+            ev.Player.SetPlayerTeamName(Extensions.ConvertToNormalTeamName(ev.NewRole).ToString().ToLower());
 
             if (latestSpawn != null)
             {
                 if (latestSpawn.escapeChange.ToList().Contains(ev.Player.Role))
                 {
                     ev.IsAllowed = false;
-                    MainPlugin.Singleton.TmMethods.ChangeTeam(ev.Player, latestSpawn, latestSpawn.Subclasses.First(), true);
+                    TeamMethods.ChangeTeam(ev.Player, latestSpawn, latestSpawn.Subclasses.First(), true);
                 }
             }
         }
@@ -315,7 +313,7 @@ namespace TeamsEXILED
         {
             if (MainPlugin.assemblyTimer)
             {
-                MainPlugin.Singleton.TmMethods.DefaultTimerConfig();
+                TeamMethods.DefaultTimerConfig();
             }
 
             foreach (var coroutine in coroutineHandle)

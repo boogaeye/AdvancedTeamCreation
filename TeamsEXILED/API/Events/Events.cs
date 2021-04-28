@@ -1,12 +1,11 @@
-﻿using TeamsEXILED.API;
-using Exiled.API.Features;
+﻿using Exiled.API.Features;
 
-namespace TeamsEXILED.Events
+namespace TeamsEXILED.API
 {
     public delegate void TeamEvent();
     public delegate void TeamEvent<TEventArgs>(TEventArgs eventArgs) where TEventArgs : System.EventArgs;
 
-    public class General
+    public class TeamEvents
     {
         public static event TeamEvent<SettingPlayerTeamEventArgs> SettingPlayerTeam;
         public static event TeamEvent<ReferencingTeamEventArgs> ReferencingTeam;

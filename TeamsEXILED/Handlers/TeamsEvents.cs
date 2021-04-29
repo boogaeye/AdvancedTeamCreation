@@ -59,7 +59,6 @@ namespace TeamsEXILED.Handlers
             if (!Round.IsStarted)
             {
                 ev.IsAllowed = false;
-                ev.Player.ShowHint("Couldnt spawn you in before the round started");
             }
 
             var p = ev.Player;

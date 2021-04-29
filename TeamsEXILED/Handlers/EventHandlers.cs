@@ -36,7 +36,6 @@ namespace TeamsEXILED
 
         public LeadingTeam leadingTeam = LeadingTeam.Draw;
 
-        public bool AllowNormalRoundEnd = false;
         public bool HasReference = false;
         public bool ForcedTeam = false;
 
@@ -108,8 +107,8 @@ namespace TeamsEXILED
         {
             if (ev.Player != null)
             {
-                Methods.CheckRoundEnd(ev.Player.AdvancedTeam());
                 teamedPlayers.Remove(ev.Player);
+                Methods.CheckRoundEnd();
             }
         }
 
@@ -223,7 +222,7 @@ namespace TeamsEXILED
                     if (ev.Attacker.AdvancedTeam().IsTeamFriendly(ev.Attacker.AdvancedTeam()) && !this.plugin.Config.FriendlyFire)
                     {
                         ev.IsAllowed = false;
-                        ev.Attacker.ShowHint("You can't hurt teams teamed with you!");
+                        ev.Attacker.ShowHint(plugin.Config.TransConfigs.FriendlyFireHint, 5);
                         Log.Debug("Protected a player in " + ev.Target.AdvancedTeam().Name + " from " + ev.Attacker.AdvancedTeam().Name, this.plugin.Config.Debug);
                     }
                 }
@@ -253,20 +252,20 @@ namespace TeamsEXILED
         {
             try
             {
-                Log.Debug(ev.Killer.AdvancedTeam(), this.plugin.Config.Debug);
+                Log.Debug(ev.Killer.AdvancedTeam(), plugin.Config.Debug);
 
                 if (ev.Killer.AdvancedTeam().IsTeamFriendly(ev.Target.AdvancedTeam()))
                 {
-                    ev.Target.Broadcast(5, this.plugin.Config.TeamKillBroadcast);
+                    ev.Target.Broadcast(5, plugin.Config.TransConfigs.TeamKillBroadcast);
                 }
                 else
                 {
-                    ev.Target.Broadcast(5, this.plugin.Config.KilledByNonfriendlyPlayer);
+                    ev.Target.Broadcast(5, plugin.Config.TransConfigs.KilledByNonfriendlyPlayer);
                 }
 
                 ev.Target.SetAdvancedTeam(Extensions.GetNormalTeam(Team.RIP));
 
-                Methods.CheckRoundEnd(ev.Killer.AdvancedTeam());
+                Methods.CheckRoundEnd();
             }
             catch (Exception)
             {
@@ -274,14 +273,16 @@ namespace TeamsEXILED
                 {
                     ev.Target.SetAdvancedTeam(Extensions.GetNormalTeam(Team.RIP));
                 }
-                
+
+                Methods.CheckRoundEnd();
+
                 Log.Debug("Caught On died error. this probably happened because someone left", this.plugin.Config.Debug);
             }
         }
 
         public void RoundEnding(EndingRoundEventArgs ev)
         {
-            if (AllowNormalRoundEnd && this.plugin.Config.Debug)
+            if (ev.IsAllowed && plugin.Config.Debug)
             {
                 Log.Debug("List of teams:", this.plugin.Config.Debug);
                 foreach (KeyValuePair<Player, Teams> t in teamedPlayers)
@@ -290,8 +291,19 @@ namespace TeamsEXILED
                 }
             }
 
-            ev.IsAllowed = AllowNormalRoundEnd;
-            ev.IsRoundEnded = AllowNormalRoundEnd;
+            // This prevents to finish the round if any team has an active requeriment
+            foreach (Teams tm in teamedPlayers.Values)
+            {
+                foreach (Teams team in teamedPlayers.Values)
+                {
+                    if (tm.Requirements.Contains(team.Name))
+                    {
+                        ev.IsAllowed = false;
+                        return;
+                    }
+                }
+            }
+
             ev.LeadingTeam = leadingTeam;
         }
 
@@ -322,7 +334,6 @@ namespace TeamsEXILED
                 Timing.KillCoroutines(coroutine);
             }
 
-            AllowNormalRoundEnd = false;
             HasReference = false;
             respawns = 0;
             latestSpawn = null;

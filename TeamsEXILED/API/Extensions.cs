@@ -38,7 +38,7 @@ namespace TeamsEXILED.API
 
         public static bool IsNormalTeam(this Teams i)
         {
-            return TeamMethods.NormalTeams.Contains(i);
+            return MainPlugin.Singleton.Config.NormalConfigs.Teams.Contains(i);
         }
 
         public static bool TeamExists(Teams team)
@@ -126,7 +126,7 @@ namespace TeamsEXILED.API
 
         public static Teams GetNormalTeam(Team team)
         {
-            return TeamMethods.NormalTeams.First(x => x.Name == team.ToString().ToLower());
+            return MainPlugin.Singleton.Config.NormalConfigs.Teams.First(x => x.Name == team.ToString().ToLower());
         }
 
         public static Team ConvertToNormalTeamName(RoleType role)

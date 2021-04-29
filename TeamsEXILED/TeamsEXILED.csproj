@@ -108,6 +108,8 @@
     <Compile Include="Commands\AdvancedTeam\TeamsAlive.cs" />
     <Compile Include="Commands\Team.cs" />
     <Compile Include="Commands\AdvancedTeam\ForceTeam.cs" />
+    <Compile Include="Configs\NormalTeams.cs" />
+    <Compile Include="Configs\Translations.cs" />
     <Compile Include="Configs\Teams.cs" />
     <Compile Include="Patches\RefNextTeam.cs" />
     <Compile Include="Config.cs" />

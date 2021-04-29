@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using TeamsEXILED.Commands;
 
-namespace ScpSwap.Commands.ScpSwapCommand
+namespace TeamsEXILED.Commands
 {
 	[CommandHandler(typeof(ClientCommandHandler))]
 	public class AdvancedTeamCommand : ParentCommand
@@ -38,7 +38,7 @@ namespace ScpSwap.Commands.ScpSwapCommand
                 }
             }
 
-			response = "You don't have the requeried permissions.";
+			response = MainPlugin.Singleton.Config.TransConfigs.NoPermissions;
 			return false;
 		}
 	}

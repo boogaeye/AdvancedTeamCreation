@@ -24,7 +24,7 @@ namespace TeamsEXILED.Commands
                 return true;
             }
 
-            response = "<color=red>You dont have permission for this command</color>";
+            response = MainPlugin.Singleton.Config.TransConfigs.NoPermissions;
             return false;
         }
     }

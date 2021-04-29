@@ -61,7 +61,7 @@ namespace TeamsEXILED
 
         public static IEnumerator<float> RespawnTimerPatch()
         {
-            var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
+            var cfg = (RespawnTimer.Config)GetRespawnTimerCfg();
             while (Round.IsStarted)
             {
                 yield return Timing.WaitForSeconds(cfg.Interval - 0.01f);
@@ -135,42 +135,28 @@ namespace TeamsEXILED
             SerpentsHand.EventHandlers.IsSpawnable = false;
         }
 
-        public static void CheckRoundEnd(Teams team)
+        public static void CheckRoundEnd()
         {
             if (RoundSummary.singleton._roundEnded)
             {
                 return;
             }
 
-            if (team.IsNormalTeam() || team == SerpentHandsTeam || team == UiUTeam)
-            {
-                return;
-            }
-
             var teamedPlayers = MainPlugin.Singleton.EventHandlers.teamedPlayers;
 
-            // Checking round for end
-            foreach (var te in teamedPlayers.Values)
+            // This checks base game teams (defined in the config) and advanced teams
+            foreach (Teams tm in teamedPlayers.Values)
             {
-                if (team.Requirements.Contains(te.Name))
+                foreach (Teams team in teamedPlayers.Values)
                 {
-                    Log.Debug($"Stopped Round from ending heres some information\n Triggered Team: {team.Name}\n Stopping Team: {te}\n Hope this works", MainPlugin.Singleton.Config.Debug);
-                    return;
+                    if (tm.Requirements.Contains(team.Name))
+                    {
+                        return;
+                    }
                 }
-            }
-            
-            if (!MainPlugin.Singleton.EventHandlers.AllowNormalRoundEnd)
-            {
-                MainPlugin.Singleton.EventHandlers.AllowNormalRoundEnd = true;
             }
 
-            MainPlugin.Singleton.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
-            {
-                if (!RoundSummary.singleton._roundEnded)
-                {
-                    Round.ForceEnd();
-                }
-            }));
+            Round.ForceEnd();
         }
 
         public static void DefaultTimerConfig()

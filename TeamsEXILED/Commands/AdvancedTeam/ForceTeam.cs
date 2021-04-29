@@ -91,7 +91,7 @@ namespace TeamsEXILED.Commands
             }
             else
             {
-                response = "<color=red>You do not have permission to use this command aka you dont have ATC.forceteam</color>";
+                response = MainPlugin.Singleton.Config.TransConfigs.NoPermissions;
             }
             return false;
         }

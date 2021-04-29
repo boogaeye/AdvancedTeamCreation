@@ -11,10 +11,6 @@ namespace TeamsEXILED
     {
         public bool IsEnabled { get; set; } = true;
 
-        public string TeamKillBroadcast { get; set; } = "You got teamkilled report this to the admins if you dont think its an accident";
-
-        public string KilledByNonfriendlyPlayer { get; set; } = "You didnt get team killed you where probably killed by someone who looks like you but isnt";
-
         [Description("allows friendly teams to hurt eachother no matter what hurts them")]
         public bool FriendlyFire { get; set; } = false;
 
@@ -29,6 +25,8 @@ namespace TeamsEXILED
         public string ConfigsFolder { get; set; } = Path.Combine(Paths.Configs, "AdvancedTeamCreation");
 
         public TeamsConfig TeamsConfigs;
+        public Translations TransConfigs;
+        public NormalTeams NormalConfigs;
 
         public void LoadTeamsConfig()
         {
@@ -47,6 +45,30 @@ namespace TeamsEXILED
             {
                 TeamsConfigs = Loader.Deserializer.Deserialize<TeamsConfig>(File.ReadAllText(fpath));
                 File.WriteAllText(fpath, Loader.Serializer.Serialize(TeamsConfigs));
+            }
+
+            string tpath = Path.Combine(ConfigsFolder, "Translations.yml");
+            if (File.Exists(tpath) == false)
+            {
+                TransConfigs = new Translations();
+                File.WriteAllText(tpath, Loader.Serializer.Serialize(TransConfigs));
+            }
+            else
+            {
+                TransConfigs = Loader.Deserializer.Deserialize<Translations>(File.ReadAllText(tpath));
+                File.WriteAllText(tpath, Loader.Serializer.Serialize(TransConfigs));
+            }
+
+            string npath = Path.Combine(ConfigsFolder, "NormalTeams.yml");
+            if (File.Exists(npath) == false)
+            {
+                NormalConfigs = new NormalTeams();
+                File.WriteAllText(npath, Loader.Serializer.Serialize(NormalConfigs));
+            }
+            else
+            {
+                NormalConfigs = Loader.Deserializer.Deserialize<NormalTeams>(File.ReadAllText(npath));
+                File.WriteAllText(npath, Loader.Serializer.Serialize(NormalConfigs));
             }
         }
     }

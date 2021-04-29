@@ -105,43 +105,5 @@ namespace TeamsEXILED
             MainPlugin.Singleton.EventHandlers.chosenTeam = null;
             MainPlugin.Singleton.EventHandlers.HasReference = false;
         }
-
-        public static Teams[] NormalTeams = new Teams[] {
-            new Teams()
-            {
-                Active = true,
-                Name = "mtf",
-            },
-            new Teams()
-            {
-                Active = true,
-                Name = "chi",
-            },
-            new Teams()
-            {
-                Active = true,
-                Name = "cdp",
-            },
-            new Teams()
-            {
-                Active = true,
-                Name = "rsc",
-            },
-            new Teams()
-            {
-                Active = true,
-                Name = "scp",
-            },
-            new Teams()
-            {
-                Active = true,
-                Name = "rip",
-            },
-            new Teams()
-            {
-                Active = true,
-                Name = "tut",
-            }
-        };
     }
 }

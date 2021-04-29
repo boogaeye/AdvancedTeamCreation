@@ -54,7 +54,7 @@ namespace TeamsEXILED.API
 
         public static bool IsDefinedInConfig(string normalteam)
         {
-            foreach (var n in TeamMethods.NormalTeams)
+            foreach (var n in MainPlugin.Singleton.Config.NormalConfigs.Teams)
             {
                 if (n.Name.ToString().ToLower() == normalteam.ToLower())
                 {

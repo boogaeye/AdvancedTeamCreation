@@ -8,7 +8,7 @@ using TeamsEXILED.Commands;
 
 namespace TeamsEXILED.Commands
 {
-	[CommandHandler(typeof(ClientCommandHandler))]
+	[CommandHandler(typeof(RemoteAdminCommandHandler))]
 	public class AdvancedTeamCommand : ParentCommand
 	{
 		public AdvancedTeamCommand() => LoadGeneratedCommands();

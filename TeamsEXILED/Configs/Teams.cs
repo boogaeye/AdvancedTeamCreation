@@ -44,7 +44,7 @@ namespace TeamsEXILED.Configs
             CassieMessageMTFSpawn = ".g5 .g5 the g r u has entered the facility. there are {SCP} scpsubjects",
             Chance = 65,
             Color = "yellow",
-            Neutral = new string[]{ "mtf", "chi", "goc" }
+            Neutral = new string[]{ "mtf", "chi", "goc" },
         },new Teams(){
             Active = true,
             Name = "tta",

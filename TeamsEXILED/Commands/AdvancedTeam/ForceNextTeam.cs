@@ -9,7 +9,7 @@ using TeamsEXILED.API;
 namespace TeamsEXILED.Commands
 {
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    class ForceNextTeam : ICommand
+    public class ForceNextTeam : ICommand
     {
         public string Command { get; } = "forcenextteam";
 

@@ -6,37 +6,42 @@ namespace TeamsEXILED.API
 {
     public static class Extensions
     {
-        public static Teams AdvancedTeam(this Player player) => GetTeamFromString(MainPlugin.Singleton.EventHandlers.teamedPlayers[player]);
+        public static Teams AdvancedTeam(this Player player) => MainPlugin.Singleton.EventHandlers.teamedPlayers[player];
 
-        public static void SetPlayerTeamName(this Player player, string name)
+        public static void SetAdvancedTeam(this Player player, Teams team)
         {
-             MainPlugin.Singleton.EventHandlers.teamedPlayers[player] = name;
+             MainPlugin.Singleton.EventHandlers.teamedPlayers[player] = team;
         }
 
-        public static void SetPlayerTeamName(List<Player> plylist, string name)
+        public static void SetAdvancedTeam(List<Player> plylist, Teams team)
         {
             foreach (var ply in plylist)
             {
-                MainPlugin.Singleton.EventHandlers.teamedPlayers[ply] = name;
+                MainPlugin.Singleton.EventHandlers.teamedPlayers[ply] = team;
             }
         }
 
-        public static bool IsTeamFriendly(this Teams i, string u)
+        public static bool IsTeamFriendly(this Teams i, Teams u)
         {
-            return i.Friendlys.Contains(u);
+            return i.Friendlys.Contains(u.Name);
         }
 
-        public static bool IsTeamEnemy(this Teams i, string u)
+        public static bool IsTeamEnemy(this Teams i, Teams u)
         {
-            return i.Requirements.Contains(u);
+            return i.Requirements.Contains(u.Name);
         }
 
-        public static bool IsTeamNeutral(this Teams i, string u)
+        public static bool IsTeamNeutral(this Teams i, Teams u)
         {
-            return i.Neutral.Contains(u);
+            return i.Neutral.Contains(u.Name);
         }
 
-        public static bool TeamExists(string team)
+        public static bool IsNormalTeam(this Teams i)
+        {
+            return TeamMethods.NormalTeams.Contains(i);
+        }
+
+        public static bool TeamExists(Teams team)
         {
             return MainPlugin.Singleton.EventHandlers.teamedPlayers.ContainsValue(team);
         }
@@ -83,11 +88,11 @@ namespace TeamsEXILED.API
             return team.Friendlys;
         }
 
-        public static List<string> GetAllRequirements(string TeamFond)
+        public static List<string> GetAllRequirements(this Teams Fteam)
         {
             List<string> team = new List<string>();
 
-            foreach (Teams t in MainPlugin.Singleton.Config.TeamsConfigs.Teams.Where(x => x.Requirements.Contains(TeamFond)))
+            foreach (Teams t in MainPlugin.Singleton.Config.TeamsConfigs.Teams.Where(x => x.Requirements.Contains(Fteam.Name)))
             {
                 team.Add(t.Name);
             }
@@ -95,11 +100,11 @@ namespace TeamsEXILED.API
             return team;
         }
 
-        public static List<string> GetAllNeutrals(string TeamFond)
+        public static List<string> GetAllNeutrals(this Teams Fteam)
         {
             List<string> team = new List<string>();
 
-            foreach (Teams t in MainPlugin.Singleton.Config.TeamsConfigs.Teams.Where(x => x.Neutral.Contains(TeamFond)))
+            foreach (Teams t in MainPlugin.Singleton.Config.TeamsConfigs.Teams.Where(x => x.Neutral.Contains(Fteam.Name)))
             {
                 team.Add(t.Name);
             }
@@ -107,16 +112,21 @@ namespace TeamsEXILED.API
             return team;
         }
 
-        public static List<string> GetAllFriendlyTeams(string TeamFond)
+        public static List<string> GetAllFriendlyTeams(this Teams Fteam)
         {
             List<string> team = new List<string>();
 
-            foreach (Teams t in MainPlugin.Singleton.Config.TeamsConfigs.Teams.Where(x => x.Friendlys.Contains(TeamFond)))
+            foreach (Teams t in MainPlugin.Singleton.Config.TeamsConfigs.Teams.Where(x => x.Friendlys.Contains(Fteam.Name)))
             {
                 team.Add(t.Name);
             }
 
             return team;
+        }
+
+        public static Teams GetNormalTeam(Team team)
+        {
+            return TeamMethods.NormalTeams.First(x => x.Name == team.ToString().ToLower());
         }
 
         public static Team ConvertToNormalTeamName(RoleType role)

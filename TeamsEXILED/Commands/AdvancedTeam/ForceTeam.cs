@@ -8,7 +8,7 @@ using Exiled.Permissions.Extensions;
 namespace TeamsEXILED.Commands
 {
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    class ForceTeam : ICommand
+    public class ForceTeam : ICommand
     {
         public string Command { get; } = "forceteam";
 
@@ -22,7 +22,7 @@ namespace TeamsEXILED.Commands
 
             if (ply.CheckPermission("ATC.forceteam"))
             {
-                if (arguments.ToList().Count == 0)
+                if (arguments.Count == 0)
                 {
                     response = "<color=blue>forceteam <teamName> <subteamName> <playerId></color>";
                     return false;

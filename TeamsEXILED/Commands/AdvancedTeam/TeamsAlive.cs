@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
+using TeamsEXILED.API;
 
 namespace TeamsEXILED.Commands
 {
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    class TeamsAlive : ICommand
+    public class TeamsAlive : ICommand
     {
         public string Command { get; } = "teamsalive";
 
@@ -21,7 +22,7 @@ namespace TeamsEXILED.Commands
             if (ply.CheckPermission("ATC.teamsalive"))
             {
                 response = "";
-                foreach (KeyValuePair<Player, string> t in MainPlugin.Singleton.EventHandlers.teamedPlayers)
+                foreach (KeyValuePair<Player, Teams> t in MainPlugin.Singleton.EventHandlers.teamedPlayers)
                 {
                     response = response + "\n" + t.Value + " : " + t.Key.Nickname;
                 }

@@ -2,7 +2,6 @@
 using Exiled.API.Features;
 using Exiled.API.Interfaces;
 using MEC;
-using UnityEngine;
 using TeamsEXILED.API;
 using System.Collections.Generic;
 
@@ -143,12 +142,17 @@ namespace TeamsEXILED
                 return;
             }
 
+            if (team.IsNormalTeam() || team == SerpentHandsTeam || team == UiUTeam)
+            {
+                return;
+            }
+
             var teamedPlayers = MainPlugin.Singleton.EventHandlers.teamedPlayers;
 
             // Checking round for end
             foreach (var te in teamedPlayers.Values)
             {
-                if (team.Requirements.Contains(te))
+                if (team.Requirements.Contains(te.Name))
                 {
                     Log.Debug($"Stopped Round from ending heres some information\n Triggered Team: {team.Name}\n Stopping Team: {te}\n Hope this works", MainPlugin.Singleton.Config.Debug);
                     return;
@@ -168,5 +172,24 @@ namespace TeamsEXILED
                 }
             }));
         }
+
+        public static void DefaultTimerConfig()
+        {
+            var cfg = (RespawnTimer.Config)GetRespawnTimerCfg();
+            cfg.translations.Ci = MainPlugin.Singleton.EventHandlers.chaosTrans;
+            cfg.translations.Ntf = MainPlugin.Singleton.EventHandlers.mtfTrans;
+        }
+
+        public static Teams UiUTeam = new Teams()
+        {
+            Active = true,
+            Name = "uiu"
+        };
+
+        public static Teams SerpentHandsTeam = new Teams()
+        {
+            Active = true,
+            Name = "serpenthands"
+        };
     }
 }

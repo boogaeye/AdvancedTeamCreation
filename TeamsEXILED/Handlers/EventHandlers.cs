@@ -4,6 +4,7 @@ using Exiled.API.Features;
 using Exiled.Events.EventArgs;
 using TeamsEXILED.API;
 using TeamsEXILED.Handlers;
+using Exiled.API.Extensions;
 using Exiled.API.Enums;
 using MEC;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace TeamsEXILED
             this.plugin = plugin;
         }
 
-        public Dictionary<Player, string> teamedPlayers = new Dictionary<Player, string>();
+        public Dictionary<Player, Teams> teamedPlayers = new Dictionary<Player, Teams>();
         public List<RoomPoint> fixedpoints = new List<RoomPoint>();
         public List<CoroutineHandle> coroutineHandle = new List<CoroutineHandle>();
 
@@ -100,14 +101,14 @@ namespace TeamsEXILED
 
         public void OnVerified(VerifiedEventArgs ev)
         {
-            teamedPlayers[ev.Player] = "RIP";
+            ev.Player.SetAdvancedTeam(Extensions.GetNormalTeam(Team.RIP));
         }
 
         public void OnLeave(LeftEventArgs ev)
         {
             if (ev.Player != null)
             {
-                Methods.CheckRoundEnd(Extensions.GetTeamFromString(teamedPlayers[ev.Player]));
+                Methods.CheckRoundEnd(ev.Player.AdvancedTeam());
                 teamedPlayers.Remove(ev.Player);
             }
         }
@@ -116,7 +117,7 @@ namespace TeamsEXILED
         {
             ev.Player.CustomInfo = string.Empty;
             ev.Player.ReferenceHub.nicknameSync.ShownPlayerInfo |= PlayerInfoArea.Role;
-            teamedPlayers[ev.Player] = ev.Player.Team.ToString().ToLower();
+            ev.Player.SetAdvancedTeam(Extensions.GetNormalTeam(ev.Player.Team));
         }
 
         public void OnRespawning(RespawningTeamEventArgs ev)
@@ -162,7 +163,7 @@ namespace TeamsEXILED
                     TeamMethods.RemoveTeamReference();
                     coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
                     {
-                        Extensions.SetPlayerTeamName(tempPlayers, "uiu");
+                        Extensions.SetAdvancedTeam(tempPlayers, Methods.UiUTeam);
                     }));
                     
                     return;
@@ -176,7 +177,7 @@ namespace TeamsEXILED
                     TeamMethods.RemoveTeamReference();
                     coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
                     {
-                        Extensions.SetPlayerTeamName(tempPlayers, "serpentshand");
+                        Extensions.SetAdvancedTeam(tempPlayers, Methods.SerpentHandsTeam);
                     }));
                     
                     return;
@@ -219,11 +220,11 @@ namespace TeamsEXILED
             {
                 try
                 {
-                    if (Extensions.IsTeamFriendly(Extensions.GetTeamFromString(teamedPlayers[ev.Target]), teamedPlayers[ev.Attacker]) && !this.plugin.Config.FriendlyFire)
+                    if (ev.Attacker.AdvancedTeam().IsTeamFriendly(ev.Attacker.AdvancedTeam()) && !this.plugin.Config.FriendlyFire)
                     {
                         ev.IsAllowed = false;
                         ev.Attacker.ShowHint("You can't hurt teams teamed with you!");
-                        Log.Debug("Protected a player in " + teamedPlayers[ev.Target] + " from " + teamedPlayers[ev.Attacker], this.plugin.Config.Debug);
+                        Log.Debug("Protected a player in " + ev.Target.AdvancedTeam().Name + " from " + ev.Attacker.AdvancedTeam().Name, this.plugin.Config.Debug);
                     }
                 }
                 catch (Exception)
@@ -254,7 +255,7 @@ namespace TeamsEXILED
             {
                 Log.Debug(ev.Killer.AdvancedTeam(), this.plugin.Config.Debug);
 
-                if (Extensions.IsTeamFriendly(ev.Killer.AdvancedTeam(), ev.Target.AdvancedTeam().Name))
+                if (ev.Killer.AdvancedTeam().IsTeamFriendly(ev.Target.AdvancedTeam()))
                 {
                     ev.Target.Broadcast(5, this.plugin.Config.TeamKillBroadcast);
                 }
@@ -263,7 +264,7 @@ namespace TeamsEXILED
                     ev.Target.Broadcast(5, this.plugin.Config.KilledByNonfriendlyPlayer);
                 }
 
-                ev.Target.SetPlayerTeamName("Dead");
+                ev.Target.SetAdvancedTeam(Extensions.GetNormalTeam(Team.RIP));
 
                 Methods.CheckRoundEnd(ev.Killer.AdvancedTeam());
             }
@@ -271,7 +272,7 @@ namespace TeamsEXILED
             {
                 if (ev.Target != null)
                 {
-                    ev.Target.SetPlayerTeamName("Dead");
+                    ev.Target.SetAdvancedTeam(Extensions.GetNormalTeam(Team.RIP));
                 }
                 
                 Log.Debug("Caught On died error. this probably happened because someone left", this.plugin.Config.Debug);
@@ -283,9 +284,9 @@ namespace TeamsEXILED
             if (AllowNormalRoundEnd && this.plugin.Config.Debug)
             {
                 Log.Debug("List of teams:", this.plugin.Config.Debug);
-                foreach (KeyValuePair<Player, string> t in teamedPlayers)
+                foreach (KeyValuePair<Player, Teams> t in teamedPlayers)
                 {
-                    Log.Debug(t.Value + " : " + t.Key, this.plugin.Config.Debug);
+                    Log.Debug(t.Value.Name + " : " + t.Key, this.plugin.Config.Debug);
                 }
             }
 
@@ -297,7 +298,7 @@ namespace TeamsEXILED
         public void OnEscaping(EscapingEventArgs ev)
         {
             // Setting team due to RoleChangeEventArgs not changing the team
-            ev.Player.SetPlayerTeamName(Extensions.ConvertToNormalTeamName(ev.NewRole).ToString().ToLower());
+            ev.Player.SetAdvancedTeam(Extensions.GetNormalTeam(ev.NewRole.GetTeam()));
 
             if (latestSpawn != null)
             {
@@ -313,7 +314,7 @@ namespace TeamsEXILED
         {
             if (MainPlugin.assemblyTimer)
             {
-                TeamMethods.DefaultTimerConfig();
+                Methods.DefaultTimerConfig();
             }
 
             foreach (var coroutine in coroutineHandle)

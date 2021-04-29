@@ -161,12 +161,12 @@ namespace TeamsEXILED.Handlers
             {
                 if (MainPlugin.Singleton.EventHandlers.spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
                 {
-                    p.ReferenceHub.characterClassManager.NetworkCurUnitName = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[MainPlugin.Singleton.EventHandlers.respawns].UnitName;
+                    p.UnitName = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[MainPlugin.Singleton.EventHandlers.respawns].UnitName;
                 }
 
                 p.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
                 p.CustomInfo = subteams.RoleName;
-                MainPlugin.Singleton.EventHandlers.teamedPlayers[p] = ev.Team.Name;
+                p.SetAdvancedTeam(ev.Team);
             }
             ));
 

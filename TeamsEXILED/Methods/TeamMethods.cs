@@ -99,60 +99,48 @@ namespace TeamsEXILED
             yield return Timing.WaitForSeconds(5f);
             if (MainPlugin.assemblyTimer)
             {
-                DefaultTimerConfig();
+                Methods.DefaultTimerConfig();
             }
 
             MainPlugin.Singleton.EventHandlers.chosenTeam = null;
             MainPlugin.Singleton.EventHandlers.HasReference = false;
         }
 
-        public static void DefaultTimerConfig()
-        {
-            var cfg = (RespawnTimer.Config)Methods.GetRespawnTimerCfg();
-            cfg.translations.Ci = MainPlugin.Singleton.EventHandlers.chaosTrans;
-            cfg.translations.Ntf = MainPlugin.Singleton.EventHandlers.mtfTrans;
-        }
-
-        public static NormalTeam[] TeamRedefine = new NormalTeam[] {
-            new NormalTeam()
+        public static Teams[] NormalTeams = new Teams[] {
+            new Teams()
             {
                 Active = true,
-                Team = Team.MTF,
-                Friendlys = new string[] { "opcf", "mtf", "rsc" },
-                Requirements = new string[] { "scp", "rsc", "chi", "cdp", "tta"  },
-                Neutral = new string[]{ "aes", "goc", "gru" }
+                Name = "mtf",
             },
-            new NormalTeam()
+            new Teams()
             {
                 Active = true,
-                Team = Team.CHI,
-                Friendlys = new string[] { "chi", "cdp" },
-                Requirements = new string[] { "scp", "rsc", "mtf", "cdp", "tta", "opcf"  },
-                Neutral = new string[]{ "aes", "goc", "gru" }
+                Name = "chi",
             },
-            new NormalTeam()
+            new Teams()
             {
                 Active = true,
-                Team = Team.CDP,
-                Friendlys = new string[] { "chi", "cdp" },
-                Requirements = new string[] { "scp", "rsc", "mtf", "tta", "opcf"  },
-                Neutral = new string[]{ "aes", "goc", "gru" }
+                Name = "cdp",
             },
-            new NormalTeam()
+            new Teams()
             {
                 Active = true,
-                Team = Team.RSC,
-                Friendlys = new string[] { "mtf", "rsc" },
-                Requirements = new string[] { "scp", "rsc", "mtf", "cdp", "tta", "opcf"  },
-                Neutral = new string[]{ "aes", "goc", "gru", "opcf" }
+                Name = "rsc",
             },
-            new NormalTeam()
+            new Teams()
             {
                 Active = true,
-                Team = Team.SCP,
-                Friendlys = new string[] { "scp" },
-                Requirements = new string[] { "rsc", "mtf", "cdp", "tta", "opcf", "aes", "goc", "gru"  },
-                Neutral = new string[]{ }
+                Name = "scp",
+            },
+            new Teams()
+            {
+                Active = true,
+                Name = "rip",
+            },
+            new Teams()
+            {
+                Active = true,
+                Name = "tut",
             }
         };
     }

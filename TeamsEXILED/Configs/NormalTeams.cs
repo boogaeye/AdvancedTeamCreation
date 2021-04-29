@@ -9,7 +9,7 @@ namespace TeamsEXILED.Configs
 {
     public class NormalTeams
     {
-        public Teams[] Teams = new Teams[] {
+        public Teams[] Teams { get; set; } = new Teams[] {
             new Teams()
             {
                 Active = true,

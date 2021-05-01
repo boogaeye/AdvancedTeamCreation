@@ -66,46 +66,42 @@ namespace TeamsEXILED.Handlers
                 return;
             }
 
-            var p = ev.Player;
-            var team = ev.Team;
-            var subteams = ev.Subclass;
+            ev.Player.SetRole(ev.Subclass.ModelRole, true);
+            ev.Player.Health = ev.Subclass.HP;
+            ev.Player.MaxHealth = ev.Subclass.HP;
 
-            p.SetRole(subteams.ModelRole, true);
-            p.Health = subteams.HP;
-            p.MaxHealth = subteams.HP;
-
-            if (team.spawnLocation != SpawnLocation.Normal)
+            if (ev.Team.spawnLocation != SpawnLocation.Normal)
             {
-                var point = MainPlugin.Singleton.EventHandlers.fixedpoints.First(x => x.Type == team.spawnLocation);
-                switch (team.spawnLocation)
+                var point = MainPlugin.Singleton.EventHandlers.fixedpoints.First(x => x.Type == ev.Team.spawnLocation);
+                switch (ev.Team.spawnLocation)
                 {
                     case SpawnLocation.Escape:
                         {
-                            p.Position = point.Position;
-                            p.Rotations = point.Direction;
+                            ev.Player.Position = point.Position;
+                            ev.Player.Rotations = point.Direction;
                             break;
                         }
                     case SpawnLocation.SCP106:
                         {
                             if (!Warhead.IsDetonated)
                             {
-                                p.Position = point.Position;
-                                p.Rotations = point.Direction;
+                                ev.Player.Position = point.Position;
+                                ev.Player.Rotations = point.Direction;
                             }
                             break;
                         }
                     case SpawnLocation.SurfaceNuke:
                         {
-                            p.Position = point.Position;
-                            p.Rotations = point.Direction;
+                            ev.Player.Position = point.Position;
+                            ev.Player.Rotations = point.Direction;
                             break;
                         }
                     case SpawnLocation.SCP012:
                         {
                             if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
                             {
-                                p.Position = point.Position;
-                                p.Rotations = point.Direction;
+                                ev.Player.Position = point.Position;
+                                ev.Player.Rotations = point.Direction;
                             }
                             break;
                         }
@@ -113,8 +109,8 @@ namespace TeamsEXILED.Handlers
                         {
                             if (!Warhead.IsDetonated)
                             {
-                                p.Position = point.Position;
-                                p.Rotations = point.Direction;
+                                ev.Player.Position = point.Position;
+                                ev.Player.Rotations = point.Direction;
                             }
                             break;
                         }
@@ -122,8 +118,8 @@ namespace TeamsEXILED.Handlers
                         {
                             if (!Warhead.IsDetonated)
                             {
-                                p.Position = point.Position;
-                                p.Rotations = point.Direction;
+                                ev.Player.Position = point.Position;
+                                ev.Player.Rotations = point.Direction;
                             }
                             break;
                         }
@@ -131,8 +127,8 @@ namespace TeamsEXILED.Handlers
                         {
                             if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
                             {
-                                p.Position = point.Position;
-                                p.Rotations = point.Direction;
+                                ev.Player.Position = point.Position;
+                                ev.Player.Rotations = point.Direction;
                             }
                             break;
                         }
@@ -140,25 +136,25 @@ namespace TeamsEXILED.Handlers
                         {
                             if (!Warhead.IsDetonated)
                             {
-                                p.Position = point.Position;
-                                p.Rotations = point.Direction;
+                                ev.Player.Position = point.Position;
+                                ev.Player.Rotations = point.Direction;
                             }
                             break;
                         }
                 }
             }
 
-            var ihandler = new TeamEvents.AddingInventoryItemsEventArgs(p, subteams, keepInv:ev.KeepItems);
+            var ihandler = new TeamEvents.AddingInventoryItemsEventArgs(ev.Player, ev.Subclass, keepInv:ev.KeepItems);
 
             ihandler.StartInvoke();
 
             if (MainPlugin.Singleton.Config.UseHints)
             {
-                p.ShowHint(subteams.RoleMessage, 10);
+                ev.Player.ShowHint(ev.Subclass.RoleMessage, 10);
             }
             else
             {
-                p.Broadcast(10, subteams.RoleMessage);
+                ev.Player.Broadcast(10, ev.Subclass.RoleMessage);
             }
 
             MainPlugin.Singleton.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(0.2f, () => 
@@ -168,13 +164,13 @@ namespace TeamsEXILED.Handlers
                     p.UnitName = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[MainPlugin.Singleton.EventHandlers.respawns].UnitName;
                 }*/
 
-                p.InfoArea &= ~PlayerInfoArea.Role;
-                p.CustomInfo = subteams.RoleName;
-                p.SetAdvancedTeam(ev.Team);
+                ev.Player.InfoArea &= ~PlayerInfoArea.Role;
+                ev.Player.CustomInfo = ev.Subclass.RoleName;
+                ev.Player.SetAdvancedTeam(ev.Team);
             }
             ));
 
-            Log.Debug("Changing player " + p.Nickname + " to " + ev.Team.Name, MainPlugin.Singleton.Config.Debug);
+            Log.Debug("Changing player " + ev.Player.Nickname + " to " + ev.Team.Name, MainPlugin.Singleton.Config.Debug);
         }
 
         public void OnAddingInventoryItems(TeamEvents.AddingInventoryItemsEventArgs ev)

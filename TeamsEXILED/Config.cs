@@ -14,7 +14,6 @@ namespace TeamsEXILED
     public class Config : IConfig
     {
         public bool IsEnabled { get; set; } = true;
-		
 
         [Description("allows friendly teams to hurt eachother no matter what hurts them")]
         public bool FriendlyFire { get; set; } = false;

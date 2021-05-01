@@ -21,6 +21,11 @@ namespace TeamsEXILED.API
             }
         }
 
+        public static void SetAdvancedTeamSubclass(this Player ply, Teams team, Subteams subclass, bool KeepInv = false)
+        {
+            TeamMethods.ChangeTeam(ply, team, subclass, KeepInv);
+        }
+
         public static bool IsTeamFriendly(this Teams i, Teams u)
         {
             return i.Friendlys.Contains(u.Name);

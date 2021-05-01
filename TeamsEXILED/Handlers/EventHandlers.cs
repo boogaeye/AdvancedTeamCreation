@@ -373,7 +373,7 @@ namespace TeamsEXILED
                 if (latestSpawn.escapeChange.ToList().Contains(ev.Player.Role))
                 {
                     ev.IsAllowed = false;
-                    TeamMethods.ChangeTeam(ev.Player, latestSpawn, latestSpawn.Subclasses.First(), true);
+                    ev.Player.SetAdvancedTeamSubclass(latestSpawn, latestSpawn.Subclasses[random.Next(0, latestSpawn.Subclasses.Count())], true);
                 }
             }
         }

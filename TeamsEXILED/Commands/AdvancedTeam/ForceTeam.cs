@@ -69,23 +69,12 @@ namespace TeamsEXILED.Commands
                             return false;
                         }
 
-                        response = "<color=red>Error Could not find subclass</color>";
+                        var player = Player.Get(arguments.ToList()[2].ToLower());
 
-                        foreach (Subteams st in t.Subclasses)
-                        {
-                            if (arguments.ToList()[1].ToLower() == st.Name)
-                            {
-                                response = "<color=red>Error Player Not Found</color>";
-                                if (Player.Get(arguments.ToList()[2].ToLower()).IsVerified)
-                                {
-                                    response = "<color=green>Changed players Team!!!</color>";
-                                    TeamMethods.ChangeTeam(Player.Get(arguments.ToList()[2].ToLower()), team, st);
-                                    return true;
-                                }
-                                return false;
-                            }
-                        }
-                        return false;
+                        player.SetAdvancedTeamSubclass(team, steam);
+
+                        response = "<color=green>Changed player Team!!!</color>";
+                        return true;
                     }
                 }
             }

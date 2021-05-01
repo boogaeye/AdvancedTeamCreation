@@ -11,7 +11,7 @@ namespace TeamsEXILED.API
         public bool Active { get; set; } = false;
 
         [Description("Sets the team name MUST be lowercase")]
-        public string Name { get; set; } = "noteam";
+        public string Name { get; set; } = "";
 
         [Description("Defines subclasses of this team such as commander and rookie(tip: define commander first then Officer then rookie then ect...)")]
         public Subteams[] Subclasses { get; set; } = new Subteams[] { };
@@ -26,7 +26,7 @@ namespace TeamsEXILED.API
         public string[] Requirements { get; set; } = new string[] { };
 
         [Description("Defines where this team can spawn by default it can spawn as both Chaos and NineTailedFox spawn locations")]
-        public SpawnableTeamType[] SpawnTypes { get; set; } = { SpawnableTeamType.ChaosInsurgency, SpawnableTeamType.NineTailedFox };
+        public SpawnableTeamType[] SpawnTypes { get; set; } = { };
 
         [Description("Makes MTF cassie messages when this team spawns set it to nothing if you dont want an MTF cassie message")]
         public string CassieMessageMTFSpawn { get; set; } = "";
@@ -41,7 +41,7 @@ namespace TeamsEXILED.API
         public SpawnLocation spawnLocation { get; set; } = SpawnLocation.Normal;
 
         [Description("makes it where if this team is the latest spawn it will spawn the assigned escapees to this team if they are defined in this config")]
-        public RoleType[] escapeChange { get; set; } = { RoleType.Scientist, RoleType.ClassD };
+        public RoleType[] escapeChange { get; set; } = { };
 
         public string Color { get; set; } = "cyan";
 

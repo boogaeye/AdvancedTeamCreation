@@ -7,6 +7,7 @@ using Exiled.API.Interfaces;
 using TeamsEXILED.Handlers;
 using TeamsEXILED.API;
 using TeamsEXILED.Configs;
+using MEC;
 
 namespace TeamsEXILED
 {
@@ -22,7 +23,7 @@ namespace TeamsEXILED
 
         public override Version RequiredExiledVersion { get; } = new Version("2.10.0");
 
-        public override PluginPriority Priority { get; } = PluginPriority.High;
+        public override PluginPriority Priority { get; } = PluginPriority.Lowest;
 
         public override string Author { get; } = "BoogaEye && Raul125";
 

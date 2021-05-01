@@ -2,6 +2,7 @@
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using System;
+using System.Linq;
 
 namespace TeamsEXILED.Commands
 {
@@ -32,6 +33,11 @@ namespace TeamsEXILED.Commands
                 {
 					response = "<color=cyan>You need to enter an argument</color>\n<b>forcenextteam</b>\n<b>forceteam</b>\n<b>teamsalive</b>";
 					return true;
+                }
+				else
+                {
+					response = "Invalid argument";
+					return false;
                 }
             }
 

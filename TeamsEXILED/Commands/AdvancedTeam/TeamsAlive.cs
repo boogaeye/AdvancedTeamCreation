@@ -30,7 +30,7 @@ namespace TeamsEXILED.Commands
                 return true;
             }
 
-            response = MainPlugin.Singleton.Config.TransConfigs.NoPermissions;
+            response = MainPlugin.Singleton.Translation.NoPermissions;
             return false;
         }
     }

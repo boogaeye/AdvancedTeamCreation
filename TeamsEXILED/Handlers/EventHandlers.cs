@@ -249,7 +249,7 @@ namespace TeamsEXILED
                     if (ev.Attacker.AdvancedTeam().IsTeamFriendly(ev.Attacker.AdvancedTeam()) && !this.plugin.Config.FriendlyFire)
                     {
                         ev.IsAllowed = false;
-                        ev.Attacker.ShowHint(plugin.Config.TransConfigs.FriendlyFireHint, 5);
+                        ev.Attacker.ShowHint(MainPlugin.Singleton.Translation.FriendlyFireHint, 5);
                         Log.Debug("Protected a player in " + ev.Target.AdvancedTeam().Name + " from " + ev.Attacker.AdvancedTeam().Name, this.plugin.Config.Debug);
                     }
                 }
@@ -300,11 +300,11 @@ namespace TeamsEXILED
 
                 if (ev.Killer.AdvancedTeam().IsTeamFriendly(ev.Target.AdvancedTeam()))
                 {
-                    ev.Target.Broadcast(5, plugin.Config.TransConfigs.TeamKillBroadcast);
+                    ev.Target.Broadcast(5, MainPlugin.Singleton.Translation.TeamKillBroadcast);
                 }
                 else
                 {
-                    ev.Target.Broadcast(5, plugin.Config.TransConfigs.KilledByNonfriendlyPlayer);
+                    ev.Target.Broadcast(5, MainPlugin.Singleton.Translation.KilledByNonfriendlyPlayer);
                 }
             }
             catch (Exception)

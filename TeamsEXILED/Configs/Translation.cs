@@ -1,6 +1,8 @@
-﻿namespace TeamsEXILED.Configs
+﻿using Exiled.API.Interfaces;
+
+namespace TeamsEXILED.Configs
 {
-    public class Translations
+    public class Translation : ITranslation
     {
         public string TeamKillBroadcast { get; set; } = "You got teamkilled report this to the admins if you dont think its an accident";
         public string KilledByNonfriendlyPlayer { get; set; } = "You didnt get team killed you where probably killed by someone who looks like you but isnt";

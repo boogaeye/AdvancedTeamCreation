@@ -80,7 +80,7 @@ namespace TeamsEXILED.Commands
             }
             else
             {
-                response = MainPlugin.Singleton.Config.TransConfigs.NoPermissions;
+                response = MainPlugin.Singleton.Translation.NoPermissions;
             }
             return false;
         }

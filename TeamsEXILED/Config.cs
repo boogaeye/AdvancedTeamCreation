@@ -32,7 +32,6 @@ namespace TeamsEXILED
         public string ConfigsFolder { get; set; } = Path.Combine(Paths.Configs, "AdvancedTeamCreation");
 
         public List<Teams> Teams = new List<Teams>();
-        public Translations TransConfigs;
         public NormalTeams NormalConfigs;
 
         public void LoadConfigs()
@@ -61,18 +60,6 @@ namespace TeamsEXILED
                 var des = Loader.Deserializer.Deserialize<TeamsConfig>(File.ReadAllText(file));
                 File.WriteAllText(file, Loader.Serializer.Serialize(des));
                 Teams.Add(des.Team);
-            }
-
-            string tpath = Path.Combine(ConfigsFolder, "Translations.yml");
-            if (File.Exists(tpath) == false)
-            {
-                TransConfigs = new Translations();
-                File.WriteAllText(tpath, Loader.Serializer.Serialize(TransConfigs));
-            }
-            else
-            {
-                TransConfigs = Loader.Deserializer.Deserialize<Translations>(File.ReadAllText(tpath));
-                File.WriteAllText(tpath, Loader.Serializer.Serialize(TransConfigs));
             }
 
             string npath = Path.Combine(ConfigsFolder, "NormalTeams.yml");

@@ -6,10 +6,11 @@ using HarmonyLib;
 using Exiled.API.Interfaces;
 using TeamsEXILED.Handlers;
 using TeamsEXILED.API;
+using TeamsEXILED.Configs;
 
 namespace TeamsEXILED
 {
-    public class MainPlugin : Plugin<Config>
+    public class MainPlugin : Plugin<Config, Translation>
     {
         public EventHandlers EventHandlers;
 

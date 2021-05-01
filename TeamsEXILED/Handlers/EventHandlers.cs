@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs;
 using TeamsEXILED.API;
-using TeamsEXILED.Handlers;
+using Exiled.API.Extensions;
 using Exiled.API.Enums;
 using MEC;
 using System.Linq;
-using TeamsEXILED.Enums;
 using UnityEngine;
 using System.Globalization;
-using static TeamsEXILED.Events.General;
 
 namespace TeamsEXILED
 {
@@ -24,7 +22,7 @@ namespace TeamsEXILED
             this.plugin = plugin;
         }
 
-        public Dictionary<Player, string> teamedPlayers = new Dictionary<Player, string>();
+        public Dictionary<Player, Teams> teamedPlayers = new Dictionary<Player, Teams>();
         public List<RoomPoint> fixedpoints = new List<RoomPoint>();
         public List<CoroutineHandle> coroutineHandle = new List<CoroutineHandle>();
 
@@ -35,9 +33,6 @@ namespace TeamsEXILED
 
         public System.Random random = new System.Random();
 
-        public LeadingTeam leadingTeam = LeadingTeam.Draw;
-
-        public bool AllowNormalRoundEnd = false;
         public bool HasReference = false;
         public bool ForcedTeam = false;
 
@@ -51,7 +46,7 @@ namespace TeamsEXILED
         {
             if (MainPlugin.assemblyTimer)
             {
-                coroutineHandle.Add(Timing.RunCoroutine(RTimerMethods.RespawnTimerPatch()));
+                coroutineHandle.Add(Timing.RunCoroutine(Methods.RespawnTimerPatch()));
             }
 
             foreach (SpawnLocation sp in (SpawnLocation[])Enum.GetValues(typeof(SpawnLocation)))
@@ -102,7 +97,7 @@ namespace TeamsEXILED
 
         public void OnVerified(VerifiedEventArgs ev)
         {
-            teamedPlayers[ev.Player] = "RIP";
+            ev.Player.SetAdvancedTeam(Extensions.GetNormalTeam(Team.RIP));
         }
 
         public void OnLeave(LeftEventArgs ev)
@@ -117,12 +112,17 @@ namespace TeamsEXILED
         public void OnRoleChange(ChangedRoleEventArgs ev)
         {
             ev.Player.CustomInfo = string.Empty;
-            ev.Player.ReferenceHub.nicknameSync.ShownPlayerInfo |= PlayerInfoArea.Role;
-            teamedPlayers[ev.Player] = ev.Player.Team.ToString().ToLower();
+            ev.Player.InfoArea |= PlayerInfoArea.Role;
+            ev.Player.SetAdvancedTeam(Extensions.GetNormalTeam(ev.Player.Team));
         }
 
         public void OnRespawning(RespawningTeamEventArgs ev)
         {
+            if (ev.IsAllowed == false)
+            {
+                return;
+            }
+
             // Need this, because ev.Players isn't working for methods
             List<Player> tempPlayers = new List<Player>();
 
@@ -161,13 +161,19 @@ namespace TeamsEXILED
             {
                 if (Methods.IsUIU())
                 {
-                    MainPlugin.Singleton.TmMethods.RemoveTeamReference();
-                    coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
+                    if (plugin.Config.DominantPlugin)
                     {
-                        TeamConvert.SetPlayerTeamName(tempPlayers, "uiu");
-                    }));
-                    
-                    return;
+                        Methods.SpawneableUIUToFalse();
+                    }
+                    else
+                    {
+                        TeamMethods.RemoveTeamReference();
+                        coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
+                        {
+                            Extensions.SetAdvancedTeam(tempPlayers, Methods.UiUTeam);
+                        }));
+                        return;
+                    }
                 }
             }
 
@@ -175,21 +181,29 @@ namespace TeamsEXILED
             {
                 if (Methods.IsSerpentHand())
                 {
-                    MainPlugin.Singleton.TmMethods.RemoveTeamReference();
-                    coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
+                    if (plugin.Config.DominantPlugin)
                     {
-                        TeamConvert.SetPlayerTeamName(tempPlayers, "serpentshand");
-                    }));
-                    
-                    return;
+                        Methods.SpawneableSerpentToFalse();
+                    }
+                    else
+                    {
+                        TeamMethods.RemoveTeamReference();
+                        coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
+                        {
+                            Extensions.SetAdvancedTeam(tempPlayers, Methods.SerpentHandsTeam);
+                        }));
+                        return;
+                    } 
                 }
             }
 
             if (!HasReference)
             {
-                MainPlugin.Singleton.TmMethods.RefNextTeamSpawn(ev.NextKnownTeam);
+                TeamMethods.RefNextTeamSpawn(ev.NextKnownTeam);
                 Log.Debug("Possible admin spawn due to No Team Reference yet", this.plugin.Config.Debug);
             }
+
+            latestSpawn = chosenTeam;
 
             spawnableTeamType = ev.NextKnownTeam;
 
@@ -202,7 +216,7 @@ namespace TeamsEXILED
             {
                 Log.Debug("Spawned " + chosenTeam.Name, this.plugin.Config.Debug);
 
-                coroutineHandle.Add(Timing.CallDelayed(0.2f, () => MainPlugin.Singleton.TmMethods.ChangePlysToTeam(tempPlayers, chosenTeam)));
+                coroutineHandle.Add(Timing.CallDelayed(0.2f, () => TeamMethods.ChangePlysToTeam(tempPlayers, chosenTeam)));
 
                 if (random.Next(0, 100) <= chosenTeam.CassieMessageChaosAnnounceChance && ev.NextKnownTeam == Respawning.SpawnableTeamType.ChaosInsurgency)
                 {
@@ -210,20 +224,33 @@ namespace TeamsEXILED
                 }
             }
 
-            MainPlugin.Singleton.TmMethods.RemoveTeamReference();
+            TeamMethods.RemoveTeamReference();
         }
 
         public void OnHurt(HurtingEventArgs ev)
         {
+            if (ev.IsAllowed == false)
+            {
+                return;
+            }
+
             if (ev.DamageType.isWeapon || ev.DamageType.isScp)
             {
                 try
                 {
-                    if (MainPlugin.Singleton.Classes.IsTeamFriendly(MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Target]), teamedPlayers[ev.Attacker]) && !this.plugin.Config.FriendlyFire)
+                    if (MainPlugin.assemblyAdvancedSubclass)
+                    {
+                        if (Methods.HasAdvancedSubclass(ev.Attacker))
+                        {
+                            return;
+                        }
+                    }
+
+                    if (ev.Attacker.AdvancedTeam().IsTeamFriendly(ev.Attacker.AdvancedTeam()) && !this.plugin.Config.FriendlyFire)
                     {
                         ev.IsAllowed = false;
-                        ev.Attacker.ShowHint("You can't hurt teams teamed with you!");
-                        Log.Debug("Protected a player in " + teamedPlayers[ev.Target] + " from " + teamedPlayers[ev.Attacker], this.plugin.Config.Debug);
+                        ev.Attacker.ShowHint(MainPlugin.Singleton.Translation.FriendlyFireHint, 5);
+                        Log.Debug("Protected a player in " + ev.Target.AdvancedTeam().Name + " from " + ev.Attacker.AdvancedTeam().Name, this.plugin.Config.Debug);
                     }
                 }
                 catch (Exception)
@@ -235,6 +262,11 @@ namespace TeamsEXILED
 
         public void MTFSpawnAnnounce(AnnouncingNtfEntranceEventArgs ev)
         {
+            if (ev.IsAllowed == false)
+            {
+                return;
+            }
+
             if (chosenTeam != null)
             {
                 ev.IsAllowed = false;
@@ -243,7 +275,7 @@ namespace TeamsEXILED
                     Cassie.Message(chosenTeam.CassieMessageMTFSpawn.Replace("{SCP}", ev.ScpsLeft.ToString()).Replace("{unit}", ev.UnitNumber.ToString()).Replace("{nato}", "nato_" + ev.UnitName[0].ToString()), isNoisy: false);
                 }
 
-                MainPlugin.Singleton.Classes.RenameUnit(respawns, chosenTeam.Name.ToUpper() + "-" + ev.UnitNumber.ToString());
+                Extensions.RenameUnit(respawns, chosenTeam.Name.ToUpper() + "-" + ev.UnitNumber.ToString());
                 Map.ChangeUnitColor(respawns, chosenTeam.Color);
             }
         }
@@ -252,53 +284,105 @@ namespace TeamsEXILED
         {
             try
             {
-                Log.Debug(teamedPlayers[ev.Killer], this.plugin.Config.Debug);
+                Log.Debug(ev.Killer.AdvancedTeam(), plugin.Config.Debug);
 
-                if (MainPlugin.Singleton.Classes.IsTeamFriendly(MainPlugin.Singleton.Classes.GetTeamFromString(teamedPlayers[ev.Killer]), teamedPlayers[ev.Target]))
+                ev.Target.SetAdvancedTeam(Extensions.GetNormalTeam(Team.RIP));
+
+                Methods.CheckRoundEnd();
+
+                if (MainPlugin.assemblyAdvancedSubclass)
                 {
-                    ev.Target.Broadcast(5, this.plugin.Config.TeamKillBroadcast);
+                    if (Methods.HasAdvancedSubclass(ev.Killer))
+                    {
+                        return;
+                    }
+                }
+
+                if (ev.Killer.AdvancedTeam().IsTeamFriendly(ev.Target.AdvancedTeam()))
+                {
+                    ev.Target.Broadcast(5, MainPlugin.Singleton.Translation.TeamKillBroadcast);
                 }
                 else
                 {
-                    ev.Target.Broadcast(5, this.plugin.Config.KilledByNonfriendlyPlayer);
+                    ev.Target.Broadcast(5, MainPlugin.Singleton.Translation.KilledByNonfriendlyPlayer);
                 }
-
-                teamedPlayers[ev.Target] = "Dead";
-
-                Methods.CheckRoundEnd();
             }
             catch (Exception)
             {
+                if (ev.Target != null)
+                {
+                    ev.Target.SetAdvancedTeam(Extensions.GetNormalTeam(Team.RIP));
+                }
+
+                Methods.CheckRoundEnd();
+
                 Log.Debug("Caught On died error. this probably happened because someone left", this.plugin.Config.Debug);
             }
         }
 
         public void RoundEnding(EndingRoundEventArgs ev)
         {
-            if (AllowNormalRoundEnd && this.plugin.Config.Debug)
+            if (ev.IsAllowed && plugin.Config.Debug)
             {
                 Log.Debug("List of teams:", this.plugin.Config.Debug);
-                foreach (KeyValuePair<Player, string> t in teamedPlayers)
+                foreach (KeyValuePair<Player, Teams> t in teamedPlayers)
                 {
-                    Log.Debug(t.Value + " : " + t.Key, this.plugin.Config.Debug);
+                    Log.Debug(t.Value.Name + " : " + t.Key, this.plugin.Config.Debug);
                 }
             }
 
-            ev.IsAllowed = AllowNormalRoundEnd;
-            ev.IsRoundEnded = AllowNormalRoundEnd;
-            ev.LeadingTeam = leadingTeam;
+            if (ev.IsAllowed == false)
+            {
+                return;
+            }
+
+            // This prevents to finish the round if any team has an active requeriment
+            foreach (Teams tm in teamedPlayers.Values)
+            {
+                foreach (Teams team in teamedPlayers.Values)
+                {
+                    if (tm.Requirements.Contains(team.Name))
+                    {
+                        ev.IsAllowed = false;
+                        return;
+                    }
+                }
+            }
         }
 
         public void OnEscaping(EscapingEventArgs ev)
         {
-            teamedPlayers[ev.Player] = MainPlugin.Singleton.Classes.ConvertToNormalTeamName(ev.NewRole).ToString().ToLower();
+            if (ev.IsAllowed == false)
+            {
+                return;
+            }
+
+            if (MainPlugin.assemblyAdvancedSubclass)
+            {
+                if (Methods.HasAdvancedSubclass(ev.Player))
+                {
+                    return;
+                }
+            }
+
+            // Setting team due to RoleChangeEventArgs not changing the team
+            ev.Player.SetAdvancedTeam(Extensions.GetNormalTeam(ev.NewRole.GetTeam()));
+
+            if (latestSpawn != null)
+            {
+                if (latestSpawn.escapeChange.ToList().Contains(ev.Player.Role))
+                {
+                    ev.IsAllowed = false;
+                    ev.Player.SetAdvancedTeamSubclass(latestSpawn, latestSpawn.Subclasses[random.Next(0, latestSpawn.Subclasses.Count())], true);
+                }
+            }
         }
 
         public void OnRestartRound()
         {
             if (MainPlugin.assemblyTimer)
             {
-                MainPlugin.Singleton.TmMethods.DefaultTimerConfig();
+                Methods.DefaultTimerConfig();
             }
 
             foreach (var coroutine in coroutineHandle)
@@ -306,7 +390,6 @@ namespace TeamsEXILED
                 Timing.KillCoroutines(coroutine);
             }
 
-            AllowNormalRoundEnd = false;
             HasReference = false;
             respawns = 0;
             latestSpawn = null;

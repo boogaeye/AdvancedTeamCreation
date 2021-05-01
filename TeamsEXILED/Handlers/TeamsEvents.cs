@@ -4,6 +4,7 @@ using Exiled.API.Enums;
 using Exiled.CustomItems.API.Features;
 using System.Linq;
 using MEC;
+using TeamsEXILED.API;
 
 namespace TeamsEXILED.Handlers
 {
@@ -16,11 +17,16 @@ namespace TeamsEXILED.Handlers
             this.plugin = plugin;
         }
 
-        public void OnReferencingTeam(Events.General.ReferencingTeamEventArgs ev)
+        public void OnReferencingTeam(TeamEvents.ReferencingTeamEventArgs ev)
         {
             Log.Debug($"Forceteam: {ev.ForceTeam}\nIsAllowed: {ev.IsAllowed}\nTeamName: {ev.Team.Name}", this.plugin.Config.Debug);
 
             if (ev.IsAllowed == false)
+            {
+                return;
+            }
+
+            if (ev.Team == null)
             {
                 return;
             }
@@ -33,13 +39,13 @@ namespace TeamsEXILED.Handlers
             }
             else
             {
-                Log.Debug("Next Known Spawn is " + Respawn.NextKnownTeam, MainPlugin.Singleton.Config.Debug);
+                Log.Debug("Next Known Spawn is " + ev.Spawning, MainPlugin.Singleton.Config.Debug);
 
                 if (MainPlugin.Singleton.EventHandlers.random.Next(0, 100) <= ev.Team.Chance)
                 {
-                    Log.Debug("Next Known Chosen Team is " + MainPlugin.Singleton.EventHandlers.chosenTeam.Name, MainPlugin.Singleton.Config.Debug);
                     MainPlugin.Singleton.EventHandlers.chosenTeam = ev.Team;
                     MainPlugin.Singleton.EventHandlers.HasReference = true;
+                    Log.Debug("Next Known Chosen Team is " + MainPlugin.Singleton.EventHandlers.chosenTeam.Name, MainPlugin.Singleton.Config.Debug);
                 }
                 else
                 {
@@ -48,130 +54,151 @@ namespace TeamsEXILED.Handlers
             }
         }
 
-        public void OnSettingPlayerTeam(Events.General.SettingPlayerTeamEventArgs ev)
+        public void OnSettingPlayerTeam(TeamEvents.SettingPlayerTeamEventArgs ev)
         {
             if (!Round.IsStarted)
             {
                 ev.IsAllowed = false;
-                ev.Player.ShowHint("Couldnt spawn you in before the round started");
             }
 
-            var p = ev.Player;
-            var team = ev.Team;
-            var subteams = ev.Subclass;
-
-            p.SetRole(subteams.ModelRole, true);
-            p.Health = subteams.HP;
-            p.MaxHealth = subteams.HP;
-
-            if (team.spawnLocation != Enums.SpawnLocation.Normal)
+            if (ev.IsAllowed == false)
             {
-                var point = MainPlugin.Singleton.EventHandlers.fixedpoints.First(x => x.Type == team.spawnLocation);
-                switch (team.spawnLocation)
+                return;
+            }
+
+            if (MainPlugin.assemblyAdvancedSubclass)
+            {
+                if (Methods.HasAdvancedSubclass(ev.Player))
                 {
-                    case Enums.SpawnLocation.Escape:
+                    Methods.RemoveAdvancedSubclass(ev.Player);
+                }
+
+                if (ev.Subclass.AdvancedSubclass != string.Empty)
+                {
+                    Methods.GiveAdvancedSubclass(ev.Player, ev.Subclass.AdvancedSubclass);
+                    return;
+                }
+            }
+
+            ev.Player.SetRole(ev.Subclass.ModelRole, true);
+            ev.Player.Health = ev.Subclass.HP;
+            ev.Player.MaxHealth = ev.Subclass.HP;
+
+            if (ev.Team.spawnLocation != SpawnLocation.Normal)
+            {
+                var point = MainPlugin.Singleton.EventHandlers.fixedpoints.First(x => x.Type == ev.Team.spawnLocation);
+                switch (ev.Team.spawnLocation)
+                {
+                    case SpawnLocation.Escape:
                         {
-                            p.Position = point.Position;
-                            p.Rotations = point.Direction;
+                            ev.Player.Position = point.Position;
+                            ev.Player.Rotations = point.Direction;
                             break;
                         }
-                    case Enums.SpawnLocation.SCP106:
+                    case SpawnLocation.SCP106:
                         {
                             if (!Warhead.IsDetonated)
                             {
-                                p.Position = point.Position;
-                                p.Rotations = point.Direction;
+                                ev.Player.Position = point.Position;
+                                ev.Player.Rotations = point.Direction;
                             }
                             break;
                         }
-                    case Enums.SpawnLocation.SurfaceNuke:
+                    case SpawnLocation.SurfaceNuke:
                         {
-                            p.Position = point.Position;
-                            p.Rotations = point.Direction;
+                            ev.Player.Position = point.Position;
+                            ev.Player.Rotations = point.Direction;
                             break;
                         }
-                    case Enums.SpawnLocation.SCP012:
+                    case SpawnLocation.SCP012:
                         {
                             if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
                             {
-                                p.Position = point.Position;
-                                p.Rotations = point.Direction;
+                                ev.Player.Position = point.Position;
+                                ev.Player.Rotations = point.Direction;
                             }
                             break;
                         }
-                    case Enums.SpawnLocation.SCP079:
+                    case SpawnLocation.SCP079:
                         {
                             if (!Warhead.IsDetonated)
                             {
-                                p.Position = point.Position;
-                                p.Rotations = point.Direction;
+                                ev.Player.Position = point.Position;
+                                ev.Player.Rotations = point.Direction;
                             }
                             break;
                         }
-                    case Enums.SpawnLocation.SCP096:
+                    case SpawnLocation.SCP096:
                         {
                             if (!Warhead.IsDetonated)
                             {
-                                p.Position = point.Position;
-                                p.Rotations = point.Direction;
+                                ev.Player.Position = point.Position;
+                                ev.Player.Rotations = point.Direction;
                             }
                             break;
                         }
-                    case Enums.SpawnLocation.SCP173:
+                    case SpawnLocation.SCP173:
                         {
                             if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
                             {
-                                p.Position = point.Position;
-                                p.Rotations = point.Direction;
+                                ev.Player.Position = point.Position;
+                                ev.Player.Rotations = point.Direction;
                             }
                             break;
                         }
-                    case Enums.SpawnLocation.Shelter:
+                    case SpawnLocation.Shelter:
                         {
                             if (!Warhead.IsDetonated)
                             {
-                                p.Position = point.Position;
-                                p.Rotations = point.Direction;
+                                ev.Player.Position = point.Position;
+                                ev.Player.Rotations = point.Direction;
                             }
                             break;
                         }
                 }
             }
 
-            var ihandler = new Events.General.AddingInventoryItemsEventArgs(p, subteams);
+            var ihandler = new TeamEvents.AddingInventoryItemsEventArgs(ev.Player, ev.Subclass, keepInv:ev.KeepItems);
+
             ihandler.StartInvoke();
 
             if (MainPlugin.Singleton.Config.UseHints)
             {
-                p.ShowHint(subteams.RoleMessage, 10);
+                ev.Player.ShowHint(ev.Subclass.RoleMessage, 10);
             }
             else
             {
-                p.Broadcast(10, subteams.RoleMessage);
+                ev.Player.Broadcast(10, ev.Subclass.RoleMessage);
             }
 
-            Timing.CallDelayed(0.2f, () =>
+            MainPlugin.Singleton.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(0.2f, () => 
             {
-                if (MainPlugin.Singleton.EventHandlers.spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
+                /*if (MainPlugin.Singleton.EventHandlers.spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
                 {
-                    p.ReferenceHub.characterClassManager.NetworkCurUnitName = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[MainPlugin.Singleton.EventHandlers.respawns].UnitName;
-                }
+                    p.UnitName = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[MainPlugin.Singleton.EventHandlers.respawns].UnitName;
+                }*/
 
-                p.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
-                p.CustomInfo = subteams.RoleName;
-                MainPlugin.Singleton.EventHandlers.teamedPlayers[p] = ev.Team.Name;
+                ev.Player.InfoArea &= ~PlayerInfoArea.Role;
+                ev.Player.CustomInfo = ev.Subclass.RoleName;
+                ev.Player.SetAdvancedTeam(ev.Team);
             }
-            );
+            ));
 
-            Log.Debug("Changing player " + p.Nickname + " to " + ev.Team.Name, MainPlugin.Singleton.Config.Debug);
+            Log.Debug("Changing player " + ev.Player.Nickname + " to " + ev.Team.Name, MainPlugin.Singleton.Config.Debug);
         }
 
-        public void OnAddingInventoryItems(Events.General.AddingInventoryItemsEventArgs ev)
+        public void OnAddingInventoryItems(TeamEvents.AddingInventoryItemsEventArgs ev)
         {
             Log.Debug($"Giving Inventory Items of the subclass {ev.Subteam.Name}, to {ev.Player.Nickname}", this.plugin.Config.Debug);
             if (ev.IsAllowed == false)
             {
                 return;
+            }
+
+            if (ev.KeepInv)
+            {
+                // This leaves the items in the escape area
+                ev.Player.DropItems();
             }
 
             ev.Player.ClearInventory();

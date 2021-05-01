@@ -5,10 +5,13 @@ using Exiled.API.Enums;
 using HarmonyLib;
 using Exiled.API.Interfaces;
 using TeamsEXILED.Handlers;
+using TeamsEXILED.API;
+using TeamsEXILED.Configs;
+using MEC;
 
 namespace TeamsEXILED
 {
-    public class MainPlugin : Plugin<Config>
+    public class MainPlugin : Plugin<Config, Translation>
     {
         public EventHandlers EventHandlers;
 
@@ -18,18 +21,15 @@ namespace TeamsEXILED
 
         public static MainPlugin Singleton;
 
-        public Classes.Classes Classes = new Classes.Classes();
-        public TeamMethods TmMethods = new TeamMethods();
-
         public override Version RequiredExiledVersion { get; } = new Version("2.10.0");
 
-        public override PluginPriority Priority { get; } = PluginPriority.High;
+        public override PluginPriority Priority { get; } = PluginPriority.Lowest;
 
-        public override string Author { get; } = "BoogaEye";
+        public override string Author { get; } = "BoogaEye && Raul125";
 
         public override string Name { get; } = "Advanced Team Creation";
 
-        public override Version Version { get; } = new Version("1.0.4.1");
+        public override Version Version { get; } = new Version("1.0.4.2");
 
         public static bool assemblyTimer = false;
 
@@ -37,12 +37,15 @@ namespace TeamsEXILED
 
         public static bool assemblySerpentHands = false;
 
+        public static bool assemblyAdvancedSubclass = false;
+
         public override void OnEnabled()
         {
             Singleton = this;
             TeamsHandlers = new TeamsEvents(this);
             EventHandlers = new EventHandlers(this);
 
+            Config.LoadConfigs();
             CheckPlugins();
 
             Harmony = new Harmony($"teamsexiled.{DateTime.Now.Ticks}");
@@ -58,11 +61,11 @@ namespace TeamsEXILED
             Exiled.Events.Handlers.Player.Left += EventHandlers.OnLeave;
             Exiled.Events.Handlers.Map.AnnouncingNtfEntrance += EventHandlers.MTFSpawnAnnounce;
             Exiled.Events.Handlers.Server.RoundStarted += EventHandlers.OnRoundStart;
+            Exiled.Events.Handlers.Player.Escaping += EventHandlers.OnEscaping;
 
-            Events.General.SettingPlayerTeam += TeamsHandlers.OnSettingPlayerTeam;
-            Events.General.AddingInventoryItems += TeamsHandlers.OnAddingInventoryItems;
-            Events.General.ReferencingTeam += TeamsHandlers.OnReferencingTeam;
-            
+            TeamEvents.SettingPlayerTeam += TeamsHandlers.OnSettingPlayerTeam;
+            TeamEvents.AddingInventoryItems += TeamsHandlers.OnAddingInventoryItems;
+            TeamEvents.ReferencingTeam += TeamsHandlers.OnReferencingTeam;
 
             if (!Server.FriendlyFire)
             {
@@ -84,10 +87,11 @@ namespace TeamsEXILED
             Exiled.Events.Handlers.Map.AnnouncingNtfEntrance -= EventHandlers.MTFSpawnAnnounce;
             Exiled.Events.Handlers.Server.RestartingRound -= EventHandlers.OnRestartRound;
             Exiled.Events.Handlers.Server.RoundStarted -= EventHandlers.OnRoundStart;
+            Exiled.Events.Handlers.Player.Escaping -= EventHandlers.OnEscaping;
 
-            Events.General.SettingPlayerTeam -= TeamsHandlers.OnSettingPlayerTeam;
-            Events.General.AddingInventoryItems -= TeamsHandlers.OnAddingInventoryItems;
-            Events.General.ReferencingTeam -= TeamsHandlers.OnReferencingTeam;
+            TeamEvents.SettingPlayerTeam -= TeamsHandlers.OnSettingPlayerTeam;
+            TeamEvents.AddingInventoryItems -= TeamsHandlers.OnAddingInventoryItems;
+            TeamEvents.ReferencingTeam -= TeamsHandlers.OnReferencingTeam;
 
             Harmony.UnpatchAll();
 
@@ -97,6 +101,12 @@ namespace TeamsEXILED
             Harmony = null;
 
             base.OnDisabled();
+        }
+
+        public override void OnReloaded()
+        {
+            Config.LoadConfigs();
+            CheckPlugins();
         }
 
         public void CheckPlugins()
@@ -120,6 +130,12 @@ namespace TeamsEXILED
                 {
                     assemblySerpentHands = true;
                     Log.Debug("SerpentHands assembly found", this.Config.Debug);
+                }
+
+                if (plugin.Name == "Subclass" && plugin.Config.IsEnabled)
+                {
+                    assemblyAdvancedSubclass = true;
+                    Log.Debug("AdvancedSubclassing assembly found", this.Config.Debug);
                 }
             }
         }

@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using Exiled.API.Features;
-using TeamsEXILED.Enums;
 using Exiled.API.Interfaces;
 using MEC;
-using UnityEngine;
+using TeamsEXILED.API;
+using System.Collections.Generic;
 
 namespace TeamsEXILED
 {
@@ -59,24 +59,42 @@ namespace TeamsEXILED
             return name;
         }
 
-        public static IConfig GetRespawnTimerCfg()
+        public static IEnumerator<float> RespawnTimerPatch()
         {
-            return Exiled.Loader.Loader.Plugins.First(x => x.Name == "RespawnTimer").Config;
-        }
+            var cfg = RespawnTimer.RespawnTimer.Singleton.Config;
+            while (Round.IsStarted)
+            {
+                yield return Timing.WaitForSeconds(cfg.Interval - 0.01f);
 
-        public static IConfig GetUIUCfg()
-        {
-            return Exiled.Loader.Loader.Plugins.First(x => x.Name == "UIU Rescue Squad").Config;
-        }
+                var rteam = Respawn.NextKnownTeam;
 
-        public static IConfig GetSerpentCfg()
-        {
-            return Exiled.Loader.Loader.Plugins.First(x => x.Name == "SerpentsHand").Config;
+                if (MainPlugin.Singleton.EventHandlers.ForcedTeam)
+                {
+                    rteam = MainPlugin.Singleton.EventHandlers.chosenTeam.SpawnTypes.FirstOrDefault();
+                }
+
+                if (MainPlugin.Singleton.EventHandlers.HasReference && MainPlugin.Singleton.EventHandlers.chosenTeam != null)
+                {
+                    switch (rteam)
+                    {
+                        case Respawning.SpawnableTeamType.NineTailedFox:
+                            {
+                                cfg.translations.Ntf = $"<color={MainPlugin.Singleton.EventHandlers.chosenTeam.Color}>{MainPlugin.Singleton.EventHandlers.chosenTeam.Name}</color>";
+                                break;
+                            }
+                        case Respawning.SpawnableTeamType.ChaosInsurgency:
+                            {
+                                cfg.translations.Ci = $"<color={MainPlugin.Singleton.EventHandlers.chosenTeam.Color}>{MainPlugin.Singleton.EventHandlers.chosenTeam.Name}</color>";
+                                break;
+                            }
+                    }
+                }
+            }
         }
 
         public static void StartRT()
         {
-            var cfg = (RespawnTimer.Config)GetRespawnTimerCfg();
+            var cfg = RespawnTimer.RespawnTimer.Singleton.Config;
             Log.Debug("Got respawn timer configs", MainPlugin.Singleton.Config.Debug);
             MainPlugin.Singleton.EventHandlers.mtfTrans = cfg.translations.Ntf;
             MainPlugin.Singleton.EventHandlers.chaosTrans = cfg.translations.Ci;
@@ -90,6 +108,21 @@ namespace TeamsEXILED
         public static bool IsSerpentHand()
         {
             return SerpentsHand.EventHandlers.IsSpawnable;
+        }
+
+        public static bool HasAdvancedSubclass(Player ply)
+        {
+            return Subclass.API.PlayerHasSubclass(ply);
+        }
+
+        public static bool RemoveAdvancedSubclass(Player ply)
+        {
+            return Subclass.API.RemoveClass(ply);
+        }
+
+        public static bool GiveAdvancedSubclass(Player ply, string name)
+        {
+            return Subclass.API.GiveClass(ply, subClass: Subclass.Subclass.Instance.Classes.First(x => x.Value.Name == name).Value);
         }
 
         public static void SpawneableUIUToFalse()
@@ -111,32 +144,38 @@ namespace TeamsEXILED
 
             var teamedPlayers = MainPlugin.Singleton.EventHandlers.teamedPlayers;
 
-            // Checking round for end
-            foreach (string t in teamedPlayers.Values)
+            // This checks base game teams (defined in the config) and advanced teams
+            foreach (Teams tm in teamedPlayers.Values)
             {
-                var team = MainPlugin.Singleton.Classes.GetTeamFromString(t);
-                foreach (var te in teamedPlayers.Values)
+                foreach (Teams team in teamedPlayers.Values)
                 {
-                    if (team.Requirements.Contains(te))
+                    if (tm.Requirements.Contains(team.Name))
                     {
-                        Log.Debug($"Stopped Round from ending heres some information\n Triggered Team: {t}\n Stopping Team: {t}\n Hope this works", MainPlugin.Singleton.Config.Debug);
                         return;
                     }
                 }
             }
 
-            if (!MainPlugin.Singleton.EventHandlers.AllowNormalRoundEnd)
-            {
-                MainPlugin.Singleton.EventHandlers.AllowNormalRoundEnd = true;
-            }
-
-            MainPlugin.Singleton.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
-            {
-                if (!RoundSummary.singleton._roundEnded)
-                {
-                    Round.ForceEnd();
-                }
-            }));
+            Round.ForceEnd();
         }
+
+        public static void DefaultTimerConfig()
+        {
+            var cfg = RespawnTimer.RespawnTimer.Singleton.Config;
+            cfg.translations.Ci = MainPlugin.Singleton.EventHandlers.chaosTrans;
+            cfg.translations.Ntf = MainPlugin.Singleton.EventHandlers.mtfTrans;
+        }
+
+        public static Teams UiUTeam = new Teams()
+        {
+            Active = true,
+            Name = "uiu"
+        };
+
+        public static Teams SerpentHandsTeam = new Teams()
+        {
+            Active = true,
+            Name = "serpenthands"
+        };
     }
 }

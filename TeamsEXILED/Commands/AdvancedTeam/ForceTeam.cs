@@ -8,7 +8,7 @@ using Exiled.Permissions.Extensions;
 namespace TeamsEXILED.Commands
 {
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    class ForceTeam : ICommand
+    public class ForceTeam : ICommand
     {
         public string Command { get; } = "forceteam";
 
@@ -22,7 +22,7 @@ namespace TeamsEXILED.Commands
 
             if (ply.CheckPermission("ATC.forceteam"))
             {
-                if (arguments.ToList().Count == 0)
+                if (arguments.Count == 0)
                 {
                     response = "<color=blue>forceteam <teamName> <subteamName> <playerId></color>";
                     return false;
@@ -69,29 +69,18 @@ namespace TeamsEXILED.Commands
                             return false;
                         }
 
-                        response = "<color=red>Error Could not find subclass</color>";
+                        var player = Player.Get(arguments.ToList()[2].ToLower());
 
-                        foreach (Subteams st in t.Subclasses)
-                        {
-                            if (arguments.ToList()[1].ToLower() == st.Name)
-                            {
-                                response = "<color=red>Error Player Not Found</color>";
-                                if (Player.Get(arguments.ToList()[2].ToLower()).IsVerified)
-                                {
-                                    response = "<color=green>Changed players Team!!!</color>";
-                                    MainPlugin.Singleton.TmMethods.ChangeTeam(Player.Get(arguments.ToList()[2].ToLower()), team, st);
-                                    return true;
-                                }
-                                return false;
-                            }
-                        }
-                        return false;
+                        player.SetAdvancedTeamSubclass(team, steam);
+
+                        response = "<color=green>Changed player Team!!!</color>";
+                        return true;
                     }
                 }
             }
             else
             {
-                response = "<color=red>You do not have permission to use this command aka you dont have ATC.forceteam</color>";
+                response = MainPlugin.Singleton.Translation.NoPermissions;
             }
             return false;
         }

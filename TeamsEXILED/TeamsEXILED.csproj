@@ -16,7 +16,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -78,6 +78,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Users\jorge\Downloads\virus para pikatu\SerpentsHand.dll</HintPath>
     </Reference>
+    <Reference Include="Subclass">
+      <HintPath>C:\Users\jorge\Downloads\Subclass.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -100,24 +103,28 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\ForceNextTeam.cs" />
-    <Compile Include="Commands\TeamsAlive.cs" />
+    <Compile Include="API\Extensions.cs" />
+    <Compile Include="API\Features\Teams.cs" />
+    <Compile Include="API\Features\Subteams.cs" />
+    <Compile Include="Commands\AdvancedTeam\ForceNextTeam.cs" />
+    <Compile Include="Commands\AdvancedTeam\AdvancedTeam.cs" />
+    <Compile Include="Commands\AdvancedTeam\TeamsAlive.cs" />
     <Compile Include="Commands\Team.cs" />
-    <Compile Include="Commands\ForceTeam.cs" />
+    <Compile Include="Commands\AdvancedTeam\ForceTeam.cs" />
+    <Compile Include="Configs\NormalTeams.cs" />
+    <Compile Include="Configs\Translation.cs" />
+    <Compile Include="Configs\Teams.cs" />
     <Compile Include="Patches\RefNextTeam.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Handlers\TeamsEvents.cs" />
     <Compile Include="Handlers\EventHandlers.cs" />
     <Compile Include="MainPlugin.cs" />
-    <Compile Include="Methods\RTimerMethods.cs" />
     <Compile Include="Methods\TeamMethods.cs" />
-    <Compile Include="Others\Classes.cs" />
-    <Compile Include="Others\Enums.cs" />
-    <Compile Include="Others\Events.cs" />
+    <Compile Include="API\Enums\Enums.cs" />
+    <Compile Include="API\Events\Events.cs" />
     <Compile Include="Methods\Methods.cs" />
-    <Compile Include="Others\Points.cs" />
+    <Compile Include="API\Features\Points.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Others\API.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

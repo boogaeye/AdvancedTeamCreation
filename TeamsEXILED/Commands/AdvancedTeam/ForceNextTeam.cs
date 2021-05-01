@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using CommandSystem;
 using Exiled.API.Features;
@@ -9,7 +8,7 @@ using TeamsEXILED.API;
 namespace TeamsEXILED.Commands
 {
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    class ForceNextTeam : ICommand
+    public class ForceNextTeam : ICommand
     {
         public string Command { get; } = "forcenextteam";
 
@@ -49,20 +48,18 @@ namespace TeamsEXILED.Commands
                 }
 
 
-                var handler = new Events.General.ReferencingTeamEventArgs(MainPlugin.Singleton.EventHandlers.chosenTeam)
+                var handler = new TeamEvents.ReferencingTeamEventArgs(team, team.SpawnTypes.FirstOrDefault())
                 {
-                    Team = team,
                     ForceTeam = true
                 };
 
                 handler.StartInvoke();
-
+				
                 response = $"<color=green> Done, {arguments.At(0)} team forced";
-
                 return true;
             }
 
-            response = "<color=red>You dont have permission for this command</color>";
+            response = MainPlugin.Singleton.Translation.NoPermissions;
             return false;
         }
     }

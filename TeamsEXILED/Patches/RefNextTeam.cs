@@ -13,7 +13,7 @@ namespace TeamsEXILED.Patches
             {
                 if (!MainPlugin.Singleton.EventHandlers.HasReference)
                 {
-                    MainPlugin.Singleton.TmMethods.RefNextTeamSpawn();
+                    TeamMethods.RefNextTeamSpawn(__result);
                 }
             }
             catch (Exception e)

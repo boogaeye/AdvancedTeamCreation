@@ -173,10 +173,10 @@ namespace TeamsEXILED.Handlers
 
             MainPlugin.Singleton.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(0.2f, () => 
             {
-                /*if (MainPlugin.Singleton.EventHandlers.spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
+                if (MainPlugin.Singleton.EventHandlers.spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
                 {
-                    p.UnitName = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[MainPlugin.Singleton.EventHandlers.respawns].UnitName;
-                }*/
+                    ev.Player.UnitName = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[MainPlugin.Singleton.EventHandlers.respawns].UnitName;
+                }
 
                 ev.Player.InfoArea &= ~PlayerInfoArea.Role;
                 ev.Player.CustomInfo = ev.Subclass.RoleName;

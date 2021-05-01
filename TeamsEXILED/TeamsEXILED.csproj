@@ -113,7 +113,6 @@
     <Compile Include="Commands\AdvancedTeam\ForceTeam.cs" />
     <Compile Include="Configs\NormalTeams.cs" />
     <Compile Include="Configs\Translation.cs" />
-    <Compile Include="Configs\Teams.cs" />
     <Compile Include="Patches\RefNextTeam.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Handlers\TeamsEvents.cs" />

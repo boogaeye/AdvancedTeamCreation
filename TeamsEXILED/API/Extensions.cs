@@ -21,7 +21,7 @@ namespace TeamsEXILED.API
             }
         }
 
-        public static void SetAdvancedTeamSubclass(this Player ply, Teams team, Subteams subclass, bool KeepInv = false)
+        public static void SetAdvancedTeamSubteam(this Player ply, Teams team, Subteams subclass, bool KeepInv = false)
         {
             TeamMethods.ChangeTeam(ply, team, subclass, KeepInv);
         }
@@ -65,20 +65,21 @@ namespace TeamsEXILED.API
             return team;
         }
 
+        // This can be added to Map of EXILED
         public static void RenameUnit(int index, string name)
         {
             var unit = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[index];
             unit.UnitName = name;
             Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames.Remove(Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[index]);
-            Respawning.NamingRules.UnitNamingRules.AllNamingRules[Respawning.SpawnableTeamType.NineTailedFox].AddCombination($"{unit.UnitName}", Respawning.SpawnableTeamType.NineTailedFox);
+            Respawning.NamingRules.UnitNamingRules.AllNamingRules[Respawning.SpawnableTeamType.NineTailedFox].AddCombination(unit.UnitName, Respawning.SpawnableTeamType.NineTailedFox);
 
-            foreach (var ply in Player.List.Where(x => x.ReferenceHub.characterClassManager.CurUnitName == unit.UnitName))
+            foreach (var ply in Player.List.Where(x => x.UnitName == unit.UnitName))
             {
                 ply.UnitName = unit.UnitName;
             }
         }
 
-        public static void AddUnit(string name, Player[] players)
+        public static void AddUnit(string name, List<Player> players)
         {
             Respawning.NamingRules.UnitNamingRules.AllNamingRules[Respawning.SpawnableTeamType.NineTailedFox].AddCombination(name, Respawning.SpawnableTeamType.NineTailedFox);
 
@@ -132,28 +133,6 @@ namespace TeamsEXILED.API
         public static Teams GetNormalTeam(Team team)
         {
             return MainPlugin.Singleton.Config.NormalConfigs.Teams.First(x => x.Name == team.ToString().ToLower());
-        }
-
-        public static Team ConvertToNormalTeamName(RoleType role)
-        {
-            RoleType[] mtf = { RoleType.NtfCadet, RoleType.NtfCommander, RoleType.NtfLieutenant, RoleType.NtfScientist, RoleType.FacilityGuard, RoleType.Scientist };
-            RoleType[] ci = { RoleType.ChaosInsurgency, RoleType.ClassD };
-            RoleType[] scp = { RoleType.Scp173, RoleType.Scp106, RoleType.Scp096, RoleType.Scp079, RoleType.Scp0492, RoleType.Scp049, RoleType.Scp93989, RoleType.Scp93953 };
-
-            if (mtf.Contains(role))
-            {
-                return Team.MTF;
-            }
-            else if (ci.Contains(role))
-            {
-                return Team.CHI;
-            }
-            else if (scp.Contains(role))
-            {
-                return Team.SCP;
-            }
-
-            return Team.TUT;
         }
     }
 }

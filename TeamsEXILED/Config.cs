@@ -7,7 +7,6 @@ using Exiled.Loader;
 using TeamsEXILED.API;
 using System.Collections.Generic;
 using System.Linq;
-using Exiled.API.Enums;
 using MEC;
 
 namespace TeamsEXILED
@@ -50,28 +49,14 @@ namespace TeamsEXILED
                 Directory.CreateDirectory(teamsdir);
                 foreach (Teams tm in TeamMethods.DefaultTeams)
                 {
-                    var des = Loader.Serializer.Serialize(tm);
-                    // Need this timing, because it needs a bit of time to Serialize
-                    Timing.CallDelayed(0.1f, () =>
-                    {
-                        File.WriteAllText(Path.Combine(teamsdir, $"{tm.Name}.yml"), des);
-                    });
-
-                    Teams.Add(tm);
+                    File.WriteAllText(Path.Combine(teamsdir, $"{tm.Name}.yml"), Loader.Serializer.Serialize(tm));
                 }
             }
-            else
+
+            var tfiles = Directory.GetFiles(teamsdir);
+            foreach (var file in tfiles.Where(x => x.EndsWith("yml")))
             {
-                var tfiles = Directory.GetFiles(teamsdir);
-                foreach (var file in tfiles.Where(x => x.EndsWith("yml")))
-                {
-                    var des = Loader.Deserializer.Deserialize<TeamsConfig>(File.ReadAllText(file));
-                    // Need this timing, because it needs a bit of time to Deserialize
-                    Timing.CallDelayed(0.1f, () =>
-                    {
-                        Teams.Add(des.Team);
-                    });
-                }
+                Teams.Add(Loader.Deserializer.Deserialize<Teams>(File.ReadAllText(file)));
             }
 
             string npath = Path.Combine(ConfigsFolder, "NormalTeams.yml");
@@ -83,7 +68,6 @@ namespace TeamsEXILED
             else
             {
                 NormalConfigs = Loader.Deserializer.Deserialize<NormalTeams>(File.ReadAllText(npath));
-                File.WriteAllText(npath, Loader.Serializer.Serialize(NormalConfigs));
             }
         }
     }

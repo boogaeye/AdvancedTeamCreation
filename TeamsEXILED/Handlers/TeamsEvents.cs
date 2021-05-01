@@ -61,6 +61,11 @@ namespace TeamsEXILED.Handlers
                 ev.IsAllowed = false;
             }
 
+            if (ev.IsAllowed == false)
+            {
+                return;
+            }
+
             var p = ev.Player;
             var team = ev.Team;
             var subteams = ev.Subclass;
@@ -158,12 +163,12 @@ namespace TeamsEXILED.Handlers
 
             MainPlugin.Singleton.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(0.2f, () => 
             {
-                if (MainPlugin.Singleton.EventHandlers.spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
+                /*if (MainPlugin.Singleton.EventHandlers.spawnableTeamType == Respawning.SpawnableTeamType.NineTailedFox)
                 {
                     p.UnitName = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[MainPlugin.Singleton.EventHandlers.respawns].UnitName;
-                }
+                }*/
 
-                p.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
+                p.InfoArea &= ~PlayerInfoArea.Role;
                 p.CustomInfo = subteams.RoleName;
                 p.SetAdvancedTeam(ev.Team);
             }
@@ -182,6 +187,7 @@ namespace TeamsEXILED.Handlers
 
             if (ev.KeepInv)
             {
+                // This leaves the items in the escape area
                 ev.Player.DropItems();
             }
 

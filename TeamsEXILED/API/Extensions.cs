@@ -49,7 +49,7 @@ namespace TeamsEXILED.API
         public static Teams GetTeamFromString(string s)
         {
             Teams team = null;
-            foreach (Teams t in MainPlugin.Singleton.Config.TeamsConfigs.Teams)
+            foreach (Teams t in MainPlugin.Singleton.Config.Teams)
             {
                 if (t.Name.ToLower() == s.ToLower())
                 {
@@ -69,7 +69,7 @@ namespace TeamsEXILED.API
 
             foreach (var ply in Player.List.Where(x => x.ReferenceHub.characterClassManager.CurUnitName == unit.UnitName))
             {
-                ply.ReferenceHub.characterClassManager.NetworkCurUnitName = unit.UnitName;
+                ply.UnitName = unit.UnitName;
             }
         }
 
@@ -79,7 +79,7 @@ namespace TeamsEXILED.API
 
             foreach (var ply in players)
             {
-                ply.ReferenceHub.characterClassManager.NetworkCurUnitName = name;
+                ply.UnitName = name;
             }
         }
 
@@ -92,7 +92,7 @@ namespace TeamsEXILED.API
         {
             List<string> team = new List<string>();
 
-            foreach (Teams t in MainPlugin.Singleton.Config.TeamsConfigs.Teams.Where(x => x.Requirements.Contains(Fteam.Name)))
+            foreach (Teams t in MainPlugin.Singleton.Config.Teams.Where(x => x.Requirements.Contains(Fteam.Name)))
             {
                 team.Add(t.Name);
             }
@@ -104,7 +104,7 @@ namespace TeamsEXILED.API
         {
             List<string> team = new List<string>();
 
-            foreach (Teams t in MainPlugin.Singleton.Config.TeamsConfigs.Teams.Where(x => x.Neutral.Contains(Fteam.Name)))
+            foreach (Teams t in MainPlugin.Singleton.Config.Teams.Where(x => x.Neutral.Contains(Fteam.Name)))
             {
                 team.Add(t.Name);
             }
@@ -116,7 +116,7 @@ namespace TeamsEXILED.API
         {
             List<string> team = new List<string>();
 
-            foreach (Teams t in MainPlugin.Singleton.Config.TeamsConfigs.Teams.Where(x => x.Friendlys.Contains(Fteam.Name)))
+            foreach (Teams t in MainPlugin.Singleton.Config.Teams.Where(x => x.Friendlys.Contains(Fteam.Name)))
             {
                 team.Add(t.Name);
             }

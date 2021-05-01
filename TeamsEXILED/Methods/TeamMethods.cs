@@ -12,15 +12,12 @@ namespace TeamsEXILED
         public static void RefNextTeamSpawn()
         {
             Log.Debug("Getting Team Referances", MainPlugin.Singleton.Config.Debug);
-            var list = MainPlugin.Singleton.Config.TeamsConfigs.Teams.Where(x => x.SpawnTypes.ToList().Contains(Respawn.NextKnownTeam) && x.Active == true).ToList();
+            var list = MainPlugin.Singleton.Config.Teams.Where(x => x.SpawnTypes.ToList().Contains(Respawn.NextKnownTeam) && x.Active == true).ToList();
             Log.Debug("Got list", MainPlugin.Singleton.Config.Debug);
             var team = list[MainPlugin.Singleton.EventHandlers.random.Next(0, list.Count)];
             Log.Debug("Got team", MainPlugin.Singleton.Config.Debug);
 
-            var handler = new TeamEvents.ReferencingTeamEventArgs(MainPlugin.Singleton.EventHandlers.chosenTeam, Respawning.SpawnableTeamType.None)
-            {
-                Team = team
-            };
+            var handler = new TeamEvents.ReferencingTeamEventArgs(team, Respawning.SpawnableTeamType.None);
             Log.Debug("Got Handler and invoking", MainPlugin.Singleton.Config.Debug);
 
             handler.StartInvoke();
@@ -30,7 +27,7 @@ namespace TeamsEXILED
         {
             Log.Debug("Getting Team Referances", MainPlugin.Singleton.Config.Debug);
             Log.Debug($"Spawning on side {spawnableTeamType}", MainPlugin.Singleton.Config.Debug);
-            var list = MainPlugin.Singleton.Config.TeamsConfigs.Teams.Where(x => x.SpawnTypes.Contains(spawnableTeamType) && x.Active == true).ToList();
+            var list = MainPlugin.Singleton.Config.Teams.Where(x => x.SpawnTypes.Contains(spawnableTeamType) && x.Active == true).ToList();
             if (list.Count == 0)
             {
                 MainPlugin.Singleton.EventHandlers.HasReference = true;

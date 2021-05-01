@@ -23,11 +23,11 @@ namespace TeamsEXILED
 
         public override PluginPriority Priority { get; } = PluginPriority.High;
 
-        public override string Author { get; } = "BoogaEye";
+        public override string Author { get; } = "BoogaEye && Raul125";
 
         public override string Name { get; } = "Advanced Team Creation";
 
-        public override Version Version { get; } = new Version("1.0.4.1");
+        public override Version Version { get; } = new Version("1.0.4.2");
 
         public static bool assemblyTimer = false;
 
@@ -41,7 +41,7 @@ namespace TeamsEXILED
             TeamsHandlers = new TeamsEvents(this);
             EventHandlers = new EventHandlers(this);
 
-            Config.LoadTeamsConfig();
+            Config.LoadConfigs();
             CheckPlugins();
 
             Harmony = new Harmony($"teamsexiled.{DateTime.Now.Ticks}");
@@ -101,7 +101,7 @@ namespace TeamsEXILED
 
         public override void OnReloaded()
         {
-            Config.LoadTeamsConfig();
+            Config.LoadConfigs();
             CheckPlugins();
         }
 

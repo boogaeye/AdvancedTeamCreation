@@ -1,10 +1,7 @@
 ﻿using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
-using MEC;
 using System;
-using System.Linq;
-using TeamsEXILED.Commands;
 
 namespace TeamsEXILED.Commands
 {

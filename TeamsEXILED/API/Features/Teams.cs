@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq;
 using Respawning;
 using Exiled.API.Enums;
@@ -33,10 +32,10 @@ namespace TeamsEXILED.API
         public LeadingTeam teamLeaders { get; set; } = LeadingTeam.Anomalies;
 
         [Description("Makes MTF cassie messages when this team spawns set it to nothing if you dont want an MTF cassie message")]
-        public string CassieMessageMTFSpawn { get; set; }
+        public string CassieMessageMTFSpawn { get; set; } = "";
 
         [Description("Makes a Chaos cassie message when the team spawns")]
-        public string CassieMessageChaosMessage { get; set; }
+        public string CassieMessageChaosMessage { get; set; } = "";
 
         [Description("set this to 0 to prevent the cassie announcement for chaos")]
         public ushort CassieMessageChaosAnnounceChance { get; set; } = 100;

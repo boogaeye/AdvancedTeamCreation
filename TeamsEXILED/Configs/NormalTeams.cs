@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TeamsEXILED.API;
+﻿using TeamsEXILED.API;
 
 namespace TeamsEXILED.Configs
 {
@@ -16,7 +11,8 @@ namespace TeamsEXILED.Configs
                 Name = "mtf",
                 Friendlys = new string[] { "mtf", "rsc" },
                 Requirements = new string[] { "scp", "chi", "cdp"},
-                Neutral = new string[]{ }
+                Neutral = new string[]{ },
+                
             },
             new Teams()
             {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using CommandSystem;
 using Exiled.API.Features;
@@ -30,7 +29,7 @@ namespace TeamsEXILED.Commands
 
                 Teams team = null;
 
-                foreach (var tm in MainPlugin.Singleton.Config.TeamsConfigs.Teams)
+                foreach (var tm in MainPlugin.Singleton.Config.Teams)
                 {
                     if (tm.Name == arguments.At(0))
                     {
@@ -41,7 +40,7 @@ namespace TeamsEXILED.Commands
                 if (team == null)
                 {
                     response = "<color=red>The name of the team isn't valid.</color> Teams:";
-                    foreach (var tm in MainPlugin.Singleton.Config.TeamsConfigs.Teams)
+                    foreach (var tm in MainPlugin.Singleton.Config.Teams)
                     {
                         response += "\n" + tm.Name;
                     }

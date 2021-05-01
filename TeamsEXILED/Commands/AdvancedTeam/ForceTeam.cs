@@ -29,7 +29,7 @@ namespace TeamsEXILED.Commands
                 }
 
                 response = "<color=red>Error Team Does Not Exist</color>";
-                foreach (Teams t in MainPlugin.Singleton.Config.TeamsConfigs.Teams)
+                foreach (Teams t in MainPlugin.Singleton.Config.Teams)
                 {
                     if (t.Name == arguments.ToList()[0].ToLower())
                     {
@@ -40,7 +40,7 @@ namespace TeamsEXILED.Commands
                         }
 
                         Teams team = null;
-                        foreach (var tm in MainPlugin.Singleton.Config.TeamsConfigs.Teams)
+                        foreach (var tm in MainPlugin.Singleton.Config.Teams)
                         {
                             if (tm.Name.ToLower() == arguments.ToList()[0].ToLower())
                             {

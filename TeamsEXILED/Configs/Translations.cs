@@ -1,17 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Exiled.API.Features;
-using Exiled.Events.EventArgs;
-using TeamsEXILED.API;
-using TeamsEXILED.Handlers;
-using Exiled.API.Enums;
-using MEC;
-using System.Linq;
-using UnityEngine;
-using System.Globalization;
-using System.ComponentModel;
-
-namespace TeamsEXILED.Configs
+﻿namespace TeamsEXILED.Configs
 {
     public class Translations
     {

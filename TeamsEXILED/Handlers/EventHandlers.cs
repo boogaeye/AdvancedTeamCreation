@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs;
 using TeamsEXILED.API;
-using TeamsEXILED.Handlers;
 using Exiled.API.Extensions;
 using Exiled.API.Enums;
 using MEC;
@@ -115,7 +114,7 @@ namespace TeamsEXILED
         public void OnRoleChange(ChangedRoleEventArgs ev)
         {
             ev.Player.CustomInfo = string.Empty;
-            ev.Player.ReferenceHub.nicknameSync.ShownPlayerInfo |= PlayerInfoArea.Role;
+            ev.Player.InfoArea |= PlayerInfoArea.Role;
             ev.Player.SetAdvancedTeam(Extensions.GetNormalTeam(ev.Player.Team));
         }
 

@@ -48,7 +48,7 @@ namespace TeamsEXILED
                 Directory.CreateDirectory(teamsdir);
                 foreach (var tm in DefaultTeams)
                 {
-                    File.WriteAllText(Path.Combine(teamsdir, $"{tm.Name}"), Loader.Serializer.Serialize(tm));
+                    File.WriteAllText(Path.Combine(teamsdir, $"{tm.Name}.yml"), Loader.Serializer.Serialize(tm));
                 }
             }
 

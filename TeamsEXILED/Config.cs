@@ -24,6 +24,9 @@ namespace TeamsEXILED
         [Description("Should display the description of the customitem when given?")]
         public bool DisplayDescription { get; set; } = false;
 
+        [Description("This plugin takes priority over UIU and SerpentHands?")]
+        public bool DominantPlugin { get; set; } = false;
+
         public bool Debug { get; set; } = false;
 
         public string ConfigsFolder { get; set; } = Path.Combine(Paths.Configs, "AdvancedTeamCreation");
@@ -93,7 +96,6 @@ namespace TeamsEXILED
             } },
             Friendlys = new string[] { "goc" },
             Requirements = new string[] { "scp", "cdp", "tta", "rsc", "opcf", "aes" },
-            teamLeaders = LeadingTeam.FacilityForces,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.ChaosInsurgency },
             CassieMessageChaosMessage = "pitch_0.6 .g5 .g5 .g5 pitch_1 the g o c has entered the facility bell_end",
             CassieMessageChaosAnnounceChance = 100,
@@ -108,7 +110,6 @@ namespace TeamsEXILED
             } },
             Friendlys = new string[] { "gru" },
             Requirements = new string[] { "scp", "tta", "cdp", "rsc", "aes" },
-            teamLeaders = LeadingTeam.FacilityForces,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.NineTailedFox },
             CassieMessageMTFSpawn = ".g5 .g5 the g r u has entered the facility. there are {SCP} scpsubjects",
             Chance = 65,
@@ -122,7 +123,6 @@ namespace TeamsEXILED
             } },
             Friendlys = new string[] { "tta" },
             Requirements = new string[] { "chi", "scp", "goc", "gru", "mtf", "cdp", "rsc", "opcf", "aes" },
-            teamLeaders = LeadingTeam.Anomalies,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.NineTailedFox, Respawning.SpawnableTeamType.ChaosInsurgency },
             CassieMessageMTFSpawn = "pitch_0.1 .g3 .g3 .g3 pitch_1 The Tactical Target Agent C has entered the facility bell_end",
             CassieMessageChaosAnnounceChance = 75,
@@ -167,7 +167,6 @@ namespace TeamsEXILED
             },
             Friendlys = new string[] { "opcf", "mtf" },
             Requirements = new string[] { "chi", "scp", "goc", "gru", "cdp", "tta", "aes" },
-            teamLeaders = LeadingTeam.FacilityForces,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.ChaosInsurgency },
             CassieMessageChaosAnnounceChance = 100,
             CassieMessageChaosMessage = "pitch_0.1 .g5 .g5 .g5 pitch_1 operation chaos force has entered the facility bell_end",
@@ -222,7 +221,6 @@ namespace TeamsEXILED
             },
             Friendlys = new string[] { "aes" },
             Requirements = new string[] { "scp", "tta" },
-            teamLeaders = LeadingTeam.FacilityForces,
             SpawnTypes = new Respawning.SpawnableTeamType[] { Respawning.SpawnableTeamType.NineTailedFox },
             CassieMessageChaosAnnounceChance = 0,
             CassieMessageChaosMessage = "",

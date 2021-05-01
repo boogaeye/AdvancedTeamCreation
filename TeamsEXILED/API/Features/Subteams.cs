@@ -15,6 +15,9 @@ namespace TeamsEXILED.API
         [Description("sets what this class has")]
         public string[] Inventory { get; set; } = new string[] { };
 
+        [Description("If you have advancedsubclassing and you want to give a specific subclass to this team, put here the name of the advancedsubclass")]
+        public string AdvancedSubclass { get; set; } = "";
+
         [Description("Define ammo so that this class has this ammo")]
         public Dictionary<AmmoType, uint> Ammo { get; set; } = new Dictionary<AmmoType, uint>() { { AmmoType.Nato556, 100 }, { AmmoType.Nato762, 100 }, { AmmoType.Nato9, 100 } };
 

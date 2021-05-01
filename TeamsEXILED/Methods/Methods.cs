@@ -61,7 +61,7 @@ namespace TeamsEXILED
 
         public static IEnumerator<float> RespawnTimerPatch()
         {
-            var cfg = (RespawnTimer.Config)GetRespawnTimerCfg();
+            var cfg = RespawnTimer.RespawnTimer.Singleton.Config;
             while (Round.IsStarted)
             {
                 yield return Timing.WaitForSeconds(cfg.Interval - 0.01f);
@@ -92,24 +92,9 @@ namespace TeamsEXILED
             }
         }
 
-        public static IConfig GetRespawnTimerCfg()
-        {
-            return Exiled.Loader.Loader.Plugins.First(x => x.Name == "RespawnTimer").Config;
-        }
-
-        public static IConfig GetUIUCfg()
-        {
-            return Exiled.Loader.Loader.Plugins.First(x => x.Name == "UIU Rescue Squad").Config;
-        }
-
-        public static IConfig GetSerpentCfg()
-        {
-            return Exiled.Loader.Loader.Plugins.First(x => x.Name == "SerpentsHand").Config;
-        }
-
         public static void StartRT()
         {
-            var cfg = (RespawnTimer.Config)GetRespawnTimerCfg();
+            var cfg = RespawnTimer.RespawnTimer.Singleton.Config;
             Log.Debug("Got respawn timer configs", MainPlugin.Singleton.Config.Debug);
             MainPlugin.Singleton.EventHandlers.mtfTrans = cfg.translations.Ntf;
             MainPlugin.Singleton.EventHandlers.chaosTrans = cfg.translations.Ci;
@@ -123,6 +108,21 @@ namespace TeamsEXILED
         public static bool IsSerpentHand()
         {
             return SerpentsHand.EventHandlers.IsSpawnable;
+        }
+
+        public static bool HasAdvancedSubclass(Player ply)
+        {
+            return Subclass.API.PlayerHasSubclass(ply);
+        }
+
+        public static bool RemoveAdvancedSubclass(Player ply)
+        {
+            return Subclass.API.RemoveClass(ply);
+        }
+
+        public static bool GiveAdvancedSubclass(Player ply, string name)
+        {
+            return Subclass.API.GiveClass(ply, subClass: Subclass.Subclass.Instance.Classes.First(x => x.Value.Name == name).Value);
         }
 
         public static void SpawneableUIUToFalse()
@@ -161,7 +161,7 @@ namespace TeamsEXILED
 
         public static void DefaultTimerConfig()
         {
-            var cfg = (RespawnTimer.Config)GetRespawnTimerCfg();
+            var cfg = RespawnTimer.RespawnTimer.Singleton.Config;
             cfg.translations.Ci = MainPlugin.Singleton.EventHandlers.chaosTrans;
             cfg.translations.Ntf = MainPlugin.Singleton.EventHandlers.mtfTrans;
         }

@@ -66,6 +66,18 @@ namespace TeamsEXILED.Handlers
                 return;
             }
 
+            if (MainPlugin.assemblyAdvancedSubclass && ev.Subclass.AdvancedSubclass != string.Empty)
+            {
+                if (Methods.HasAdvancedSubclass(ev.Player))
+                {
+                    Methods.RemoveAdvancedSubclass(ev.Player);
+                }
+
+                Methods.GiveAdvancedSubclass(ev.Player, ev.Subclass.AdvancedSubclass);
+
+                return;
+            }
+
             ev.Player.SetRole(ev.Subclass.ModelRole, true);
             ev.Player.Health = ev.Subclass.HP;
             ev.Player.MaxHealth = ev.Subclass.HP;

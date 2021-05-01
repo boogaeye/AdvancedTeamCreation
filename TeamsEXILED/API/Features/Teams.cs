@@ -28,9 +28,6 @@ namespace TeamsEXILED.API
         [Description("Defines where this team can spawn by default it can spawn as both Chaos and NineTailedFox spawn locations")]
         public SpawnableTeamType[] SpawnTypes { get; set; } = { SpawnableTeamType.ChaosInsurgency, SpawnableTeamType.NineTailedFox };
 
-        [Description("defines who wins at the end of the round if the Requirements perameter is accepted")]
-        public LeadingTeam teamLeaders { get; set; } = LeadingTeam.Anomalies;
-
         [Description("Makes MTF cassie messages when this team spawns set it to nothing if you dont want an MTF cassie message")]
         public string CassieMessageMTFSpawn { get; set; } = "";
 

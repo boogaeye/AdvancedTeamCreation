@@ -78,6 +78,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Users\jorge\Downloads\virus para pikatu\SerpentsHand.dll</HintPath>
     </Reference>
+    <Reference Include="Subclass">
+      <HintPath>C:\Users\jorge\Downloads\Subclass.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />

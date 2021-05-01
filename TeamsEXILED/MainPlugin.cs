@@ -35,6 +35,8 @@ namespace TeamsEXILED
 
         public static bool assemblySerpentHands = false;
 
+        public static bool assemblyAdvancedSubclass = false;
+
         public override void OnEnabled()
         {
             Singleton = this;
@@ -126,6 +128,12 @@ namespace TeamsEXILED
                 {
                     assemblySerpentHands = true;
                     Log.Debug("SerpentHands assembly found", this.Config.Debug);
+                }
+
+                if (plugin.Name == "Subclass" && plugin.Config.IsEnabled)
+                {
+                    assemblyAdvancedSubclass = true;
+                    Log.Debug("AdvancedSubclassing assembly found", this.Config.Debug);
                 }
             }
         }

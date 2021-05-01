@@ -54,9 +54,8 @@ namespace TeamsEXILED.Commands
                 };
 
                 handler.StartInvoke();
-
+				
                 response = $"<color=green> Done, {arguments.At(0)} team forced";
-
                 return true;
             }
 

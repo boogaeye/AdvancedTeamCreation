@@ -66,16 +66,18 @@ namespace TeamsEXILED.Handlers
                 return;
             }
 
-            if (MainPlugin.assemblyAdvancedSubclass && ev.Subclass.AdvancedSubclass != string.Empty)
+            if (MainPlugin.assemblyAdvancedSubclass)
             {
                 if (Methods.HasAdvancedSubclass(ev.Player))
                 {
                     Methods.RemoveAdvancedSubclass(ev.Player);
                 }
 
-                Methods.GiveAdvancedSubclass(ev.Player, ev.Subclass.AdvancedSubclass);
-
-                return;
+                if (ev.Subclass.AdvancedSubclass != string.Empty)
+                {
+                    Methods.GiveAdvancedSubclass(ev.Player, ev.Subclass.AdvancedSubclass);
+                    return;
+                }
             }
 
             ev.Player.SetRole(ev.Subclass.ModelRole, true);

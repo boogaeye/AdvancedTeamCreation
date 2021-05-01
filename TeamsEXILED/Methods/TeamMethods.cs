@@ -53,12 +53,12 @@ namespace TeamsEXILED
             {
                 if (team.Subclasses[selectedSubclass].NumOfAllowedPlayers > i)
                 {
-                    y.SetAdvancedTeamSubclass(team, team.Subclasses[selectedSubclass]);
+                    y.SetAdvancedTeamSubteam(team, team.Subclasses[selectedSubclass]);
                     Log.Debug("allowed subteam " + team.Subclasses[selectedSubclass].Name + " from referance method", MainPlugin.Singleton.Config.Debug);
                 }
                 else if (team.Subclasses[selectedSubclass].NumOfAllowedPlayers == -1)
                 {
-                    y.SetAdvancedTeamSubclass(team, team.Subclasses[selectedSubclass]);
+                    y.SetAdvancedTeamSubteam(team, team.Subclasses[selectedSubclass]);
                     Log.Debug("allowed subteam " + team.Subclasses[selectedSubclass].Name + " from referance method with -1 players allowed(making everyone else this role)", MainPlugin.Singleton.Config.Debug);
                 }
                 else

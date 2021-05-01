@@ -71,7 +71,7 @@ namespace TeamsEXILED.Commands
 
                         var player = Player.Get(arguments.ToList()[2].ToLower());
 
-                        player.SetAdvancedTeamSubclass(team, steam);
+                        player.SetAdvancedTeamSubteam(team, steam);
 
                         response = "<color=green>Changed player Team!!!</color>";
                         return true;

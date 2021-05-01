@@ -157,6 +157,11 @@ namespace TeamsEXILED
                 }
             }
 
+            if (ev.NextKnownTeam == Respawning.SpawnableTeamType.NineTailedFox)
+            {
+                respawns++;
+            }
+
             if (MainPlugin.assemblyUIU == true)
             {
                 if (Methods.IsUIU())
@@ -206,11 +211,6 @@ namespace TeamsEXILED
             latestSpawn = chosenTeam;
 
             spawnableTeamType = ev.NextKnownTeam;
-
-            if (ev.NextKnownTeam == Respawning.SpawnableTeamType.NineTailedFox)
-            {
-                respawns++;
-            }
 
             if (chosenTeam != null)
             {
@@ -373,7 +373,7 @@ namespace TeamsEXILED
                 if (latestSpawn.escapeChange.ToList().Contains(ev.Player.Role))
                 {
                     ev.IsAllowed = false;
-                    ev.Player.SetAdvancedTeamSubclass(latestSpawn, latestSpawn.Subclasses[random.Next(0, latestSpawn.Subclasses.Count())], true);
+                    ev.Player.SetAdvancedTeamSubteam(latestSpawn, latestSpawn.Subclasses[random.Next(0, latestSpawn.Subclasses.Count())], true);
                 }
             }
         }

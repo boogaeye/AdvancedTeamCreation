@@ -7,7 +7,7 @@ using Exiled.API.Interfaces;
 using TeamsEXILED.Handlers;
 using TeamsEXILED.API;
 using TeamsEXILED.Configs;
-using MEC;
+using Exiled.Events.EventArgs;
 
 namespace TeamsEXILED
 {
@@ -45,7 +45,6 @@ namespace TeamsEXILED
             TeamsHandlers = new TeamsEvents(this);
             EventHandlers = new EventHandlers(this);
 
-            Config.LoadConfigs();
             CheckPlugins();
 
             Harmony = new Harmony($"teamsexiled.{DateTime.Now.Ticks}");
@@ -71,6 +70,8 @@ namespace TeamsEXILED
             {
                 Log.Warn("Friendly Fire Is heavily recommended to be enabled on server config as it can lead to problems with people not being able to finish around because a person is supposed to be their enemy");
             }
+
+            Config.LoadConfigs();
 
             base.OnEnabled();
         }
@@ -105,8 +106,8 @@ namespace TeamsEXILED
 
         public override void OnReloaded()
         {
-            Config.LoadConfigs();
             CheckPlugins();
+            Config.LoadConfigs();
         }
 
         public void CheckPlugins()

@@ -28,7 +28,7 @@ namespace TeamsEXILED.API
 
             public void StartInvoke()
             {
-                SettingPlayerTeam?.Invoke(this);
+                SettingPlayerTeam.Invoke(this);
             }
         }
 

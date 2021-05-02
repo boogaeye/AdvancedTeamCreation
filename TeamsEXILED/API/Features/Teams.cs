@@ -48,19 +48,6 @@ namespace TeamsEXILED.API
         [Description("the chance this team will spawn if its been selected")]
         public ushort Chance { get; set; } = 50;
 
-        public static bool IsDefinedInConfig(string normalteam)
-        {
-            foreach (var n in MainPlugin.Singleton.Config.NormalConfigs.Teams)
-            {
-                if (n.Name.ToString().ToLower() == normalteam.ToLower())
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         public Subteams GetSubteamByString(string name)
         {
             return this.Subclasses.First(x => x.Name == name);

@@ -97,7 +97,7 @@ namespace TeamsEXILED
 
         public void OnVerified(VerifiedEventArgs ev)
         {
-            ev.Player.SetAdvancedTeam(Extensions.GetNormalTeam(Team.RIP));
+            ev.Player.SetAdvancedTeam(Team.RIP.GetNormalAdvancedTeam());
         }
 
         public void OnLeave(LeftEventArgs ev)
@@ -113,7 +113,7 @@ namespace TeamsEXILED
         {
             ev.Player.CustomInfo = string.Empty;
             ev.Player.InfoArea |= PlayerInfoArea.Role;
-            ev.Player.SetAdvancedTeam(Extensions.GetNormalTeam(ev.Player.Team));
+            ev.Player.SetAdvancedTeam(ev.Player.Team.GetNormalAdvancedTeam());
         }
 
         public void OnRespawning(RespawningTeamEventArgs ev)
@@ -124,14 +124,12 @@ namespace TeamsEXILED
             }
 
             // Need this, because ev.Players isn't working for methods
-            List<Player> tempPlayers = new List<Player>();
+            List<Player> tempPlayers = new List<Player>(ev.Players);
 
-            foreach (Player i in ev.Players)
+            if (teamedPlayers.Count == 0)
             {
-                if (i.IsOverwatchEnabled == false)
-                {
-                    tempPlayers.Add(i);
-                }
+                TeamMethods.RemoveTeamReference();
+                return;
             }
 
             if (ForcedTeam && HasReference)
@@ -209,14 +207,13 @@ namespace TeamsEXILED
             }
 
             latestSpawn = chosenTeam;
-
             spawnableTeamType = ev.NextKnownTeam;
 
             if (chosenTeam != null)
             {
                 Log.Debug("Spawned " + chosenTeam.Name, this.plugin.Config.Debug);
 
-                coroutineHandle.Add(Timing.CallDelayed(0.2f, () => TeamMethods.ChangePlysToTeam(tempPlayers, chosenTeam)));
+                coroutineHandle.Add(Timing.CallDelayed(0.01f, () => TeamMethods.ChangePlysToTeam(tempPlayers, chosenTeam)));
 
                 if (random.Next(0, 100) <= chosenTeam.CassieMessageChaosAnnounceChance && ev.NextKnownTeam == Respawning.SpawnableTeamType.ChaosInsurgency)
                 {
@@ -230,6 +227,11 @@ namespace TeamsEXILED
         public void OnHurt(HurtingEventArgs ev)
         {
             if (ev.IsAllowed == false)
+            {
+                return;
+            }
+
+            if (ev.Target == ev.Attacker)
             {
                 return;
             }
@@ -270,9 +272,10 @@ namespace TeamsEXILED
             if (chosenTeam != null)
             {
                 ev.IsAllowed = false;
+                Log.Info("Si");
                 if (chosenTeam.CassieMessageMTFSpawn != null)
                 {
-                    Cassie.Message(chosenTeam.CassieMessageMTFSpawn.Replace("{SCP}", ev.ScpsLeft.ToString()).Replace("{unit}", ev.UnitNumber.ToString()).Replace("{nato}", "nato_" + ev.UnitName[0].ToString()), isNoisy: false);
+                    Cassie.Message(chosenTeam.CassieMessageMTFSpawn.Replace("{SCP}", ev.ScpsLeft.ToString()).Replace("{unit}", ev.UnitNumber.ToString()).Replace("{nato}", "nato_" + ev.UnitName[0]), isNoisy: true);
                 }
 
                 Extensions.RenameUnit(respawns, chosenTeam.Name.ToUpper() + "-" + ev.UnitNumber.ToString());
@@ -286,7 +289,7 @@ namespace TeamsEXILED
             {
                 Log.Debug(ev.Killer.AdvancedTeam(), plugin.Config.Debug);
 
-                ev.Target.SetAdvancedTeam(Extensions.GetNormalTeam(Team.RIP));
+                ev.Target.SetAdvancedTeam(Team.RIP.GetNormalAdvancedTeam());
 
                 Methods.CheckRoundEnd();
 
@@ -298,20 +301,23 @@ namespace TeamsEXILED
                     }
                 }
 
-                if (ev.Killer.AdvancedTeam().IsTeamFriendly(ev.Target.AdvancedTeam()))
+                if (ev.Target != ev.Killer)
                 {
-                    ev.Target.Broadcast(5, MainPlugin.Singleton.Translation.TeamKillBroadcast);
-                }
-                else
-                {
-                    ev.Target.Broadcast(5, MainPlugin.Singleton.Translation.KilledByNonfriendlyPlayer);
+                    if (ev.Killer.AdvancedTeam().IsTeamFriendly(ev.Target.AdvancedTeam()))
+                    {
+                        ev.Target.Broadcast(5, MainPlugin.Singleton.Translation.TeamKillBroadcast);
+                    }
+                    else
+                    {
+                        ev.Target.Broadcast(5, MainPlugin.Singleton.Translation.KilledByNonfriendlyPlayer);
+                    }
                 }
             }
             catch (Exception)
             {
                 if (ev.Target != null)
                 {
-                    ev.Target.SetAdvancedTeam(Extensions.GetNormalTeam(Team.RIP));
+                    ev.Target.SetAdvancedTeam(Team.RIP.GetNormalAdvancedTeam());
                 }
 
                 Methods.CheckRoundEnd();
@@ -366,7 +372,7 @@ namespace TeamsEXILED
             }
 
             // Setting team due to RoleChangeEventArgs not changing the team
-            ev.Player.SetAdvancedTeam(Extensions.GetNormalTeam(ev.NewRole.GetTeam()));
+            ev.Player.SetAdvancedTeam(ev.NewRole.GetTeam().GetNormalAdvancedTeam());
 
             if (latestSpawn != null)
             {
@@ -390,13 +396,17 @@ namespace TeamsEXILED
                 Timing.KillCoroutines(coroutine);
             }
 
-            HasReference = false;
+            coroutineHandle.Clear();
+        }
+
+        public void OnWaitingForPlayers()
+        {
             respawns = 0;
+            HasReference = false;
             latestSpawn = null;
             chosenTeam = null;
             ForcedTeam = false;
 
-            coroutineHandle.Clear();
             teamedPlayers.Clear();
             fixedpoints.Clear();
         }

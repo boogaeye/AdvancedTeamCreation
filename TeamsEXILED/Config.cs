@@ -7,7 +7,6 @@ using Exiled.Loader;
 using TeamsEXILED.API;
 using System.Collections.Generic;
 using System.Linq;
-using MEC;
 
 namespace TeamsEXILED
 {
@@ -59,6 +58,7 @@ namespace TeamsEXILED
                 Teams.Add(Loader.Deserializer.Deserialize<Teams>(File.ReadAllText(file)));
             }
 
+            // This let the people change the normal requeriments and friendly teams of the base game teams
             string npath = Path.Combine(ConfigsFolder, "NormalTeams.yml");
             if (File.Exists(npath) == false)
             {
@@ -68,6 +68,17 @@ namespace TeamsEXILED
             else
             {
                 NormalConfigs = Loader.Deserializer.Deserialize<NormalTeams>(File.ReadAllText(npath));
+            }
+
+            foreach (var ntm in NormalConfigs.NTeams)
+            {
+                Teams.Add(new Teams
+                {
+                    Active = false,
+                    Name = ntm.Name,
+                    Requirements = ntm.Requirements,
+                    Friendlys = ntm.FriendlyTeams
+                });
             }
         }
     }

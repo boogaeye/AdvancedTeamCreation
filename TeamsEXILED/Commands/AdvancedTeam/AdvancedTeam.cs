@@ -31,9 +31,23 @@ namespace TeamsEXILED.Commands
             {
 				if (arguments.Count == 0)
                 {
-					response = "<color=cyan>You need to enter an argument</color>\n<b>forcenextteam</b>\n<b>forceteam</b>\n<b>teamsalive</b>";
+					response = "You need to enter an argument\n<b>forcenextteam</b>\n<b>forceteam</b>\n<b>teamsalive</b>\n<b>reload</b>";
 					return true;
                 }
+				else if (arguments.Contains("reload"))
+                {
+					if (ply.CheckPermission("ATC.reload"))
+                    {
+						MainPlugin.Singleton.Config.LoadConfigs();
+						response = "Done";
+						return true;
+					}
+                    else 
+					{
+						response = MainPlugin.Singleton.Translation.NoPermissions;
+						return false;
+					}
+				}
 				else
                 {
 					response = "Invalid argument";

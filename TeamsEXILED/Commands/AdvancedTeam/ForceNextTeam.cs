@@ -42,7 +42,10 @@ namespace TeamsEXILED.Commands
                     response = "<color=red>The name of the team isn't valid.</color> Teams:";
                     foreach (var tm in MainPlugin.Singleton.Config.Teams)
                     {
-                        response += "\n" + tm.Name;
+                        if (tm.Active)
+                        {
+                            response += "\n" + tm.Name;
+                        }
                     }
                     return false;
                 }

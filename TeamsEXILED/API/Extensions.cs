@@ -13,14 +13,6 @@ namespace TeamsEXILED.API
              MainPlugin.Singleton.EventHandlers.teamedPlayers[player] = team;
         }
 
-        public static void SetAdvancedTeam(List<Player> plylist, Teams team)
-        {
-            foreach (var ply in plylist)
-            {
-                MainPlugin.Singleton.EventHandlers.teamedPlayers[ply] = team;
-            }
-        }
-
         public static void SetAdvancedTeamSubteam(this Player ply, Teams team, Subteams subclass, bool KeepInv = false)
         {
             TeamMethods.ChangeTeam(ply, team, subclass, KeepInv);
@@ -43,53 +35,22 @@ namespace TeamsEXILED.API
 
         public static bool IsNormalTeam(this Teams i)
         {
-            return MainPlugin.Singleton.Config.NormalConfigs.Teams.Contains(i);
+            List<string> names = new List<string>();
+
+            foreach (var tm in MainPlugin.Singleton.Config.NormalConfigs.NTeams)
+            {
+                names.Add(tm.Name.ToLower());
+            }
+
+            return names.Contains(i.Name);
         }
 
-        public static bool TeamExists(Teams team)
+        public static bool IsTeamAlive(this Teams team)
         {
             return MainPlugin.Singleton.EventHandlers.teamedPlayers.ContainsValue(team);
         }
 
-        public static Teams GetTeamFromString(string s)
-        {
-            Teams team = null;
-            foreach (Teams t in MainPlugin.Singleton.Config.Teams)
-            {
-                if (t.Name.ToLower() == s.ToLower())
-                {
-                    team = t;
-                }
-            }
-
-            return team;
-        }
-
-        // This can be added to Map of EXILED
-        public static void RenameUnit(int index, string name)
-        {
-            var unit = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[index];
-            unit.UnitName = name;
-            Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames.Remove(Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[index]);
-            Respawning.NamingRules.UnitNamingRules.AllNamingRules[Respawning.SpawnableTeamType.NineTailedFox].AddCombination(unit.UnitName, Respawning.SpawnableTeamType.NineTailedFox);
-
-            foreach (var ply in Player.List.Where(x => x.UnitName == unit.UnitName))
-            {
-                ply.UnitName = unit.UnitName;
-            }
-        }
-
-        public static void AddUnit(string name, List<Player> players)
-        {
-            Respawning.NamingRules.UnitNamingRules.AllNamingRules[Respawning.SpawnableTeamType.NineTailedFox].AddCombination(name, Respawning.SpawnableTeamType.NineTailedFox);
-
-            foreach (var ply in players)
-            {
-                ply.UnitName = name;
-            }
-        }
-
-        public static string[] GetFriendlyTeams(Teams team)
+        public static string[] GetFriendlyTeams(this Teams team)
         {
             return team.Friendlys;
         }
@@ -130,9 +91,46 @@ namespace TeamsEXILED.API
             return team;
         }
 
-        public static Teams GetNormalTeam(Team team)
+        public static Teams GetNormalAdvancedTeam(this Team team)
         {
-            return MainPlugin.Singleton.Config.NormalConfigs.Teams.First(x => x.Name == team.ToString().ToLower());
+            return MainPlugin.Singleton.Config.Teams.First(x => x.Name == team.ToString().ToLower());
+        }
+
+        // Not Extensions at all ↓
+        public static Teams GetTeamFromString(string s)
+        {
+            Teams team = null;
+            foreach (Teams t in MainPlugin.Singleton.Config.Teams)
+            {
+                if (t.Name.ToLower() == s.ToLower())
+                {
+                    team = t;
+                }
+            }
+
+            return team;
+        }
+
+        // This can be added to Map of EXILED
+        public static void RenameUnit(int index, string name)
+        {
+            var unit = Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[index];
+            unit.UnitName = name;
+            Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames.Remove(Respawning.RespawnManager.Singleton.NamingManager.AllUnitNames[index]);
+            Respawning.NamingRules.UnitNamingRules.AllNamingRules[Respawning.SpawnableTeamType.NineTailedFox].AddCombination(unit.UnitName, Respawning.SpawnableTeamType.NineTailedFox);
+
+            foreach (var ply in Player.List.Where(x => x.UnitName == unit.UnitName))
+            {
+                ply.UnitName = unit.UnitName;
+            }
+        }
+
+        public static void SetAdvancedTeam(List<Player> plylist, Teams team)
+        {
+            foreach (var ply in plylist)
+            {
+                MainPlugin.Singleton.EventHandlers.teamedPlayers[ply] = team;
+            }
         }
     }
 }

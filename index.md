@@ -22,4 +22,5 @@ this plugin supports:
 - UIURescueSquad
 - SerpentHands
 - CustomItems
+- AdvancedSubclassing
 ```

@@ -2,9 +2,7 @@
 
 namespace TeamsEXILED.API
 {
-    public delegate void TeamEvent();
     public delegate void TeamEvent<TEventArgs>(TEventArgs eventArgs) where TEventArgs : System.EventArgs;
-
     public class TeamEvents
     {
         public static event TeamEvent<SettingPlayerTeamEventArgs> SettingPlayerTeam;

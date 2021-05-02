@@ -104,6 +104,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\Extensions.cs" />
+    <Compile Include="API\Features\NormalTeam.cs" />
     <Compile Include="API\Features\Teams.cs" />
     <Compile Include="API\Features\Subteams.cs" />
     <Compile Include="Commands\AdvancedTeam\ForceNextTeam.cs" />

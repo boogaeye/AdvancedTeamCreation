@@ -7,7 +7,6 @@ using Exiled.API.Interfaces;
 using TeamsEXILED.Handlers;
 using TeamsEXILED.API;
 using TeamsEXILED.Configs;
-using Exiled.Events.EventArgs;
 
 namespace TeamsEXILED
 {
@@ -45,22 +44,23 @@ namespace TeamsEXILED
             TeamsHandlers = new TeamsEvents(this);
             EventHandlers = new EventHandlers(this);
 
-            CheckPlugins();
-
             Harmony = new Harmony($"teamsexiled.{DateTime.Now.Ticks}");
             Harmony.PatchAll();
 
-            Exiled.Events.Handlers.Server.EndingRound += EventHandlers.RoundEnding;
-            Exiled.Events.Handlers.Server.RestartingRound += EventHandlers.OnRestartRound;
             Exiled.Events.Handlers.Player.Died += EventHandlers.OnDied;
-            Exiled.Events.Handlers.Server.RespawningTeam += EventHandlers.OnRespawning;
             Exiled.Events.Handlers.Player.ChangedRole += EventHandlers.OnRoleChange;
             Exiled.Events.Handlers.Player.Hurting += EventHandlers.OnHurt;
             Exiled.Events.Handlers.Player.Verified += EventHandlers.OnVerified;
             Exiled.Events.Handlers.Player.Left += EventHandlers.OnLeave;
-            Exiled.Events.Handlers.Map.AnnouncingNtfEntrance += EventHandlers.MTFSpawnAnnounce;
-            Exiled.Events.Handlers.Server.RoundStarted += EventHandlers.OnRoundStart;
             Exiled.Events.Handlers.Player.Escaping += EventHandlers.OnEscaping;
+
+            Exiled.Events.Handlers.Map.AnnouncingNtfEntrance += EventHandlers.MTFSpawnAnnounce;
+
+            Exiled.Events.Handlers.Server.RoundStarted += EventHandlers.OnRoundStart;
+            Exiled.Events.Handlers.Server.WaitingForPlayers += EventHandlers.OnWaitingForPlayers;
+            Exiled.Events.Handlers.Server.RespawningTeam += EventHandlers.OnRespawning;
+            Exiled.Events.Handlers.Server.EndingRound += EventHandlers.RoundEnding;
+            Exiled.Events.Handlers.Server.RestartingRound += EventHandlers.OnRestartRound;
 
             TeamEvents.SettingPlayerTeam += TeamsHandlers.OnSettingPlayerTeam;
             TeamEvents.AddingInventoryItems += TeamsHandlers.OnAddingInventoryItems;
@@ -71,6 +71,7 @@ namespace TeamsEXILED
                 Log.Warn("Friendly Fire Is heavily recommended to be enabled on server config as it can lead to problems with people not being able to finish around because a person is supposed to be their enemy");
             }
 
+            CheckPlugins();
             Config.LoadConfigs();
 
             base.OnEnabled();
@@ -78,17 +79,20 @@ namespace TeamsEXILED
 
         public override void OnDisabled()
         {
-            Exiled.Events.Handlers.Server.EndingRound -= EventHandlers.RoundEnding;
             Exiled.Events.Handlers.Player.Died -= EventHandlers.OnDied;
-            Exiled.Events.Handlers.Server.RespawningTeam -= EventHandlers.OnRespawning;
             Exiled.Events.Handlers.Player.ChangedRole -= EventHandlers.OnRoleChange;
             Exiled.Events.Handlers.Player.Hurting -= EventHandlers.OnHurt;
             Exiled.Events.Handlers.Player.Verified -= EventHandlers.OnVerified;
             Exiled.Events.Handlers.Player.Left -= EventHandlers.OnLeave;
-            Exiled.Events.Handlers.Map.AnnouncingNtfEntrance -= EventHandlers.MTFSpawnAnnounce;
-            Exiled.Events.Handlers.Server.RestartingRound -= EventHandlers.OnRestartRound;
-            Exiled.Events.Handlers.Server.RoundStarted -= EventHandlers.OnRoundStart;
             Exiled.Events.Handlers.Player.Escaping -= EventHandlers.OnEscaping;
+
+            Exiled.Events.Handlers.Map.AnnouncingNtfEntrance -= EventHandlers.MTFSpawnAnnounce;
+
+            Exiled.Events.Handlers.Server.RoundStarted -= EventHandlers.OnRoundStart;
+            Exiled.Events.Handlers.Server.WaitingForPlayers -= EventHandlers.OnWaitingForPlayers;
+            Exiled.Events.Handlers.Server.RespawningTeam -= EventHandlers.OnRespawning;
+            Exiled.Events.Handlers.Server.EndingRound -= EventHandlers.RoundEnding;
+            Exiled.Events.Handlers.Server.RestartingRound -= EventHandlers.OnRestartRound;
 
             TeamEvents.SettingPlayerTeam -= TeamsHandlers.OnSettingPlayerTeam;
             TeamEvents.AddingInventoryItems -= TeamsHandlers.OnAddingInventoryItems;

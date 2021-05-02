@@ -87,75 +87,78 @@ namespace TeamsEXILED.Handlers
             if (ev.Team.spawnLocation != SpawnLocation.Normal)
             {
                 var point = MainPlugin.Singleton.EventHandlers.fixedpoints.First(x => x.Type == ev.Team.spawnLocation);
-                switch (ev.Team.spawnLocation)
+                MainPlugin.Singleton.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
                 {
-                    case SpawnLocation.Escape:
-                        {
-                            ev.Player.Position = point.Position;
-                            ev.Player.Rotations = point.Direction;
-                            break;
-                        }
-                    case SpawnLocation.SCP106:
-                        {
-                            if (!Warhead.IsDetonated)
+                    switch (ev.Team.spawnLocation)
+                    {
+                        case SpawnLocation.Escape:
                             {
                                 ev.Player.Position = point.Position;
                                 ev.Player.Rotations = point.Direction;
+                                break;
                             }
-                            break;
-                        }
-                    case SpawnLocation.SurfaceNuke:
-                        {
-                            ev.Player.Position = point.Position;
-                            ev.Player.Rotations = point.Direction;
-                            break;
-                        }
-                    case SpawnLocation.SCP012:
-                        {
-                            if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
+                        case SpawnLocation.SCP106:
+                            {
+                                if (!Warhead.IsDetonated)
+                                {
+                                    ev.Player.Position = point.Position;
+                                    ev.Player.Rotations = point.Direction;
+                                }
+                                break;
+                            }
+                        case SpawnLocation.SurfaceNuke:
                             {
                                 ev.Player.Position = point.Position;
                                 ev.Player.Rotations = point.Direction;
+                                break;
                             }
-                            break;
-                        }
-                    case SpawnLocation.SCP079:
-                        {
-                            if (!Warhead.IsDetonated)
+                        case SpawnLocation.SCP012:
                             {
-                                ev.Player.Position = point.Position;
-                                ev.Player.Rotations = point.Direction;
+                                if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
+                                {
+                                    ev.Player.Position = point.Position;
+                                    ev.Player.Rotations = point.Direction;
+                                }
+                                break;
                             }
-                            break;
-                        }
-                    case SpawnLocation.SCP096:
-                        {
-                            if (!Warhead.IsDetonated)
+                        case SpawnLocation.SCP079:
                             {
-                                ev.Player.Position = point.Position;
-                                ev.Player.Rotations = point.Direction;
+                                if (!Warhead.IsDetonated)
+                                {
+                                    ev.Player.Position = point.Position;
+                                    ev.Player.Rotations = point.Direction;
+                                }
+                                break;
                             }
-                            break;
-                        }
-                    case SpawnLocation.SCP173:
-                        {
-                            if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
+                        case SpawnLocation.SCP096:
                             {
-                                ev.Player.Position = point.Position;
-                                ev.Player.Rotations = point.Direction;
+                                if (!Warhead.IsDetonated)
+                                {
+                                    ev.Player.Position = point.Position;
+                                    ev.Player.Rotations = point.Direction;
+                                }
+                                break;
                             }
-                            break;
-                        }
-                    case SpawnLocation.Shelter:
-                        {
-                            if (!Warhead.IsDetonated)
+                        case SpawnLocation.SCP173:
                             {
-                                ev.Player.Position = point.Position;
-                                ev.Player.Rotations = point.Direction;
+                                if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
+                                {
+                                    ev.Player.Position = point.Position;
+                                    ev.Player.Rotations = point.Direction;
+                                }
+                                break;
                             }
-                            break;
-                        }
-                }
+                        case SpawnLocation.Shelter:
+                            {
+                                if (!Warhead.IsDetonated)
+                                {
+                                    ev.Player.Position = point.Position;
+                                    ev.Player.Rotations = point.Direction;
+                                }
+                                break;
+                            }
+                    }
+                }));
             }
 
             var ihandler = new TeamEvents.AddingInventoryItemsEventArgs(ev.Player, ev.Subclass, keepInv:ev.KeepItems);

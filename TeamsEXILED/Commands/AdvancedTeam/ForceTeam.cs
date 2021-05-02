@@ -33,16 +33,10 @@ namespace TeamsEXILED.Commands
                 {
                     if (t.Name == arguments.ToList()[0].ToLower())
                     {
-                        if (!t.Active && !ply.CheckPermission("ATC.bypass"))
-                        {
-                            response = "<color=red>Error you cant force team this team as you dont have the ATC.bypass Permission</color>";
-                            return false;
-                        }
-
                         Teams team = null;
                         foreach (var tm in MainPlugin.Singleton.Config.Teams)
                         {
-                            if (tm.Name.ToLower() == arguments.ToList()[0].ToLower())
+                            if (tm.Name.ToLower() == arguments.ToList()[0].ToLower() && tm.Active)
                             {
                                 team = tm;
                             }
@@ -50,7 +44,7 @@ namespace TeamsEXILED.Commands
 
                         if (team == null)
                         {
-                            response = "<color=red>Team not found</color>";
+                            response = "<color=red>Team not found or isn't active</color>";
                             return false;
                         }
 

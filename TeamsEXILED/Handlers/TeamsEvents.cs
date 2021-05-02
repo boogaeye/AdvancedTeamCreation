@@ -66,6 +66,8 @@ namespace TeamsEXILED.Handlers
                 return;
             }
 
+            ev.Player.SetRole(ev.Subclass.ModelRole, true);
+
             if (MainPlugin.assemblyAdvancedSubclass)
             {
                 if (Methods.HasAdvancedSubclass(ev.Player))
@@ -80,7 +82,6 @@ namespace TeamsEXILED.Handlers
                 }
             }
 
-            ev.Player.SetRole(ev.Subclass.ModelRole, true);
             ev.Player.Health = ev.Subclass.HP;
             ev.Player.MaxHealth = ev.Subclass.HP;
 

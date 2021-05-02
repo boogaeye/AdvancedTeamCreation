@@ -24,7 +24,7 @@ namespace TeamsEXILED.Commands
                 response = "";
                 foreach (KeyValuePair<Player, Teams> t in MainPlugin.Singleton.EventHandlers.teamedPlayers)
                 {
-                    response = response + "\n" + t.Value + " : " + t.Key.Nickname;
+                    response = response + "\n" + t.Value.Name + " : " + t.Key.Nickname;
                 }
 
                 return true;

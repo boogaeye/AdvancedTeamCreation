@@ -28,7 +28,7 @@ namespace TeamsEXILED
 
         public override string Name { get; } = "Advanced Team Creation";
 
-        public override Version Version { get; } = new Version("1.0.4.2");
+        public override Version Version { get; } = new Version("1.0.5.0");
 
         public static bool assemblyTimer = false;
 

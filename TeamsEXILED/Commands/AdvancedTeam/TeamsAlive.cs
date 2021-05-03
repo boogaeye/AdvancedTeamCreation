@@ -18,8 +18,7 @@ namespace TeamsEXILED.Commands
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            Player ply = Player.Get(sender as CommandSender);
-            if (ply.CheckPermission("ATC.teamsalive"))
+            if (sender.CheckPermission("ATC.teamsalive"))
             {
                 response = "";
                 foreach (KeyValuePair<Player, Teams> t in MainPlugin.Singleton.EventHandlers.teamedPlayers)

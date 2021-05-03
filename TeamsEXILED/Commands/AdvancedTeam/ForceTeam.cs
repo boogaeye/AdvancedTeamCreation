@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using CommandSystem;
 using TeamsEXILED.API;
 using Exiled.API.Features;
@@ -18,9 +17,7 @@ namespace TeamsEXILED.Commands
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            Player ply = Player.Get(sender as CommandSender);
-
-            if (ply.CheckPermission("ATC.forceteam"))
+            if (sender.CheckPermission("ATC.forceteam"))
             {
                 if (arguments.Count == 0)
                 {
@@ -28,54 +25,38 @@ namespace TeamsEXILED.Commands
                     return false;
                 }
 
-                response = "<color=red>Error Team Does Not Exist</color>";
-                foreach (Teams t in MainPlugin.Singleton.Config.Teams)
+                if (!Teams.TryGet(arguments.At(0), out Teams team))
                 {
-                    if (t.Name == arguments.ToList()[0].ToLower())
-                    {
-                        Teams team = null;
-                        foreach (var tm in MainPlugin.Singleton.Config.Teams)
-                        {
-                            if (tm.Name.ToLower() == arguments.ToList()[0].ToLower() && tm.Active)
-                            {
-                                team = tm;
-                            }
-                        }
+                    response = "<color=red>Error Team Does Not Exist</color>";
+                    return false;
+                }
 
-                        if (team == null)
-                        {
-                            response = "<color=red>Team not found or isn't active</color>";
-                            return false;
-                        }
+                if (!team.Active)
+                {
+                    response = "<color=red>The Team isn't active</color>";
+                    return false;
+                }
 
-                        Subteams steam = null;
-                        foreach (var sb in team.Subclasses)
-                        {
-                            if (sb.Name.ToLower() == arguments.ToList()[0].ToLower())
-                            {
-                                steam = sb;
-                            }
-                        }
+                if (!team.TryGetSubteam(arguments.At(1), out Subteams subteam))
+                {
+                    response = "<color=red>Error Subteam doesn't exist</color>";
+                    return false;
+                }
 
-                        if (steam == null)
-                        {
-                            response = "<color=red>SubClass not found</color>";
-                            return false;
-                        }
-
-                        var player = Player.Get(arguments.ToList()[2].ToLower());
-
-                        player.SetAdvancedTeamSubteam(team, steam);
-
-                        response = "<color=green>Changed player Team!!!</color>";
-                        return true;
-                    }
+                if (Player.Get(arguments.At(2)) is Player player)
+                {
+                    player.SetAdvancedTeamSubteam(team, subteam);
+                    response = "<color=green>Changed player Team!!!</color>";
+                    return true;
+                }
+                else
+                {
+                    response = "<color=red>Error Player doesn't exist</color>";
+                    return false;
                 }
             }
-            else
-            {
-                response = MainPlugin.Singleton.Translation.NoPermissions;
-            }
+
+            response = MainPlugin.Singleton.Translation.NoPermissions;
             return false;
         }
     }

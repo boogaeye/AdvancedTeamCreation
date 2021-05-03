@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Linq;
 using Respawning;
-using Exiled.API.Enums;
 
 namespace TeamsEXILED.API
 {
@@ -38,19 +37,44 @@ namespace TeamsEXILED.API
         public ushort CassieMessageChaosAnnounceChance { get; set; } = 100;
 
         [Description("Sets where this team spawns")]
-        public SpawnLocation spawnLocation { get; set; } = SpawnLocation.Normal;
+        public SpawnLocation SpawnLocation { get; set; } = SpawnLocation.Normal;
 
         [Description("makes it where if this team is the latest spawn it will spawn the assigned escapees to this team if they are defined in this config")]
-        public RoleType[] escapeChange { get; set; } = { };
+        public RoleType[] EscapeChange { get; set; } = { };
 
         public string Color { get; set; } = "cyan";
 
         [Description("the chance this team will spawn if its been selected")]
         public ushort Chance { get; set; } = 50;
 
-        public Subteams GetSubteamByString(string name)
+        public bool TryGetSubteam(string name, out Subteams subteam)
         {
-            return this.Subclasses.First(x => x.Name == name);
+            if (name == null)
+            {
+                subteam = null;
+                return false;
+            }
+
+            subteam = GetSubteam(name);
+
+            return subteam != null;
+        }
+
+        public Subteams GetSubteam(string name) => Subclasses?.FirstOrDefault(x => x.Name == name);
+
+        public static Teams Get(string name) => MainPlugin.Singleton.Config.Teams?.FirstOrDefault(x => x.Name == name);
+
+        public static bool TryGet(string name, out Teams team)
+        {
+            if (name == null)
+            {
+                team = null;
+                return false;
+            }
+
+            team = Get(name);
+
+            return team != null;
         }
     }
 }

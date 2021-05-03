@@ -1,5 +1,4 @@
 ﻿using CommandSystem;
-using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using System;
 using System.Linq;
@@ -26,8 +25,7 @@ namespace TeamsEXILED.Commands
 
 		protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
 		{
-			Player ply = Player.Get(((CommandSender)sender).Nickname);
-			if (ply.CheckPermission("ATC.main"))
+			if (sender.CheckPermission("ATC.main"))
             {
 				if (arguments.Count == 0)
                 {
@@ -36,7 +34,7 @@ namespace TeamsEXILED.Commands
                 }
 				else if (arguments.Contains("reload"))
                 {
-					if (ply.CheckPermission("ATC.reload"))
+					if (sender.CheckPermission("ATC.reload"))
                     {
 						MainPlugin.Singleton.Config.LoadConfigs();
 						response = "Done";

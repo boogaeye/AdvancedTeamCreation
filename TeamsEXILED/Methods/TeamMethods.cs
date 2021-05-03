@@ -13,14 +13,18 @@ namespace TeamsEXILED
         public static void RefNextTeamSpawn()
         {
             Log.Debug("Getting Team Referances", MainPlugin.Singleton.Config.Debug);
-            var list = MainPlugin.Singleton.Config.Teams.Where(x => x.SpawnTypes.ToList().Contains(Respawn.NextKnownTeam) && x.Active == true).ToList();
+            var list = MainPlugin.Singleton.Config.Teams.Where(x => x.SpawnTypes.Contains(Respawn.NextKnownTeam) && x.Active == true).ToList();
+            if (list.Count == 0)
+            {
+                MainPlugin.Singleton.EventHandlers.HasReference = true;
+                return;
+            }
+
             Log.Debug("Got list", MainPlugin.Singleton.Config.Debug);
             var team = list[MainPlugin.Singleton.EventHandlers.random.Next(0, list.Count)];
             Log.Debug("Got team", MainPlugin.Singleton.Config.Debug);
-
             var handler = new TeamEvents.ReferencingTeamEventArgs(team, Respawning.SpawnableTeamType.None);
             Log.Debug("Got Handler and invoking", MainPlugin.Singleton.Config.Debug);
-
             handler.StartInvoke();
         }
 
@@ -36,9 +40,7 @@ namespace TeamsEXILED
             }
 
             var team = list[MainPlugin.Singleton.EventHandlers.random.Next(0, list.Count)];
-
             var handler = new TeamEvents.ReferencingTeamEventArgs(team, spawnableTeamType);
-
             handler.StartInvoke();
         }
 
@@ -145,7 +147,7 @@ namespace TeamsEXILED
             CassieMessageChaosMessage = "pitch_0.1 .g3 .g3 .g3 pitch_1 The Tactical Target Agent C unit {nato} {SCP} has entered the facility bell_end",
             Chance = 50,
             Color = "red",
-            spawnLocation = SpawnLocation.SurfaceNuke
+            SpawnLocation = SpawnLocation.SurfaceNuke
         },new Teams{
             Active = true,
             Name = "opcf",
@@ -189,7 +191,7 @@ namespace TeamsEXILED
             Chance = 100,
             Color = "green",
             Neutral = new string[]{ "rsc" },
-            spawnLocation = SpawnLocation.Escape
+            SpawnLocation = SpawnLocation.Escape
         }, new Teams{
             Active = true,
             Name = "aes",
@@ -243,7 +245,7 @@ namespace TeamsEXILED
             Chance = 50,
             Color = "red",
             Neutral = new string[]{ "mtf", "opcf", "goc", "gru", "chi", "rsc", "cdp" },
-            spawnLocation = SpawnLocation.SCP106,
+            SpawnLocation = SpawnLocation.SCP106,
             CassieMessageMTFSpawn = "cassie pitch_0.6 .g3 .g3 pitch_1 the arrival of the anomaly emergency squad {nato} {unit} has entered the facility. pitch_0.96 please escort2 all scpsubjects to surface zone. pitch_1 all scpsubjects need to be secured. please wait inside of your designated evacuation shelters until this emergency has been completed. there are {SCP} scpsubjects remaining."
         }
         };

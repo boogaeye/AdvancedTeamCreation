@@ -16,7 +16,6 @@ namespace TeamsEXILED
     {
         #region vars
         private readonly Plugin<Config> plugin;
-
         public EventHandlers(Plugin<Config> plugin)
         {
             this.plugin = plugin;
@@ -25,20 +24,15 @@ namespace TeamsEXILED
         public Dictionary<Player, Teams> teamedPlayers = new Dictionary<Player, Teams>();
         public List<RoomPoint> fixedpoints = new List<RoomPoint>();
         public List<CoroutineHandle> coroutineHandle = new List<CoroutineHandle>();
-
         public CoroutineHandle RemoveChosenTeam;
-
         public Teams chosenTeam;
         public Teams latestSpawn;
-
-        public System.Random random = new System.Random();
-
+        public readonly System.Random random = new System.Random();
         public bool HasReference = false;
         public bool ForcedTeam = false;
-
         public int respawns = 0;
-
-        public string mtfTrans, chaosTrans;
+        public string mtfTrans;
+        public string chaosTrans;
         public Respawning.SpawnableTeamType spawnableTeamType = Respawning.SpawnableTeamType.None;
 
         #endregion
@@ -53,16 +47,14 @@ namespace TeamsEXILED
             {
                 var rn = Methods.PointThings(sp);
 
-                if (rn != "")
+                if (rn != null)
                 {
                     var point = rn.Split(':');
                     var post = point[1].Split(',');
                     var dirt = point[2].Split(',');
-
                     var roomt = Map.Rooms.First(x => x.Name.Contains(point[0])).Transform;
                     var pos = new Vector3(float.Parse(post[0], NumberStyles.Float, CultureInfo.InvariantCulture), float.Parse(post[1], NumberStyles.Float, CultureInfo.InvariantCulture), float.Parse(post[2], NumberStyles.Float, CultureInfo.InvariantCulture));
                     var dir = new Vector2(float.Parse(dirt[0], NumberStyles.Float, CultureInfo.InvariantCulture), float.Parse(dirt[1], NumberStyles.Float, CultureInfo.InvariantCulture));
-
                     var fpos = roomt.TransformPoint(pos);
                     var fdir = roomt.TransformDirection(dir);
 
@@ -376,7 +368,7 @@ namespace TeamsEXILED
 
             if (latestSpawn != null)
             {
-                if (latestSpawn.escapeChange.ToList().Contains(ev.Player.Role))
+                if (latestSpawn.EscapeChange.Contains(ev.Player.Role))
                 {
                     ev.IsAllowed = false;
                     ev.Player.SetAdvancedTeamSubteam(latestSpawn, latestSpawn.Subclasses[random.Next(0, latestSpawn.Subclasses.Count())], true);

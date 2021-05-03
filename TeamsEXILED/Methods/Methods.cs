@@ -11,7 +11,7 @@ namespace TeamsEXILED
     {
         public static string PointThings(SpawnLocation loc)
         {
-            string name = "";
+            string name = null;
             switch (loc)
             {
                 case SpawnLocation.Escape:
@@ -65,9 +65,7 @@ namespace TeamsEXILED
             while (Round.IsStarted)
             {
                 yield return Timing.WaitForSeconds(cfg.Interval - 0.01f);
-
                 var rteam = Respawn.NextKnownTeam;
-
                 if (MainPlugin.Singleton.EventHandlers.ForcedTeam)
                 {
                     rteam = MainPlugin.Singleton.EventHandlers.chosenTeam.SpawnTypes.FirstOrDefault();
@@ -143,7 +141,6 @@ namespace TeamsEXILED
             }
 
             var teamedPlayers = MainPlugin.Singleton.EventHandlers.teamedPlayers;
-
             // This checks base game teams (defined in the config) and advanced teams
             foreach (Teams tm in teamedPlayers.Values)
             {

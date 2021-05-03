@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using CommandSystem;
-using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using TeamsEXILED.API;
 
@@ -18,26 +17,15 @@ namespace TeamsEXILED.Commands
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            Player ply = Player.Get(sender as CommandSender);
-            if (ply.CheckPermission("ATC.forcenextteam"))
+            if (sender.CheckPermission("ATC.forcenextteam"))
             {
-                if (arguments.Count <= 0)
+                if (arguments.Count == 0)
                 {
-                    response = "<color=red>You need to add the team name.</color>\nUsage: fnt teamname";
+                    response = "<color=red>You need to add the name of the team.</color>\nUsage: fnt teamname";
                     return false;
                 }
 
-                Teams team = null;
-
-                foreach (var tm in MainPlugin.Singleton.Config.Teams)
-                {
-                    if (tm.Name == arguments.At(0))
-                    {
-                        team = tm;
-                    }
-                }
-
-                if (team == null)
+                if (!Teams.TryGet(arguments.At(0), out Teams team))
                 {
                     response = "<color=red>The name of the team isn't valid.</color> Teams:";
                     foreach (var tm in MainPlugin.Singleton.Config.Teams)
@@ -47,18 +35,23 @@ namespace TeamsEXILED.Commands
                             response += "\n" + tm.Name;
                         }
                     }
+
                     return false;
                 }
 
+                if (!team.Active)
+                {
+                    response = "<color=red>The team isn't active</color>";
+                    return false;
+                }
 
                 var handler = new TeamEvents.ReferencingTeamEventArgs(team, team.SpawnTypes.FirstOrDefault())
                 {
                     ForceTeam = true
                 };
-
                 handler.StartInvoke();
 				
-                response = $"<color=green> Done, {arguments.At(0)} team forced";
+                response = $"<color=green> Done, {arguments.At(0)} team forced</color>";
                 return true;
             }
 

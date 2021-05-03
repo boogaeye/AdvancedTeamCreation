@@ -67,7 +67,6 @@ namespace TeamsEXILED.Handlers
             }
 
             ev.Player.SetRole(ev.Subclass.ModelRole, true);
-
             if (MainPlugin.assemblyAdvancedSubclass)
             {
                 if (Methods.HasAdvancedSubclass(ev.Player))
@@ -84,13 +83,12 @@ namespace TeamsEXILED.Handlers
 
             ev.Player.Health = ev.Subclass.HP;
             ev.Player.MaxHealth = ev.Subclass.HP;
-
-            if (ev.Team.spawnLocation != SpawnLocation.Normal)
+            if (ev.Team.SpawnLocation != SpawnLocation.Normal)
             {
-                var point = MainPlugin.Singleton.EventHandlers.fixedpoints.First(x => x.Type == ev.Team.spawnLocation);
+                var point = MainPlugin.Singleton.EventHandlers.fixedpoints.First(x => x.Type == ev.Team.SpawnLocation);
                 MainPlugin.Singleton.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
                 {
-                    switch (ev.Team.spawnLocation)
+                    switch (ev.Team.SpawnLocation)
                     {
                         case SpawnLocation.Escape:
                             {
@@ -163,9 +161,7 @@ namespace TeamsEXILED.Handlers
             }
 
             var ihandler = new TeamEvents.AddingInventoryItemsEventArgs(ev.Player, ev.Subclass, keepInv:ev.KeepItems);
-
             ihandler.StartInvoke();
-
             if (MainPlugin.Singleton.Config.UseHints)
             {
                 ev.Player.ShowHint(ev.Subclass.RoleMessage, 10);
@@ -206,7 +202,6 @@ namespace TeamsEXILED.Handlers
             }
 
             ev.Player.ClearInventory();
-
             foreach (string i in ev.Subteam.Inventory)
             {
                 if (int.TryParse(i, out int citem))

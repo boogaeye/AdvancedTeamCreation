@@ -36,7 +36,6 @@ namespace TeamsEXILED
         public void LoadConfigs()
         {
             Teams.Clear();
-
             if (Directory.Exists(ConfigsFolder) == false)
             {
                 Directory.CreateDirectory(ConfigsFolder);

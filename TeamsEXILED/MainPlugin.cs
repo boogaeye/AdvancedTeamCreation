@@ -12,30 +12,20 @@ namespace TeamsEXILED
 {
     public class MainPlugin : Plugin<Config, Translation>
     {
-        public EventHandlers EventHandlers;
-
-        public TeamsEvents TeamsHandlers;
-
-        private Harmony Harmony;
-
         public static MainPlugin Singleton;
+        public EventHandlers EventHandlers;
+        public TeamsEvents TeamsHandlers;
+        public Harmony Harmony;
 
         public override Version RequiredExiledVersion { get; } = new Version("2.10.0");
-
         public override PluginPriority Priority { get; } = PluginPriority.Lowest;
-
         public override string Author { get; } = "BoogaEye && Raul125";
-
         public override string Name { get; } = "Advanced Team Creation";
-
         public override Version Version { get; } = new Version("1.0.5.0");
 
         public static bool assemblyTimer = false;
-
         public static bool assemblyUIU = false;
-
         public static bool assemblySerpentHands = false;
-
         public static bool assemblyAdvancedSubclass = false;
 
         public override void OnEnabled()
@@ -43,9 +33,7 @@ namespace TeamsEXILED
             Singleton = this;
             TeamsHandlers = new TeamsEvents(this);
             EventHandlers = new EventHandlers(this);
-
             Harmony = new Harmony($"teamsexiled.{DateTime.Now.Ticks}");
-            Harmony.PatchAll();
 
             Exiled.Events.Handlers.Player.Died += EventHandlers.OnDied;
             Exiled.Events.Handlers.Player.ChangedRole += EventHandlers.OnRoleChange;
@@ -53,9 +41,7 @@ namespace TeamsEXILED
             Exiled.Events.Handlers.Player.Verified += EventHandlers.OnVerified;
             Exiled.Events.Handlers.Player.Left += EventHandlers.OnLeave;
             Exiled.Events.Handlers.Player.Escaping += EventHandlers.OnEscaping;
-
             Exiled.Events.Handlers.Map.AnnouncingNtfEntrance += EventHandlers.MTFSpawnAnnounce;
-
             Exiled.Events.Handlers.Server.RoundStarted += EventHandlers.OnRoundStart;
             Exiled.Events.Handlers.Server.WaitingForPlayers += EventHandlers.OnWaitingForPlayers;
             Exiled.Events.Handlers.Server.RespawningTeam += EventHandlers.OnRespawning;
@@ -71,6 +57,7 @@ namespace TeamsEXILED
                 Log.Warn("Friendly Fire Is heavily recommended to be enabled on server config as it can lead to problems with people not being able to finish around because a person is supposed to be their enemy");
             }
 
+            Harmony.PatchAll();
             CheckPlugins();
             Config.LoadConfigs();
 
@@ -85,9 +72,7 @@ namespace TeamsEXILED
             Exiled.Events.Handlers.Player.Verified -= EventHandlers.OnVerified;
             Exiled.Events.Handlers.Player.Left -= EventHandlers.OnLeave;
             Exiled.Events.Handlers.Player.Escaping -= EventHandlers.OnEscaping;
-
             Exiled.Events.Handlers.Map.AnnouncingNtfEntrance -= EventHandlers.MTFSpawnAnnounce;
-
             Exiled.Events.Handlers.Server.RoundStarted -= EventHandlers.OnRoundStart;
             Exiled.Events.Handlers.Server.WaitingForPlayers -= EventHandlers.OnWaitingForPlayers;
             Exiled.Events.Handlers.Server.RespawningTeam -= EventHandlers.OnRespawning;
@@ -99,7 +84,6 @@ namespace TeamsEXILED
             TeamEvents.ReferencingTeam -= TeamsHandlers.OnReferencingTeam;
 
             Harmony.UnpatchAll();
-
             Singleton = null;
             EventHandlers = null;
             TeamsHandlers = null;

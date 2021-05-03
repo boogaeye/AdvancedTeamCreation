@@ -101,11 +101,15 @@ namespace TeamsEXILED
             }
         }
 
-        public void OnRoleChange(ChangedRoleEventArgs ev)
+        public void OnRoleChanging(ChangingRoleEventArgs ev)
         {
-            ev.Player.CustomInfo = string.Empty;
-            ev.Player.InfoArea |= PlayerInfoArea.Role;
-            ev.Player.SetAdvancedTeam(ev.Player.Team.GetNormalAdvancedTeam());
+            if (!ev.Player.IsNormalAdvancedTeam())
+            {
+                ev.Player.CustomInfo = string.Empty;
+                ev.Player.InfoArea |= PlayerInfoArea.Role;
+            }
+
+            ev.Player.SetAdvancedTeam(ev.NewRole.GetTeam().GetNormalAdvancedTeam());
         }
 
         public void OnRespawning(RespawningTeamEventArgs ev)

@@ -18,6 +18,11 @@ namespace TeamsEXILED.API
             TeamMethods.ChangeTeam(ply, team, subclass, KeepInv);
         }
 
+        public static bool IsNormalAdvancedTeam(this Player ply)
+        {
+            return TeamMethods.NormalTeamsNames.Contains(ply.AdvancedTeam().Name.ToLower());
+        }
+
         public static bool IsTeamFriendly(this Teams i, Teams u)
         {
             return i.Friendlys.Contains(u.Name);
@@ -33,18 +38,6 @@ namespace TeamsEXILED.API
             return i.Neutral.Contains(u.Name);
         }
 
-        public static bool IsNormalTeam(this Teams i)
-        {
-            List<string> names = new List<string>();
-
-            foreach (var tm in MainPlugin.Singleton.Config.NormalConfigs.NTeams)
-            {
-                names.Add(tm.Name.ToLower());
-            }
-
-            return names.Contains(i.Name);
-        }
-
         public static bool IsTeamAlive(this Teams team)
         {
             return MainPlugin.Singleton.EventHandlers.teamedPlayers.ContainsValue(team);
@@ -58,7 +51,6 @@ namespace TeamsEXILED.API
         public static List<string> GetAllRequirements(this Teams Fteam)
         {
             List<string> team = new List<string>();
-
             foreach (Teams t in MainPlugin.Singleton.Config.Teams.Where(x => x.Requirements.Contains(Fteam.Name)))
             {
                 team.Add(t.Name);
@@ -70,7 +62,6 @@ namespace TeamsEXILED.API
         public static List<string> GetAllNeutrals(this Teams Fteam)
         {
             List<string> team = new List<string>();
-
             foreach (Teams t in MainPlugin.Singleton.Config.Teams.Where(x => x.Neutral.Contains(Fteam.Name)))
             {
                 team.Add(t.Name);
@@ -82,7 +73,6 @@ namespace TeamsEXILED.API
         public static List<string> GetAllFriendlyTeams(this Teams Fteam)
         {
             List<string> team = new List<string>();
-
             foreach (Teams t in MainPlugin.Singleton.Config.Teams.Where(x => x.Friendlys.Contains(Fteam.Name)))
             {
                 team.Add(t.Name);
@@ -97,20 +87,6 @@ namespace TeamsEXILED.API
         }
 
         // Not Extensions at all ↓
-        public static Teams GetTeamFromString(string s)
-        {
-            Teams team = null;
-            foreach (Teams t in MainPlugin.Singleton.Config.Teams)
-            {
-                if (t.Name.ToLower() == s.ToLower())
-                {
-                    team = t;
-                }
-            }
-
-            return team;
-        }
-
         // This can be added to Map of EXILED
         public static void RenameUnit(int index, string name)
         {

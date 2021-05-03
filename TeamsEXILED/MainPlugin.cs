@@ -36,7 +36,7 @@ namespace TeamsEXILED
             Harmony = new Harmony($"teamsexiled.{DateTime.Now.Ticks}");
 
             Exiled.Events.Handlers.Player.Died += EventHandlers.OnDied;
-            Exiled.Events.Handlers.Player.ChangedRole += EventHandlers.OnRoleChange;
+            Exiled.Events.Handlers.Player.ChangingRole += EventHandlers.OnRoleChanging;
             Exiled.Events.Handlers.Player.Hurting += EventHandlers.OnHurt;
             Exiled.Events.Handlers.Player.Verified += EventHandlers.OnVerified;
             Exiled.Events.Handlers.Player.Left += EventHandlers.OnLeave;
@@ -67,7 +67,7 @@ namespace TeamsEXILED
         public override void OnDisabled()
         {
             Exiled.Events.Handlers.Player.Died -= EventHandlers.OnDied;
-            Exiled.Events.Handlers.Player.ChangedRole -= EventHandlers.OnRoleChange;
+            Exiled.Events.Handlers.Player.ChangingRole -= EventHandlers.OnRoleChanging;
             Exiled.Events.Handlers.Player.Hurting -= EventHandlers.OnHurt;
             Exiled.Events.Handlers.Player.Verified -= EventHandlers.OnVerified;
             Exiled.Events.Handlers.Player.Left -= EventHandlers.OnLeave;

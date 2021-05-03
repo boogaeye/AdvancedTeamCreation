@@ -249,5 +249,16 @@ namespace TeamsEXILED
             CassieMessageMTFSpawn = "cassie pitch_0.6 .g3 .g3 pitch_1 the arrival of the anomaly emergency squad {nato} {unit} has entered the facility. pitch_0.96 please escort2 all scpsubjects to surface zone. pitch_1 all scpsubjects need to be secured. please wait inside of your designated evacuation shelters until this emergency has been completed. there are {SCP} scpsubjects remaining."
         }
         };
+
+        public static string[] NormalTeamsNames = new string[]
+        {
+            "scp",
+            "rsc",
+            "cdp",
+            "chi",
+            "mtf",
+            "rip",
+            "tut"
+        };
     }
 }

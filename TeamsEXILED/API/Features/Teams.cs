@@ -56,7 +56,6 @@ namespace TeamsEXILED.API
             }
 
             subteam = GetSubteam(name);
-
             return subteam != null;
         }
 
@@ -73,7 +72,6 @@ namespace TeamsEXILED.API
             }
 
             team = Get(name);
-
             return team != null;
         }
     }

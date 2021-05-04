@@ -61,7 +61,6 @@
                     new RoomPoint
                     {
                         Position = fpos,
-                        Direction = fdir,
                         Type = sp
                     });
                 }
@@ -372,11 +371,6 @@
 
         public void OnRestartRound()
         {
-            if (assemblyTimer)
-            {
-                Methods.DefaultTimerConfig();
-            }
-
             foreach (var coroutine in coroutineHandle)
             {
                 Timing.KillCoroutines(coroutine);
@@ -387,6 +381,11 @@
 
         public void OnWaitingForPlayers()
         {
+            if (assemblyTimer)
+            {
+                Methods.DefaultTimerConfig();
+            }
+
             respawns = 0;
             HasReference = false;
             latestSpawn = null;

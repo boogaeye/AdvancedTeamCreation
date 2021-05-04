@@ -19,7 +19,7 @@
         public static readonly Random Rand = new Random();
 
         public override Version RequiredExiledVersion { get; } = new Version("2.10.0");
-        public override PluginPriority Priority { get; } = PluginPriority.Lowest;
+        public override PluginPriority Priority { get; } = PluginPriority.Last;
         public override string Author { get; } = "BoogaEye && Raul125";
         public override string Name { get; } = "Advanced Team Creation";
         public override Version Version { get; } = new Version("1.0.5.0");
@@ -97,6 +97,7 @@
         {
             CheckPlugins();
             Config.LoadConfigs();
+            base.OnReloaded();
         }
 
         public void CheckPlugins()

@@ -12,10 +12,10 @@
         [Description("sets the subclasses HP")]
         public int HP { get; set; } = 100;
 
-        [Description("sets what this class has")]
+        [Description("sets what this class has, use ids for CustomItems and ItemType names for normal items")]
         public string[] Inventory { get; set; } = new string[] { };
 
-        [Description("If you have advancedsubclassing and you want to give a specific subclass to this team, put here the name of the advancedsubclass")]
+        [Description("If you have advancedsubclassing and you want to give a specific subclass to this subteam, put here the name of the advancedsubclass")]
         public string AdvancedSubclass { get; set; } = null;
 
         [Description("Define ammo so that this class has this ammo")]

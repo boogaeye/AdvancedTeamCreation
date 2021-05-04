@@ -82,79 +82,37 @@
             ev.Player.MaxHealth = ev.Subclass.HP;
             if (ev.Team.SpawnLocation != SpawnLocation.Normal)
             {
-                var point = Instance.EventHandlers.fixedpoints.First(x => x.Type == ev.Team.SpawnLocation);
-                Instance.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
+                if (ev.Team.SpawnLocation == SpawnLocation.SCP012 || ev.Team.SpawnLocation == SpawnLocation.SCP173)
                 {
-                    switch (ev.Team.SpawnLocation)
+                    if (Warhead.IsDetonated || Map.IsLCZDecontaminated)
                     {
-                        case SpawnLocation.Escape:
-                            {
-                                ev.Player.Position = point.Position;
-                                ev.Player.Rotations = point.Direction;
-                                break;
-                            }
-                        case SpawnLocation.SCP106:
-                            {
-                                if (!Warhead.IsDetonated)
-                                {
-                                    ev.Player.Position = point.Position;
-                                    ev.Player.Rotations = point.Direction;
-                                }
-                                break;
-                            }
-                        case SpawnLocation.SurfaceNuke:
-                            {
-                                ev.Player.Position = point.Position;
-                                ev.Player.Rotations = point.Direction;
-                                break;
-                            }
-                        case SpawnLocation.SCP012:
-                            {
-                                if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
-                                {
-                                    ev.Player.Position = point.Position;
-                                    ev.Player.Rotations = point.Direction;
-                                }
-                                break;
-                            }
-                        case SpawnLocation.SCP079:
-                            {
-                                if (!Warhead.IsDetonated)
-                                {
-                                    ev.Player.Position = point.Position;
-                                    ev.Player.Rotations = point.Direction;
-                                }
-                                break;
-                            }
-                        case SpawnLocation.SCP096:
-                            {
-                                if (!Warhead.IsDetonated)
-                                {
-                                    ev.Player.Position = point.Position;
-                                    ev.Player.Rotations = point.Direction;
-                                }
-                                break;
-                            }
-                        case SpawnLocation.SCP173:
-                            {
-                                if (!Map.IsLCZDecontaminated && !Warhead.IsDetonated)
-                                {
-                                    ev.Player.Position = point.Position;
-                                    ev.Player.Rotations = point.Direction;
-                                }
-                                break;
-                            }
-                        case SpawnLocation.Shelter:
-                            {
-                                if (!Warhead.IsDetonated)
-                                {
-                                    ev.Player.Position = point.Position;
-                                    ev.Player.Rotations = point.Direction;
-                                }
-                                break;
-                            }
+                        Log.Debug("Not changing player position because the warhead is detonated or the lcz is decontaminated", Instance.Config.Debug);
                     }
-                }));
+                    else
+                    {
+                        var point = Instance.EventHandlers.fixedpoints.First(x => x.Type == ev.Team.SpawnLocation);
+                        Instance.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
+                        {
+                            ev.Player.Position = point.Position;
+                        }));
+                    }
+                }
+
+                if (ev.Team.SpawnLocation == SpawnLocation.SCP079 || ev.Team.SpawnLocation == SpawnLocation.SCP096 || ev.Team.SpawnLocation == SpawnLocation.SCP106 || ev.Team.SpawnLocation == SpawnLocation.Shelter)
+                {
+                    if (Warhead.IsDetonated || Map.IsLCZDecontaminated)
+                    {
+                        Log.Debug("Not changing player position because the warhead is detonated", Instance.Config.Debug);
+                    }
+                    else
+                    {
+                        var point = Instance.EventHandlers.fixedpoints.First(x => x.Type == ev.Team.SpawnLocation);
+                        Instance.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
+                        {
+                            ev.Player.Position = point.Position;
+                        }));
+                    }
+                }
             }
 
             var ihandler = new TeamEvents.AddingInventoryItemsEventArgs(ev.Player, ev.Subclass, keepInv:ev.KeepItems);

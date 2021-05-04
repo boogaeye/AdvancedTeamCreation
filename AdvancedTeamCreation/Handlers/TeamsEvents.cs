@@ -99,7 +99,7 @@
                 } 
                 else if (ev.Team.SpawnLocation == SpawnLocation.SCP079 || ev.Team.SpawnLocation == SpawnLocation.SCP096 || ev.Team.SpawnLocation == SpawnLocation.SCP106 || ev.Team.SpawnLocation == SpawnLocation.Shelter)
                 {
-                    if (Warhead.IsDetonated || Map.IsLCZDecontaminated)
+                    if (Warhead.IsDetonated)
                     {
                         Log.Debug("Not changing player position because the warhead is detonated", Instance.Config.Debug);
                     }

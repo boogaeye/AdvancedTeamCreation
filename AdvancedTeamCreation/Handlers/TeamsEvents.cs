@@ -82,6 +82,7 @@
             ev.Player.MaxHealth = ev.Subclass.HP;
             if (ev.Team.SpawnLocation != SpawnLocation.Normal)
             {
+                var point = Instance.EventHandlers.fixedpoints.First(x => x.Type == ev.Team.SpawnLocation);
                 if (ev.Team.SpawnLocation == SpawnLocation.SCP012 || ev.Team.SpawnLocation == SpawnLocation.SCP173)
                 {
                     if (Warhead.IsDetonated || Map.IsLCZDecontaminated)
@@ -90,15 +91,13 @@
                     }
                     else
                     {
-                        var point = Instance.EventHandlers.fixedpoints.First(x => x.Type == ev.Team.SpawnLocation);
                         Instance.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
                         {
                             ev.Player.Position = point.Position;
                         }));
                     }
-                }
-
-                if (ev.Team.SpawnLocation == SpawnLocation.SCP079 || ev.Team.SpawnLocation == SpawnLocation.SCP096 || ev.Team.SpawnLocation == SpawnLocation.SCP106 || ev.Team.SpawnLocation == SpawnLocation.Shelter)
+                } 
+                else if (ev.Team.SpawnLocation == SpawnLocation.SCP079 || ev.Team.SpawnLocation == SpawnLocation.SCP096 || ev.Team.SpawnLocation == SpawnLocation.SCP106 || ev.Team.SpawnLocation == SpawnLocation.Shelter)
                 {
                     if (Warhead.IsDetonated || Map.IsLCZDecontaminated)
                     {
@@ -106,12 +105,18 @@
                     }
                     else
                     {
-                        var point = Instance.EventHandlers.fixedpoints.First(x => x.Type == ev.Team.SpawnLocation);
                         Instance.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
                         {
                             ev.Player.Position = point.Position;
                         }));
                     }
+                }
+                else
+                {
+                    Instance.EventHandlers.coroutineHandle.Add(Timing.CallDelayed(0.2f, () =>
+                    {
+                        ev.Player.Position = point.Position;
+                    }));
                 }
             }
 
